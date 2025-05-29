@@ -1,10 +1,7 @@
-import os
 import boto3
-import dotenv
-from utils import log_factory, env, json_utils
 from botocore.exceptions import ClientError
 
-dotenv.load_dotenv()
+from utils import log_factory, env, json_utils
 
 _log = log_factory.get_logger(__name__)
 _s3_client = None
@@ -12,7 +9,7 @@ _s3_client = None
 
 def init_client():
     region = env.require_env("AWS_REGION", default_value="us-east-1")
-    endpoint = os.getenv("AWS_S3_ENDPOINT")
+    endpoint = env.get_env("AWS_S3_ENDPOINT", default_value=None)
     if endpoint:
         _log.info(f"Initializing S3 client [awsRegion={region}, endpoint={endpoint}]...")
         return boto3.client('s3', region_name=region, endpoint_url=endpoint)
@@ -27,7 +24,7 @@ def get_s3_client():
     return _s3_client
 
 
-def upload_file(path, file_obj, content_type='application/json'):
+def upload_file(path, file_obj):
     bucket = env.get_s3_bucket()
     file_exists = check_file_exists(path)
     if file_exists:
@@ -56,12 +53,6 @@ def put_json_object(path, data):
 
 
 def check_file_exists(file):
-    """
-    Check if a file exists in an S3 bucket.
-    :param bucket_name: Name of the S3 bucket
-    :param file: Key (path) of the file in the bucket
-    :return: True if the file exists, False otherwise
-    """
     try:
         get_s3_client().head_object(Bucket=env.get_s3_bucket(), Key=file)
         return True
@@ -71,13 +62,23 @@ def check_file_exists(file):
         raise
 
 
-def read_json_object(file_key):
+def get_object(file_key):
+    _log.info(f"Retrieving object from S3: {file_key}...")
     bucket_name = env.get_s3_bucket()
     try:
         response = get_s3_client().get_object(Bucket=bucket_name, Key=file_key)
-        file_content = response['Body'].read().decode('utf-8')
-        return json_utils.from_json(file_content)
+        return response['Body']
     except Exception as e:
         _log.error(f"Error reading file '{file_key}' from bucket '{bucket_name}': {e}")
-        raise ValueError("Failed to read JSON file from S3: "
-                         f"bucker={bucket_name}, path={file_key}, error={e}")
+        raise ValueError(
+            f"Failed to read JSON file from S3: bucker={bucket_name}, path={file_key}, error={e}")
+
+
+def read_json_object(file_key):
+    file_content = get_object(file_key).read().decode('utf-8')
+    return json_utils.from_json(file_content)
+
+
+def read_json_gz_object(file_key):
+    file_content = get_object(file_key)
+    return json_utils.from_gz_json(file_content)

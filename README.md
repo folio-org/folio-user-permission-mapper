@@ -19,6 +19,7 @@ for further analysis.
 ---
 
 ## Installation
+
 ### Prerequisites
 
 - Python 3.12 or higher
@@ -35,7 +36,8 @@ You can install the tool directly using `pip` with the provided `.whl` file:
 pip install <.whi-file>
 ```
 
-This will install the CLI tool globally, and you can run it using the `folio-permission-mapper` command.
+This will install the CLI tool globally, and you can run it using the `folio-permission-mapper`
+command.
 
 ### Prerequisites
 
@@ -94,10 +96,9 @@ This command will:
 **Output**:
 
 - A JSON file named `analysis-result.json` is saved to the S3 bucket under the path
-  `<tenant_id>/analysis-result.json`.
+  `<tenant_id>/analysis-result.json.gz`. JSON is archived using gzip for compression.
 
-
-### `generate-excel `
+### `generate-excel`
 
 **Description**:
 
@@ -110,6 +111,27 @@ This command will:
 
 - A JSON file named `analysis-result.xlsx` is saved to the S3 bucket under the path
   `<tenant_id>/analysis-result.xlsx`.
+
+---
+
+### `download-analysis-json`
+
+**Options**:
+
+- `--out-file <file>`: Specify the output file path where the JSON will be saved. If not provided,
+  it defaults to `analysis-result.json`.
+
+**Description**:
+
+This command will:
+
+1. Fetch a file from s3 storage generated using `collect-permissions` command.
+2. Format and save it to a file system
+
+**Output**:
+
+- A JSON file downloaded
+
 ---
 
 ## Configuration
@@ -128,6 +150,8 @@ variables are set:
 | ADMIN_USERNAME                |               | true     | The username for the admin user in Okapi                  |
 | ADMIN_PASSWORD                |               | true     | The password for the admin user in Okapi                  |
 | PERMISSION_IDS_PARTITION_SIZE | 50            | false    | Amount of user permissions pulled by ids at a single call |
+| DOTENV                        | .env          | false    | Custom `.env` file                                        |
+
 
 You can use a `.env` file to manage these variables. For example:
 

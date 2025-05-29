@@ -1,6 +1,7 @@
-from utils import log_factory, env, json_utils
-from integrations import permissions_client
 from collections import OrderedDict
+
+from integrations import permissions_client
+from utils import log_factory, env
 
 _log = log_factory.get_logger(__name__)
 
@@ -34,7 +35,8 @@ def load_permission_users(permissions):
     partitioned_values = __partition(uniqueValues, env.get_ids_partition_size())
     result = []
     for partition in partitioned_values:
-        result += permissions_client.load_user_permissions_by_id(partition)
+        perm_users = permissions_client.load_user_permissions_by_id(partition)
+        result += __convert_permission_users(perm_users)
     _log.info(f"Permission users are loaded: total={len(result)}")
     return result
 
@@ -83,6 +85,6 @@ def __convert_permission_users(page):
         result.append(OrderedDict({
             'id': permission_user.get('id'),
             'userId': permission_user.get('userId'),
-            'permissions': permission_user.get('permissionId'),
+            'permissions': permission_user.get('permissions', []),
         }))
     return result

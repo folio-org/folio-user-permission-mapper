@@ -1,10 +1,8 @@
-import dotenv
 import requests
 
-from utils import env, log_factory
 from services import login_service
+from utils import env, log_factory
 
-dotenv.load_dotenv()
 _log = log_factory.get_logger(__name__)
 
 

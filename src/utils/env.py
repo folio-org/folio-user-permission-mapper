@@ -1,10 +1,7 @@
 import os
 
-import dotenv
-
 from utils import log_factory
 
-dotenv.load_dotenv()
 _log = log_factory.get_logger(__name__)
 
 _okapi_url = None
@@ -42,6 +39,13 @@ def get_admin_username():
 
 def get_admin_password():
     return require_env("ADMIN_PASSWORD", log_result=False)
+
+
+def get_env(env_variable_name, default_value, log_result=True):
+    env_variable_value = os.getenv(env_variable_name, default_value)
+    if log_result:
+        _log.info(f"Resolved value for {env_variable_name}: {env_variable_value}")
+    return env_variable_value
 
 
 def require_env(env_variable_name, default_value=None, log_result=True):

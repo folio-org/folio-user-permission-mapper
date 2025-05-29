@@ -4,13 +4,17 @@ from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.worksheet.worksheet import Worksheet
 
+from utils import log_factory
+
+_log = log_factory.get_logger(__name__)
+
 
 def generate_report(analysis_json):
-    permission_users = analysis_json['permissionUsers']
-
+    _log.info("generating XLSX report...")
     wb = Workbook()
 
-    __fill_permission_set_netsting_ws(analysis_json, wb.active)
+
+    __fill_permission_set_nesting_ws(analysis_json, wb.active)
     __fill_users_permission_sets_ws(analysis_json, wb.create_sheet())
     __fill_permission_permission_sets_ws(analysis_json, wb.create_sheet())
 
@@ -19,65 +23,70 @@ def generate_report(analysis_json):
     return __to_byte_doc(wb)
 
 
-def __fill_permission_set_netsting_ws(analysis_json, ws: Worksheet):
+def __fill_permission_set_nesting_ws(analysis_json, ws: Worksheet):
     ws.title = "PermissionSets Nesting"
+    _log.info(f"Filling worksheet: {ws.title}...")
     ws.append(["PS", "PS Parent"])
-    mutalbe_permissions = analysis_json['mutablePermissions']
-    for permission in mutalbe_permissions:
+    permissions = analysis_json['allPermissions']
+    for permission in permissions:
+        if not permission.get('mutable', False):
+            continue
         permission_name = permission['permissionName']
         parent_permissions = permission.get('childOf', [])
         if not parent_permissions:
             ws.append([permission_name, 'null'])
         else:
-            for sub_permission in parent_permissions:
-                ws.append([permission_name, sub_permission])
+            for perm in parent_permissions:
+                ws.append([permission_name, perm])
+    _log.info(f"Worksheet finished: {ws.title}")
 
 
 def __fill_users_permission_sets_ws(analysis_json, ws: Worksheet):
     ws.title = "Users-PermissionSets"
+    _log.info(f"Filling worksheet: {ws.title}...")
     ws.append(["User UUID", "PS"])
 
     mutable_permission_names = __get_mutable_permission_names(analysis_json)
 
-    permission_users = analysis_json.get('permissionUsers', [])
+    permission_users = analysis_json.get('allPermissionUsers', [])
     for permission_user in permission_users:
         user_id = permission_user.get('userId')
         permissions = permission_user.get('permissions', [])
         for permission in permissions:
             if permission in mutable_permission_names:
                 ws.append([user_id, permission])
-
-
-def __get_mutable_permission_names(analysis_json):
-    mutable_permissions = analysis_json.get('mutablePermissions', [])
-    return set([x.get('permissionName') for x in mutable_permissions])
+    _log.info(f"Worksheet finished: {ws.title}")
 
 
 def __fill_permission_permission_sets_ws(analysis_json, ws: Worksheet):
     ws.title = "PermissionSet-PermissionSets"
+    _log.info(f"Filling worksheet: {ws.title}...")
     ws.append(["PS", "Child PS"])
-    mutable_permission_names = __get_mutable_permission_names(analysis_json)
-    mutalbe_permissions = analysis_json.get('mutablePermissions', [])
-    for permission in mutalbe_permissions:
+    permissions = analysis_json.get('allPermissions', [])
+    for permission in permissions:
         permission_name = permission['permissionName']
         sub_permissions = permission.get('subPermissions', [])
-        filter_func = lambda x: (x in mutable_permission_names and x != permission_name)
-        filtered_sub_permissions=list(filter(filter_func, sub_permissions))
-        if not filtered_sub_permissions:
+        if not sub_permissions:
             ws.append([permission_name, 'null'])
         else:
-            for sub_permission in filtered_sub_permissions:
+            for sub_permission in sub_permissions:
                 ws.append([permission_name, sub_permission])
+    _log.info(f"Worksheet finished: {ws.title}")
+
+
+def __get_mutable_permission_names(analysis_json):
+    mutable_permissions = analysis_json.get('allPermissions', [])
+    return set([x.get('permissionName') for x in mutable_permissions if x.get('mutable', False)])
 
 
 def __format_spreadsheet(wb: Workbook):
     header_font = Font(bold=True, italic=True)
-    ws_names = wb.get_sheet_names()
+    ws_names = wb.sheetnames
     for ws_name in ws_names:
-        ws = wb.get_sheet_by_name(ws_name)
+        ws = wb[ws_name]
         ws.column_dimensions['A'].width = 40
-        ws.column_dimensions['B'].width = 40
-        applyFontForCells(ws, "A1:B1", header_font)
+        ws.column_dimensions['B'].width = 60
+        __apply_font_for_cells(ws, "A1:B1", header_font)
 
 
 def __to_byte_doc(wb):
@@ -87,7 +96,7 @@ def __to_byte_doc(wb):
     return excel_buffer
 
 
-def applyFontForCells(ws, key, font):
+def __apply_font_for_cells(ws, key, font):
     """
     Apply the given font to all cells in the worksheet.
     """
