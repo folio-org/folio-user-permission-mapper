@@ -6,7 +6,7 @@ from utils import log_factory, env
 _log = log_factory.get_logger(__name__)
 
 
-def load_all_permissions_by_query(query):
+def load_all_permissions_by_query(query, expanded=False):
     tenant_id = env.get_tenant_id()
     _log.info(f"Loading all permissions by query: tenant={tenant_id}, query='{query}'")
     result = []
@@ -14,7 +14,7 @@ def load_all_permissions_by_query(query):
     last_offset = 0
 
     while True:
-        page = permissions_client.load_perms_page(limit, last_offset, query)
+        page = permissions_client.load_perms_page(limit, last_offset, query, expanded)
         last_load_size = len(page)
         result += __convert_permissions(page)
         last_offset += limit

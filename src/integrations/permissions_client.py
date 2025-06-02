@@ -6,7 +6,7 @@ from utils import env, log_factory
 _log = log_factory.get_logger(__name__)
 
 
-def load_perms_page(limit, offset, query):
+def load_perms_page(limit, offset, query, expanded=False):
     """Load user permissions from Okapi."""
     tenant_id = env.get_tenant_id()
     _log.info("Loading permissions page: "
@@ -22,7 +22,7 @@ def load_perms_page(limit, offset, query):
         'query': query,
         'limit': limit,
         "offset": offset,
-        'expanded': 'true',
+        'expanded': str(expanded).lower(),
     }
 
     response = requests.get(

@@ -96,7 +96,7 @@ This command will:
 **Output**:
 
 - A JSON file named `analysis-result.json` is saved to the S3 bucket under the path
-  `<tenant_id>/analysis-result.json.gz`. JSON is archived using gzip for compression.
+  `<tenant_id>/<tenant_id>-analysis-result.json.gz`. JSON is archived using gzip for compression.
 
 ### `generate-excel`
 
@@ -110,7 +110,7 @@ This command will:
 **Output**:
 
 - A JSON file named `analysis-result.xlsx` is saved to the S3 bucket under the path
-  `<tenant_id>/analysis-result.xlsx`.
+  `<tenant_id>/<tenant_id>-analysis-result.xlsx`.
 
 ---
 
