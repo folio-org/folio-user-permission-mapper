@@ -95,10 +95,10 @@ This command will:
 
 **Output**:
 
-- A JSON file named `analysis-result.json` is saved to the S3 bucket under the path
-  `<tenant_id>/<tenant_id>-analysis-result.json.gz`. JSON is archived using gzip for compression.
+- A JSON file named `okapi-permissions.json.gz` is saved to the S3 bucket under the path
+  `<tenant_id>/<tenant_id>-okapi-permissions.json.gz`. JSON is archived using gzip for compression.
 
-### `generate-excel`
+### `generate-report`
 
 **Description**:
 
@@ -111,26 +111,6 @@ This command will:
 
 - A JSON file named `analysis-result.xlsx` is saved to the S3 bucket under the path
   `<tenant_id>/<tenant_id>-analysis-result.xlsx`.
-
----
-
-### `download-analysis-json`
-
-**Options**:
-
-- `--out-file <file>`: Specify the output file path where the JSON will be saved. If not provided,
-  it defaults to `analysis-result.json`.
-
-**Description**:
-
-This command will:
-
-1. Fetch a file from s3 storage generated using `collect-permissions` command.
-2. Format and save it to a file system
-
-**Output**:
-
-- A JSON file downloaded
 
 ---
 
@@ -152,7 +132,6 @@ variables are set:
 | PERMISSION_IDS_PARTITION_SIZE | 50            | false    | Amount of user permissions pulled by ids at a single call |
 | DOTENV                        | .env          | false    | Custom `.env` file                                        |
 
-
 You can use a `.env` file to manage these variables. For example:
 
 ```env
@@ -166,6 +145,14 @@ ADMIN_USERNAME=my-username
 ADMIN_PASSWORD=my-password
 ```
 
+### Development
+
+This command is used to normalize the project (applies import sorting, code formatting, and linting):
+
+
+```bash
+ poetry run isort . && poetry run black . && poetry run flake8 
+```
 ---
 
 ## License

@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 import os
 import time
-from collections import OrderedDict
 
 import click
 import dotenv
 
+from dto.models import AnalysisResult
 from integrations import s3_client
-from services import permission_service, xlsx_service, okapi_service, analysis_service, graph_service
-from utils import log_factory, env, json_utils
+from services import analysis_service, eureka_service, graph_service, permission_loader, xlsx_service
+from utils import env, json_utils, log_factory
 
 _log = log_factory.get_logger(__name__)
+_okapi_permissions_json_fn = "okapi-permissions.json.gz"
 _analysis_result_json_fn = "analysis-result.json.gz"
 _analysis_result_xlsx_fn = "analysis-result.xlsx"
 
 dotenv.load_dotenv()
-dotenv.load_dotenv(os.getenv('DOTENV', '.env'), override=True)
+dotenv.load_dotenv(os.getenv("DOTENV", ".env"), override=True)
 
 
 @click.group()
@@ -26,55 +27,65 @@ def cli():
 
 @cli.command("collect-permissions")
 def collect_permissions():
-    _log.info("Starting user permission loading...")
-    okapi_permissions = okapi_service.get_okapi_defined_permissions()
-    all_perms = permission_service.load_all_permissions_by_query("cql.allRecords=1", expanded=False)
-    all_perm_users = permission_service.load_permission_users(all_perms)
-    all_perms_enriched = permission_service.enrich_permissions(all_perms, all_perm_users)
-    result_object = OrderedDict({
-        'okapiPermissions': okapi_permissions,
-        'allPermissions': all_perms_enriched,
-        'allPermissionUsers': all_perm_users,
-    })
-
+    load_result_object = permission_loader.load_permission_data()
     tenant_id = env.get_tenant_id()
-    path = f"{tenant_id}/{tenant_id}-{_analysis_result_json_fn}"
-    compressed_json = json_utils.to_gz_json(result_object)
+    path = f"{tenant_id}/{tenant_id}-{_okapi_permissions_json_fn}"
+    compressed_json = json_utils.to_gz_json(load_result_object)
     s3_client.upload_file(path, compressed_json)
-    _log.info("Permission loading finished successfully.")
 
 
-@cli.command("generate-excel")
-@click.option("--store-locally", "store_locally", is_flag=True, default=False)
-def generate_excel(store_locally):
+@cli.command("generate-report")
+@click.option("--store-locally", is_flag=True, default=False)
+@click.option("--role-strategy", default="distributed")
+def generate_report(store_locally: bool = False, role_strategy: str = "distributed"):
     tenantId = env.get_tenant_id()
-    path = f"{tenantId}/{tenantId}-{_analysis_result_json_fn}"
-    analysis_result = s3_client.read_json_gz_object(path)
-    analysis_report = analysis_service.analyze_results(analysis_result)
+    path = f"{tenantId}/{tenantId}-{_okapi_permissions_json_fn}"
+    load_result = s3_client.read_json_gz_object(path)
+    analysis_report = analysis_service.analyze_results(load_result, role_strategy)
     xlsx_report = xlsx_service.generate_report(analysis_report)
 
     if store_locally:
         directory = f".temp/{tenantId}"
         if not os.path.exists(directory):
             os.makedirs(directory)
-        with open(f"{directory}/{tenantId}-analysis-report-{time.time_ns()}.xlsx", "wb") as f:
+        report_time = time.time_ns()
+        with open(f"{directory}/{tenantId}-analysis-report-{report_time}.xlsx", "wb") as f:
             f.write(xlsx_report.getbuffer())
             xlsx_report.seek(0)
 
-        graph_service.generate_graph(analysis_report)
+        graph_service.generate_graph(analysis_report, ts=report_time, store=store_locally)
 
+    analysis_report_dict = analysis_report.model_dump()
+    compressed_json = json_utils.to_gz_json(analysis_report_dict)
     s3_client.upload_file(f"{tenantId}/{tenantId}-{_analysis_result_xlsx_fn}", xlsx_report)
+    s3_client.upload_file(f"{tenantId}/{tenantId}-{_analysis_result_json_fn}", compressed_json)
 
 
-@cli.command("download-analysis-json")
-@click.option("--out-file", "out_file",
-              type=click.Path(exists=False, writable=True),
-              default="analysis-result.json")
-def download_analysis_json(out_file):
+@cli.command("download-load-json")
+@click.option(
+    "--out-file",
+    "out_file",
+    type=click.Path(exists=False, writable=True),
+    default="okapi-permissions.json",
+)
+def download_load_json(out_file):
+    permission_data = __load_tenant_json("okapi-permissions")
+    json_utils.to_formatted_json_file(permission_data, file=out_file)
+
+
+@cli.command("run-eureka-migration")
+def run_eureka_migration():
+    """Create Eureka roles based on Okapi permissions."""
+    analysis_result = AnalysisResult(**__load_tenant_json("analysis-result"))
+    eureka_service.migrate_to_eureka(analysis_result)
+    _log.info("Starting creation of Eureka roles based on Okapi permissions...")
+
+
+def __load_tenant_json(json_name):
     tenant_id = env.get_tenant_id()
-    path = f"{tenant_id}/{tenant_id}-{_analysis_result_json_fn}"
-    analysis_result = s3_client.read_json_gz_object(path)
-    json_utils.to_formatted_json_file(analysis_result, file=out_file)
+    file_path = f"{tenant_id}/{tenant_id}-{json_name}.json.gz"
+    _log.info(f"Loading JSON from s3: {file_path}")
+    return s3_client.read_json_gz_object(file_path)
 
 
 if __name__ == "__main__":

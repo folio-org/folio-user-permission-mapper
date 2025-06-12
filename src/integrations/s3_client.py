@@ -1,7 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 
-from utils import log_factory, env, json_utils
+from utils import env, json_utils, log_factory
 
 _log = log_factory.get_logger(__name__)
 _s3_client = None
@@ -12,9 +12,9 @@ def init_client():
     endpoint = env.get_env("AWS_S3_ENDPOINT", default_value=None)
     if endpoint:
         _log.info(f"Initializing S3 client [awsRegion={region}, endpoint={endpoint}]...")
-        return boto3.client('s3', region_name=region, endpoint_url=endpoint)
+        return boto3.client("s3", region_name=region, endpoint_url=endpoint)
     _log.info(f"Initializing S3 client [awsRegion={region}]...")
-    return boto3.client('s3', region_name=region)
+    return boto3.client("s3", region_name=region)
 
 
 def get_s3_client():
@@ -33,7 +33,7 @@ def upload_file(path, file_obj):
     get_s3_client().upload_fileobj(file_obj, Bucket=bucket, Key=path)
 
 
-def put_object(path, content, content_type='application/json'):
+def put_object(path, content, content_type="application/json"):
     bucket = env.get_s3_bucket()
     file_exists = check_file_exists(path)
     if file_exists:
@@ -43,8 +43,9 @@ def put_object(path, content, content_type='application/json'):
         Key=path,
         Body=content,
         Bucket=bucket,
-        ContentEncoding='utf-8',
-        ContentType=content_type)
+        ContentEncoding="utf-8",
+        ContentType=content_type,
+    )
 
 
 def put_json_object(path, data):
@@ -57,7 +58,7 @@ def check_file_exists(file):
         get_s3_client().head_object(Bucket=env.get_s3_bucket(), Key=file)
         return True
     except ClientError as e:
-        if e.response['Error']['Code'] == "404":
+        if e.response["Error"]["Code"] == "404":
             return False
         raise
 
@@ -67,18 +68,17 @@ def get_object(file_key):
     bucket_name = env.get_s3_bucket()
     try:
         response = get_s3_client().get_object(Bucket=bucket_name, Key=file_key)
-        return response['Body']
+        return response["Body"]
     except Exception as e:
         _log.error(f"Error reading file '{file_key}' from bucket '{bucket_name}': {e}")
-        raise ValueError(
-            f"Failed to read JSON file from S3: bucker={bucket_name}, path={file_key}, error={e}")
+        raise ValueError("Failed to read JSON file from S3: " f"bucker={bucket_name}, path={file_key}, error={e}")
 
 
-def read_json_object(file_key):
-    file_content = get_object(file_key).read().decode('utf-8')
+def read_json_object(file_key) -> dict:
+    file_content = get_object(file_key).read().decode("utf-8")
     return json_utils.from_json(file_content)
 
 
-def read_json_gz_object(file_key):
+def read_json_gz_object(file_key) -> dict:
     file_content = get_object(file_key)
     return json_utils.from_gz_json(file_content)

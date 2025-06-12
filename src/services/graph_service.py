@@ -4,24 +4,23 @@ from dto.models import AnalysisResult
 from utils import env
 
 
-def generate_graph(analysis_result: AnalysisResult):
+def generate_graph(analysis_result: AnalysisResult, ts=None, store: bool = False) -> nx.DiGraph:
     graph = nx.DiGraph()
-    processed_nodes = set()
-    processed_edge = set()
-    for permission_name, sub_permissions in analysis_result.permissionPermissionSets.items():
-        if permission_name.startswith("SYS#"):
-            continue
-        if permission_name not in processed_nodes:
-            processed_nodes.add(permission_name)
-            graph.add_node(permission_name)
-        for sub_permission_name in sub_permissions:
-            if permission_name.startswith("SYS#"):
-                continue
-            if sub_permission_name not in processed_nodes:
-                processed_nodes.add(sub_permission_name)
-                graph.add_node(sub_permission_name)
-            if (permission_name, sub_permission_name) not in processed_edge:
-                processed_edge.add((permission_name, sub_permission_name))
-                graph.add_edge(permission_name, sub_permission_name)
+    user_permission_sets = analysis_result.usersPermissionSets
+    uq_user_ids = set()
+    uq_permission_set_ids = set()
+    for user_id, up_holder in user_permission_sets.items():
+        permission_set_ids = up_holder.mutablePermissions
+        if user_id not in uq_permission_set_ids:
+            uq_user_ids.add(user_id)
+            graph.add_node(user_id, t="user")
+        for permission_set_id in permission_set_ids:
+            if permission_set_id not in uq_permission_set_ids:
+                graph.add_node(permission_set_id, t="ps")
+                uq_permission_set_ids.add(permission_set_id)
+            graph.add_edge(user_id, permission_set_id, t="user-ps")
 
-    nx.write_gexf(graph, f"./.temp/{env.get_tenant_id()}/permissionSets.gexf")
+    if store:
+        nx.write_gexf(graph, f"./.temp/{env.get_tenant_id()}/permissionSets-{ts}.gexf")
+
+    return graph
