@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
-import integrations.okapi_client as okapi_client
-from utils import log_factory
+import folio_upm.integrations.okapi_client as okapi_client
+from folio_upm.utils import log_factory
 
 _log = log_factory.get_logger(__name__)
 

@@ -3,10 +3,10 @@ from typing import List, Optional
 
 import requests
 
-from dto.models import Capability, Role
-from services import login_service
-from utils import common_utils, env, json_utils, log_factory
-from utils.json_utils import from_json
+from folio_upm.dto.models import Capability, Role
+from folio_upm.services import login_service
+from folio_upm.utils import common_utils, env, json_utils, log_factory
+from folio_upm.utils.json_utils import from_json
 
 _log = log_factory.get_logger(__name__)
 

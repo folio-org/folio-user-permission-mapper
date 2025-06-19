@@ -1,6 +1,6 @@
 import os
 
-from integrations import login_client
+from folio_upm.integrations import login_client
 
 _cached_okapi_token = None
 _cached_eureka_token = None

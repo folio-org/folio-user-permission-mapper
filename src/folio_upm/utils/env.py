@@ -1,7 +1,7 @@
 import os
 from functools import cache
 
-from utils import log_factory
+from folio_upm.utils import log_factory
 
 _log = log_factory.get_logger(__name__)
 

@@ -1,8 +1,8 @@
 from typing import List, OrderedDict
 
-from dto.models import AnalysisResult, Capability, Role
-from integrations import eureka_client
-from utils import common_utils, env
+from folio_upm.dto.models import AnalysisResult, Capability, Role
+from folio_upm.integrations import eureka_client
+from folio_upm.utils import common_utils, env
 
 
 def migrate_to_eureka(result: AnalysisResult):

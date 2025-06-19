@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
-from integrations import permissions_client
-from utils import common_utils, env, log_factory
+from folio_upm.integrations import permissions_client
+from folio_upm.utils import common_utils, env, log_factory
 
 _log = log_factory.get_logger(__name__)
 

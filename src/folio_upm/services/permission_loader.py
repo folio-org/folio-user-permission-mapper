@@ -1,8 +1,8 @@
 from collections import OrderedDict
 from typing import OrderedDict as OrdDict
 
-from services import okapi_service, permission_service
-from utils import log_factory
+from folio_upm.services import okapi_service, permission_service
+from folio_upm.utils import log_factory
 
 _log = log_factory.get_logger(__name__)
 

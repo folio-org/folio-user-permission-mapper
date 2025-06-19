@@ -1,7 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 
-from utils import env, json_utils, log_factory
+from folio_upm.utils import env, json_utils, log_factory
 
 _log = log_factory.get_logger(__name__)
 _s3_client = None

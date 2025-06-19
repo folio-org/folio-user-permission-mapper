@@ -1,7 +1,7 @@
 import networkx as nx
 
-from dto.models import AnalysisResult
-from utils import env
+from folio_upm.dto.models import AnalysisResult
+from folio_upm.utils import env
 
 
 def generate_graph(analysis_result: AnalysisResult, ts=None, store: bool = False) -> nx.DiGraph:

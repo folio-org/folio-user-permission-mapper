@@ -1,6 +1,6 @@
 import requests
 
-from utils import env, log_factory
+from folio_upm.utils import env, log_factory
 
 _log = log_factory.get_logger(__name__)
 
