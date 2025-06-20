@@ -8,7 +8,7 @@ from openpyxl.formatting.rule import FormulaRule
 from openpyxl.styles import Border, Font, PatternFill, Side
 from openpyxl.worksheet.worksheet import Worksheet
 
-from folio_upm.dto.models import AnalysisResult
+from folio_upm.dto.results import AnalysisResult
 from folio_upm.utils import log_factory
 
 _log = log_factory.get_logger(__name__)

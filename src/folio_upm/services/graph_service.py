@@ -1,6 +1,6 @@
 import networkx as nx
 
-from folio_upm.dto.models import AnalysisResult
+from folio_upm.dto.results import AnalysisResult
 from folio_upm.utils import env
 
 

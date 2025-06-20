@@ -4,15 +4,11 @@ from typing import List
 from typing import OrderedDict as OrdDict
 from typing import Set
 
-from folio_upm.dto.models import (
-    AnalysisResult,
-    AnalyzedPermission,
-    LoadResult,
-    Permission,
-    Role,
-    RoleCapabilityHolder,
-    UserPermsHolder,
-)
+from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
+from folio_upm.dto.support import RoleCapabilityHolder, AnalyzedPermission, UserPermsHolder
+from folio_upm.dto.eureka import Role
+from folio_upm.dto.okapi import Permission
+from folio_upm.dto.results import PermissionAnalysisResult, LoadResult, AnalysisResult
 from folio_upm.services.permission_analyzer import PermissionAnalyzer
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
@@ -21,41 +17,66 @@ from folio_upm.utils.service_utils import ServiceUtils
 _log = log_factory.get_logger(__name__)
 
 
-def analyze_results(analysis_json: dict, strategy: str = "distributed") -> AnalysisResult:
-    report = LoadResult(**analysis_json)
-    perms_analysis_result = PermissionAnalyzer(report).get_analysis_result()
+class LoadResultAnalyzer:
 
-    all_ps = __get_all_ps_desc(report)
-    mutable_ps = set([name for name, value in all_ps.items() if value.mutable])
-    ps_nesting = __get_mutable_permission_set_nesting(report)
-    user_permission_sets = __get_user_permission_sets(report, all_ps, mutable_ps)
-    mutable_ps_users = __get_permission_set_users(report)
+    def __init__(self, analysis_json: dict, strategy: StrategyType = DISTRIBUTED):
+        self._analysis_json = analysis_json
+        self._load_result = LoadResult(**analysis_json)
+        self._ps_analysis_result = PermissionAnalyzer(self._load_result).get_analysis_result()
 
-    roles = __create_roles(all_ps)
+    def __analyze_results(self) -> AnalysisResult:
+        load_result = self._load_result
 
-    return AnalysisResult(
-        permissionSets=all_ps,
-        flatPermissionSets=__get_flatten_ps_pss(report),
-        permissionSetsNesting=ps_nesting,
-        usersPermissionSets=user_permission_sets,
-        permissionPermissionSets=permission_permission_sets,
-        roles=roles,
-        roleUsers=__create_role_users(roles, mutable_ps_users, strategy),
-        roleCapabilities=__create_role_capabilities(roles, all_ps),
-    )
+        all_ps = __get_all_ps_desc(load_result)
+        mutable_ps = set([name for name, value in all_ps.items() if value.mutable])
+        ps_nesting = __get_mutable_permission_set_nesting(load_result)
+        user_permission_sets = __get_user_permission_sets(load_result, all_ps, mutable_ps)
+        mutable_ps_users = __get_permission_set_users(load_result)
 
+        roles = __create_roles(ps_result.mutable.values())
 
-def __get_all_ps_desc(report: LoadResult) -> OrdDict[str, List[Permission]]:
-    result = OrderedDict()
-    for permission in report.allPermissions:
-        name = permission.permissionName
-        if ServiceUtils.is_system_permission(permission.permissionName):
-            continue
-        value = result.get(permission.permissionName)
-        if not value:
-            result[permission.permissionName] = []
-        result[name] += permission
-    return result
+        return AnalysisResult(
+            permsAnalysisResult=ps_result,
+            permissionSets=all_ps,
+            flatPermissionSets=__get_flatten_ps_pss(load_result),
+            permissionSetsNesting=ps_nesting,
+            usersPermissionSets=user_permission_sets,
+            permissionPermissionSets=permission_permission_sets,
+            roles=roles,
+            roleUsers=__create_role_users(roles, mutable_ps_users, strategy),
+            roleCapabilities=__create_role_capabilities(roles, all_ps),
+        )
+
+    class _Utils:
+
+        @staticmethod
+        def get_all_ps_desc(report: LoadResult) -> OrdDict[str, List[Permission]]:
+            result = OrderedDict()
+            for permission in report.allPermissions:
+                name = permission.permissionName
+                if ServiceUtils.is_system_permission(permission.permissionName):
+                    continue
+                value = result.get(permission.permissionName)
+                if not value:
+                    result[permission.permissionName] = []
+                result[name] += permission
+            return result
+
+        @staticmethod
+        def create_roles(mutable_perms: List[AnalyzedPermission]) -> List[Role]:
+            result = []
+            for ap in mutable_perms:
+                result.append(_Utils.create_role(ap))
+            return result
+
+        @staticmethod
+        def create_role(ps: AnalyzedPermission) -> Role:
+            return Role(
+                id=str(uuid.uuid4()),
+                name=next(iter(set(vh.val for vh in ps.displayNames))),
+                description=permission_value.description,
+                source=permission_name,
+            )
 
 
 def __get_mutable_permission_set_nesting(report: LoadResult) -> OrdDict[str, List[str]]:
@@ -116,20 +137,6 @@ def __get_permission_set_users(report: LoadResult) -> OrdDict[str, List[str]]:
             continue
         if permission.assignedUserIds:
             result[permission_name] = permission.assignedUserIds
-    return result
-
-
-def __create_roles(mutable_descriptors: OrdDict[str, Permission]) -> List[Role]:
-    result = []
-    for permission_name, permission_value in mutable_descriptors.items():
-        result.append(
-            Role(
-                id=str(uuid.uuid4()),
-                name=permission_value.displayName,
-                description=permission_value.description,
-                source=permission_name,
-            )
-        )
     return result
 
 
@@ -197,48 +204,6 @@ def __has_mutable_permission(permission: str, mutable_user_pss: Set[str], flat_p
         if permission in flat_ps_pss.get(mutable_permission, []):
             return True
     return False
-
-
-def __unique_values(iterable):
-    return list(OrderedDict.fromkeys(iterable).keys())
-
-
-def __analyze_permissions(load_result: LoadResult) -> OrdDict[str, AnalyzedPermission]:
-    system_permissions_count = 0
-    analyzed_perms = OrderedDict[str, AnalyzedPermission]()
-    flat_perms = load_result.allPermissionsExpanded
-    okapi_perms_dict = __collect_okapi_permissions(load_result)
-
-    for permission in load_result.allPermissions:
-        name = permission.permissionName
-        if ServiceUtils.is_system_permission(name):
-            system_permissions_count += 1
-            continue
-        ap = analyzed_perms.get(name)
-
-        if ap:
-            ap.refPermissions.append(permission)
-            if permission.subPermissions:
-                ap.subPermissions.add(permission.subPermissions)
-        else:
-            ap = _create_analyzed_permission(name, permission)
-            analyzed_perms[name] = ap
-
-    _log.info(f"System permissions filtered: {system_permissions_count}")
-    return analyzed_perms
-
-
-def _create_analyzed_permission(permission):
-    return AnalyzedPermission(
-        permissionName=permission.permissionName,
-        mutable=[permission.mutable],
-        displayNames=[permission.displayName],
-        subPermissions=OrderedSet(permission.subPermissions),
-        parentPermissions=OrderedSet(permission.childOf),
-        flatSubPermissions=OrderedSet(),
-        okapiSubPermissions=OrderedSet(),
-        refPermissions=[permission],
-    )
 
 
 def __collect_okapi_permissions(load_result: LoadResult) -> OrdDict[str, List[Permission]]:

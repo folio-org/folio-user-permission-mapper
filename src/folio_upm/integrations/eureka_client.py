@@ -3,7 +3,7 @@ from typing import List, Optional
 
 import requests
 
-from folio_upm.dto.models import Capability, Role
+from folio_upm.dto.eureka import Role, Capability
 from folio_upm.services import login_service
 from folio_upm.utils import common_utils, env, json_utils, log_factory
 from folio_upm.utils.json_utils import from_json

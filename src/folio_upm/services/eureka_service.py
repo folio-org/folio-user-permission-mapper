@@ -1,6 +1,7 @@
 from typing import List, OrderedDict
 
-from folio_upm.dto.models import AnalysisResult, Capability, Role
+from folio_upm.dto.results import AnalysisResult
+from folio_upm.dto.eureka import Role, Capability
 from folio_upm.integrations import eureka_client
 from folio_upm.utils import common_utils, env
 

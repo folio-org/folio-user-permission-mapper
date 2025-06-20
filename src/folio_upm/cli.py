@@ -4,9 +4,9 @@ import time
 
 import click
 import dotenv
-from dto.models import AnalysisResult
+from folio_upm.dto.results import AnalysisResult
 from integrations import s3_client
-from services import analysis_service, eureka_service, graph_service, permission_loader, xlsx_service
+from services import load_result_analyzer, eureka_service, graph_service, permission_loader, xlsx_service
 from utils import env, json_utils, log_factory
 
 _log = log_factory.get_logger(__name__)
