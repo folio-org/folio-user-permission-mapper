@@ -5,6 +5,7 @@ from folio_upm.utils.ordered_set import OrderedSet
 
 def test_test():
     assert len([1, 2, 3]) == 3
+    assert {3, 2, 1} == {1, 2, 3}
 
 
 def test_ordered_set():

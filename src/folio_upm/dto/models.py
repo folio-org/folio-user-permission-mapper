@@ -12,6 +12,9 @@ class Permission(BaseModel):
     displayName: Optional[str] = None
     description: Optional[str] = None
     mutable: bool = False
+    deprecated: bool = False
+    moduleName: Optional[str] = None
+    moduleVersion: Optional[str] = None
     childOf: List[str] = []
     grantedTo: List[str] = []
     assignedUserIds: List[str] = []
@@ -36,24 +39,30 @@ class ValueHolder(BaseModel):
 
 
 class AnalyzedPermission(BaseModel):
+    reasons: List[Tuple[str, str]] = []
     sources: List[str]
+    note: Optional[str] = None
     permissionName: str
     mutable: List[ValueHolder] = False
     displayNames: List[ValueHolder] = []
-    definedInOkapi: bool = False
+    modules: List[ValueHolder] = []
+    deprecated: List[ValueHolder] = []
     subPermissions: List[ValueHolder] = []
     parentPermissions: List[ValueHolder] = []
-    flatSubPermissions: List[ValueHolder] = []
-    okapiSubPermissions: List[ValueHolder] = []
     refPermissions: List[ValueHolder] = []
-
-    @field_serializer("subPermissions", "parentPermissions", "flatSubPermissions", "okapiSubPermissions")
-    def serialize_ordered_set(self, value: OrderedSet[str]) -> List[str]:
-        return value.to_list()
 
     @field_serializer("refPermissions")
     def serialize_ref_permissions(self, value: List[Permission]) -> List[str] | None:
         return None
+
+
+class PermissionAnalysisResult(BaseModel):
+    mutable: OrderedDict[str, AnalyzedPermission] = OrderedDict()
+    system: OrderedDict[str, AnalyzedPermission] = OrderedDict()
+    invalid: OrderedDict[str, AnalyzedPermission] = OrderedDict()
+    deprecated: OrderedDict[str, AnalyzedPermission] = OrderedDict()
+    questionable: OrderedDict[str, AnalyzedPermission] = OrderedDict()
+    unprocessed: OrderedDict[str, AnalyzedPermission] = OrderedDict()
 
 
 class LoadResult(BaseModel):

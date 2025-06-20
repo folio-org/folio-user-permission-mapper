@@ -48,7 +48,7 @@ command.
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone git@github.com:folio-org/folio-user-permission-mapper.git
    cd folio-user-permission-mapper
    ```
 

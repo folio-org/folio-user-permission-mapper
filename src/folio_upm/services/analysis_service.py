@@ -23,7 +23,7 @@ _log = log_factory.get_logger(__name__)
 
 def analyze_results(analysis_json: dict, strategy: str = "distributed") -> AnalysisResult:
     report = LoadResult(**analysis_json)
-    result = PermissionAnalyzer(report).get_analysis_result()
+    perms_analysis_result = PermissionAnalyzer(report).get_analysis_result()
 
     all_ps = __get_all_ps_desc(report)
     mutable_ps = set([name for name, value in all_ps.items() if value.mutable])
@@ -185,7 +185,7 @@ def __get_flatten_ps_pss(report: LoadResult) -> OrdDict[str, List[str]]:
     result = OrderedDict()
     for permission in report.allPermissionsExpanded:
         permission_name = permission.permissionName
-        if is_system_permission(permission_name):
+        if ServiceUtils.is_system_permission(permission_name):
             continue
         else:
             result[permission_name] = permission.subPermissions
