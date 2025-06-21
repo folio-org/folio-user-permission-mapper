@@ -2,9 +2,9 @@ from typing import OrderedDict, Optional, Tuple, List
 
 from pydantic import BaseModel
 
-from folio_upm.dto.eureka import Role, UserPermission
+from folio_upm.dto.eureka import Role, UserPermission, RoleUsers
 from folio_upm.dto.okapi import Permission, ModuleDescriptor
-from folio_upm.dto.support import RoleCapabilityHolder, AnalyzedPermission, UserPermsHolder
+from folio_upm.dto.support import RoleCapabilities, AnalyzedPermission, UserPermsHolder
 from folio_upm.utils.ordered_set import OrderedSet
 
 
@@ -48,14 +48,13 @@ class PermissionAnalysisResult(BaseModel):
 
 class AnalysisResult(BaseModel):
     permsAnalysisResult: PermissionAnalysisResult = None
-    permissionSets: OrderedDict[str, List[Permission]] = OrderedDict()
+    mutablePermissionSets: OrderedDict[str, List[Permission]] = OrderedDict()
     flatPermissionSets: OrderedDict[str, List[str]] = OrderedDict()
     permissionSetsNesting: OrderedDict[str, List[str]] = OrderedDict()
     usersPermissionSets: OrderedDict[str, UserPermsHolder] = OrderedDict()
     permissionSetUsers: OrderedDict[str, List[str]] = OrderedDict()
     permissionPermissionSets: OrderedDict[str, List[str]] = OrderedDict()
     permissionFlatPermissionSets: OrderedDict[str, List[str]] = OrderedDict()
-    roles: List[Role] = []
-    roleUsers: OrderedDict[str, List[str]] = OrderedDict()
-    rolePermissions: OrderedDict[str, List[str]] = OrderedDict()
-    roleCapabilities: OrderedDict[str, RoleCapabilityHolder] = OrderedDict()
+    roles: List[Role] = list[Role]()
+    roleUsers: List[RoleUsers] = list[RoleUsers]()
+    roleCapabilities: List[RoleCapabilities] = list[RoleCapabilities]()

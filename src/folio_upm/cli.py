@@ -4,9 +4,13 @@ import time
 
 import click
 import dotenv
+
 from folio_upm.dto.results import AnalysisResult
+from folio_upm.dto.strategy_type import StrategyType, DISTRIBUTED
+from folio_upm.services.load_result_analyzer import LoadedDataAnalyzer
+from folio_upm.services.xlsx_generator import XlsxReportGenerator
 from integrations import s3_client
-from services import load_result_analyzer, eureka_service, graph_service, permission_loader, xlsx_service
+from services import eureka_service, graph_service, permission_loader, xlsx_generator
 from utils import env, json_utils, log_factory
 
 _log = log_factory.get_logger(__name__)
@@ -40,22 +44,15 @@ def generate_report(store_locally: bool = False, role_strategy: str = "distribut
     tenantId = env.get_tenant_id()
     path = f"{tenantId}/{tenantId}-{_okapi_permissions_json_fn}"
     load_result = s3_client.read_json_gz_object(path)
-    analysis_report = analysis_service.analyze_results(load_result, role_strategy)
-    xlsx_report = xlsx_service.generate_report(analysis_report)
-    analysis_report_dict = analysis_report.model_dump()
+    strategy = StrategyType[role_strategy.upper()].value
+    analysis_result = LoadedDataAnalyzer(load_result, strategy).get_results()
+    xlsx_report_bytes = XlsxReportGenerator(analysis_result).get_report_bytes()
 
     if store_locally:
-        directory = f".temp/{tenantId}"
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        report_time = time.time_ns()
-        with open(f"{directory}/{tenantId}-analysis-report-{report_time}.xlsx", "wb") as f:
-            f.write(xlsx_report.getbuffer())
-            xlsx_report.seek(0)
-        graph_service.generate_graph(analysis_report, ts=report_time, store=store_locally)
+        write_local_data(analysis_result, store_locally, tenantId, xlsx_report_bytes)
 
-    compressed_json = json_utils.to_gz_json(analysis_report_dict)
-    s3_client.upload_file(f"{tenantId}/{tenantId}-{_analysis_result_xlsx_fn}", xlsx_report)
+    compressed_json = json_utils.to_gz_json(analysis_result.model_dump())
+    s3_client.upload_file(f"{tenantId}/{tenantId}-{_analysis_result_xlsx_fn}", xlsx_report_bytes)
     s3_client.upload_file(f"{tenantId}/{tenantId}-{_analysis_result_json_fn}", compressed_json)
 
 
@@ -84,7 +81,7 @@ def generate_report_2():
     tenantId = env.get_tenant_id()
     path = f"{tenantId}/{tenantId}-{_okapi_permissions_json_fn}"
     load_result = s3_client.read_json_gz_object(path)
-    analysis_service.analyze_results(load_result)
+    LoadedDataAnalyzer(load_result).get_results()
     _log.info("Analysis finished.")
 
 
@@ -98,6 +95,17 @@ def load_tenant_json(json_name):
 def get_file_path(file_name: str, extension="json", ts=None) -> str:
     tenant_id = env.get_tenant_id()
     return f"{tenant_id}/{tenant_id}-{file_name}{'-' if ts else ''}.{extension}"
+
+
+def write_local_data(analysis_report, store_locally, tenant_id, xlsx_report):
+    directory = f".temp/{tenant_id}"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    report_time = time.time_ns()
+    with open(f"{directory}/{tenant_id}-analysis-report-{report_time}.xlsx", "wb") as f:
+        f.write(xlsx_report.getbuffer())
+        xlsx_report.seek(0)
+    graph_service.generate_graph(analysis_report, ts=report_time, store=store_locally)
 
 
 if __name__ == "__main__":

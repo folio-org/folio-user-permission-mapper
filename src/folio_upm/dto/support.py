@@ -11,7 +11,7 @@ class UserPermsHolder(BaseModel):
     systemPermissions: List[Tuple[str, bool, bool]] = []
 
 
-class RoleCapabilityHolder(BaseModel):
+class RoleCapabilities(BaseModel):
     roleId: str
     capabilityPS: List[str] = []
     capabilitySetPS: List[str] = []

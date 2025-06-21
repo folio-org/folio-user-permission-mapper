@@ -18,33 +18,33 @@ _log = log_factory.get_logger(__name__)
 class PermissionAnalyzer:
 
     def __init__(self, load_result: LoadResult):
-        _log.info("Starting permissions analysis...")
         self._load_result = load_result
-        self._analyzed_permissions = 0
         self._analyzed_ps_dict = OrderedDict[str, AnalyzedPermission]()
-        self._system_perms_count = dict[SourceType, int]()
-        self._system_permission_names = OrderedSet[str]()
         self._result = PermissionAnalysisResult()
         self.__analyze_permissions()
-        self._put_permissions_in_buckets()
-        self.__log_results()
 
     def get_analysis_result(self) -> PermissionAnalysisResult:
         return self._result
 
     def __analyze_permissions(self):
-        self.__collect_permissions()
-        self.__enhance_with_flat_permissions()
-        self.__enhance_with_okapi_permissions()
+        _log.info("Starting permissions analysis...")
+        self._analyzed_permissions = 0
+        self._system_perms_count = dict[SourceType, int]()
+        self._system_permission_names = OrderedSet[str]()
+        self.__process_permissions()
+        self.__process_flat_permissions()
+        self.__process_okapi_permissions()
         self._result.systemPermissionNames = self._system_permission_names
+        self._put_permissions_in_buckets()
+        self.__log_results()
 
-    def __collect_permissions(self):
+    def __process_permissions(self):
         self.__process_ps_list(PS, self._load_result.allPermissions)
 
-    def __enhance_with_flat_permissions(self):
+    def __process_flat_permissions(self):
         self.__process_ps_list(FLAT_PS, self._load_result.allPermissionsExpanded)
 
-    def __enhance_with_okapi_permissions(self):
+    def __process_okapi_permissions(self):
         for descriptor in self._load_result.okapiPermissions:
             self.__process_ps_list(OKAPI_PS, descriptor.permissionSets)
 
