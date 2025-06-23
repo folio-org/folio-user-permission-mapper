@@ -1,6 +1,6 @@
 import uuid
-from collections import Counter, OrderedDict
-from typing import List
+from collections import OrderedDict
+from typing import List, Optional
 from typing import OrderedDict as OrdDict
 from typing import Set
 
@@ -10,7 +10,7 @@ from folio_upm.dto.results import LoadResult, AnalysisResult
 from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
 from folio_upm.dto.support import RoleCapabilities, AnalyzedPermission, UserPermsHolder
 from folio_upm.services.permission_analyzer import PermissionAnalyzer
-from folio_upm.services.permission_processor import PermissionProvider
+from folio_upm.services.permission_processor import PermissionProcessor
 from folio_upm.services.roles_provider import RolesProvider
 from folio_upm.utils import log_factory
 from folio_upm.utils.service_utils import ServiceUtils
@@ -18,11 +18,13 @@ from folio_upm.utils.service_utils import ServiceUtils
 _log = log_factory.get_logger(__name__)
 
 
-class LoadedDataAnalyzer:
+class LoadResultAnalyzer:
 
-    def __init__(self, analysis_json: dict, strategy: StrategyType = DISTRIBUTED):
+    def __init__(self, analysis_json: dict, eureka_load_result=Optional[dict], strategy: StrategyType = DISTRIBUTED):
+        _log.debug("LoadResultAnalyzer initialized.")
         self._analysis_json = analysis_json
         self._load_result = LoadResult(**analysis_json)
+        self._eureka_load_result = eureka_load_result
         self._strategy = strategy
         self._ps_analysis_result = PermissionAnalyzer(self._load_result).get_analysis_result()
         self._result = self.__analyze_results()
@@ -33,7 +35,7 @@ class LoadedDataAnalyzer:
     def __analyze_results(self) -> AnalysisResult:
         load_result = self._load_result
         roles_provider = RolesProvider(self._load_result, self._ps_analysis_result, self._strategy)
-        ps_data_provider = PermissionProvider(self._load_result, self._ps_analysis_result)
+        ps_processor = PermissionProcessor(self._load_result, self._ps_analysis_result)
 
         all_ps = __get_all_ps_desc(load_result)
         mutable_ps = set([name for name, value in all_ps.items() if value.mutable])
@@ -42,17 +44,10 @@ class LoadedDataAnalyzer:
         mutable_ps_users = __get_permission_set_users(load_result)
 
         return AnalysisResult(
-            permsAnalysisResult=self._ps_analysis_result,
-            allPermissionSets=ps_data_provider.get_all_permission_sets(),
-            mutablePermissionSets=all_ps,
-            flatPermissionSets=__get_flatten_ps_pss(load_result),
-            permissionSetsNesting=ps_nesting,
-            usersPermissionSets=user_permission_sets,
-            permissionPermissionSets=permission_permission_sets,
+            userStatistics=ps_processor.get_user_stats(),
             roles=roles_provider.get_roles(),
-            roleUsers=roles_provider.get_role_users(),
-            roleCapabilities=roles_provider.get_role_capabilities(),
         )
+
 
 class _Utils:
 
@@ -85,7 +80,6 @@ class _Utils:
             source=permission_name,
         )
 
-
     def __get_mutable_permission_set_nesting(report: LoadResult) -> OrdDict[str, List[str]]:
         result = OrderedDict()
         for permission in report.allPermissions:
@@ -97,7 +91,6 @@ class _Utils:
             for parent_permission_name in parent_permissions_names:
                 result[permission_name].append(parent_permission_name)
         return result
-
 
     def __get_user_permission_sets(
         report: LoadResult, all_perms: OrdDict[str, Permission], mutable_perm_names: Set[str]

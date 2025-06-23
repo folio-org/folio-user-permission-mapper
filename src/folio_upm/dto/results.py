@@ -2,7 +2,7 @@ from typing import OrderedDict, Optional, Tuple, List
 
 from pydantic import BaseModel
 
-from folio_upm.dto.eureka import Role, UserPermission, RoleUsers
+from folio_upm.dto.eureka import Role, UserPermission, RoleUsers, Capability, CapabilitySet
 from folio_upm.dto.okapi import Permission, ModuleDescriptor
 from folio_upm.dto.support import RoleCapabilities, AnalyzedPermission, UserPermsHolder
 from folio_upm.utils.ordered_set import OrderedSet
@@ -13,6 +13,10 @@ class LoadResult(BaseModel):
     allPermissions: List[Permission] = []
     allPermissionsExpanded: List[Permission] = []
     allPermissionUsers: List[UserPermission] = []
+
+class EurekaLoadResult(BaseModel):
+    capabilities: List[Capability] = []
+    capabilitySets: List[CapabilitySet] = []
 
 
 class PermissionAnalysisResult(BaseModel):
@@ -46,7 +50,17 @@ class PermissionAnalysisResult(BaseModel):
         return None
 
 
+class UserStatistics(BaseModel):
+    userId: str
+    mutablePermissionSetsCount: int = 0
+    invalidPermissionSetsCount: int = 0
+    okapiPermissionSetsCount: int = 0
+    deprecatedPermissionSetsCount: int = 0
+    allPermissionSetsCount: int = 0
+
+
 class AnalysisResult(BaseModel):
+    userStatistics: List[UserStatistics] = list[UserStatistics]()
     permsAnalysisResult: PermissionAnalysisResult = None
     mutablePermissionSets: OrderedDict[str, List[Permission]] = OrderedDict()
     flatPermissionSets: OrderedDict[str, List[str]] = OrderedDict()

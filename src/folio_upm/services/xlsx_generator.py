@@ -1,6 +1,6 @@
 import io
 from collections import OrderedDict
-from typing import List
+from typing import List, Any, Callable
 from typing import OrderedDict as OrdDict
 
 from openpyxl import Workbook
@@ -14,6 +14,7 @@ from folio_upm.utils import log_factory
 _log = log_factory.get_logger(__name__)
 _light_green_fill = PatternFill(start_color="c6efe3", end_color="c6efe3", fill_type="darkHorizontal")
 _light_red_fill = PatternFill(start_color="ffe1e5", end_color="ffe1e5", fill_type="darkHorizontal")
+_list_yellow_fill = PatternFill(start_color="ffffcc", end_color="ffffcc", fill_type="darkHorizontal")
 _thin_border = Border(
     left=Side(style="thin", color="bababa"),
     right=Side(style="thin", color="bababa"),
@@ -44,15 +45,15 @@ class XlsxReportGenerator:
         _log.info("generating XLSX report...")
 
         self.__fill_user_stats()
-        self.__fill_mutable_pss()
-        self.__fill_all_pss()
-        self.__fill_permission_set_nesting_ws()
-        self.__fill_users_mutable_pss_ws()
-        self.__fill_users_system_pss_ws()
-        self.__fill_permission_permission_sets_ws()
-        self.__fill_roles()
-        self.__fill_role_users()
-        self.__fill_role_capabilities()
+        # self.__fill_mutable_pss()
+        # self.__fill_all_pss()
+        # self.__fill_permission_set_nesting_ws()
+        # self.__fill_users_mutable_pss_ws()
+        # self.__fill_users_system_pss_ws()
+        # self.__fill_permission_permission_sets_ws()
+        # self.__fill_roles()
+        # self.__fill_role_users()
+        # self.__fill_role_capabilities()
 
     def __fill_user_stats(self):
         headers = ["User Id", "# of Mutable PS", "# of System PS", "# of unmatched PS", "# of Total PS"]
@@ -232,6 +233,11 @@ class _Utils:
         for row in ws[key]:
             for cell in row:
                 cell.font = font
+
+    @staticmethod
+    def add_row(data: list, ws: Worksheet, color_resolver=Callable):
+        max_row = ws.max_row
+
 
     @staticmethod
     def __apply_borders(ws: Worksheet, end_col):

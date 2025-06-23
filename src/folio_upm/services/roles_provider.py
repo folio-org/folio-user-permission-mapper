@@ -1,12 +1,13 @@
 from typing import List
 
 from folio_upm.dto.eureka import Role, UserRoles, RoleUsers
-from folio_upm.dto.results import LoadResult, PermissionAnalysisResult
+from folio_upm.dto.results import LoadResult, PermissionAnalysisResult, EurekaLoadResult
 from folio_upm.dto.strategy_type import StrategyType, DISTRIBUTED
 from folio_upm.dto.support import RoleCapabilities
 from folio_upm.utils import log_factory
 
 _log = log_factory.get_logger(__name__)
+
 
 class RolesProvider:
     """
@@ -17,10 +18,12 @@ class RolesProvider:
         self,
         load_result: LoadResult,
         ps_analysis_result: PermissionAnalysisResult,
+        eureka_load_result: EurekaLoadResult = None,
         strategy: StrategyType = DISTRIBUTED,
     ):
         self._load_result = load_result
         self._load_result = load_result
+        self._eureka_load_result = eureka_load_result
         self._ps_analysis_result = ps_analysis_result
         self._strategy = strategy
         self.__init_roles_and_relations()
@@ -46,7 +49,6 @@ class RolesProvider:
 
     def __create_role_users(self) -> List[RoleUsers]:
         pass
-
 
     def __create_role_capabilities(self) -> List[RoleCapabilities]:
         pass

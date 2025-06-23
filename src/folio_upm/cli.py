@@ -6,15 +6,16 @@ import click
 import dotenv
 
 from folio_upm.dto.results import AnalysisResult
-from folio_upm.dto.strategy_type import StrategyType, DISTRIBUTED
-from folio_upm.services.load_result_analyzer import LoadedDataAnalyzer
+from folio_upm.dto.strategy_type import StrategyType
+from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
 from folio_upm.services.xlsx_generator import XlsxReportGenerator
 from integrations import s3_client
-from services import eureka_service, graph_service, permission_loader, xlsx_generator
+from services import eureka_service, graph_service, permission_loader
 from utils import env, json_utils, log_factory
 
 _log = log_factory.get_logger(__name__)
 _okapi_permissions_json_fn = "okapi-permissions.json.gz"
+_eureka_capabilities_json_fn = "eureka-capabilities.json.gz"
 _analysis_result_json_fn = "analysis-result.json.gz"
 _analysis_result_xlsx_fn = "analysis-result.xlsx"
 
@@ -37,23 +38,40 @@ def collect_permissions():
     s3_client.upload_file(path, compressed_json)
 
 
+@cli.command("collect-capabilities")
+def collect_capabilities():
+    tenant_id = env.get_tenant_id()
+    path_prefix = f"{tenant_id}/{tenant_id}"
+    compressed_json = json_utils.to_gz_json(analysis_result.model_dump())
+    s3_client.upload_file(f"{path_prefix}-{_analysis_result_json_fn}", compressed_json)
+
+
 @cli.command("generate-report")
 @click.option("--store-locally", is_flag=True, default=False)
 @click.option("--role-strategy", default="distributed")
 def generate_report(store_locally: bool = False, role_strategy: str = "distributed"):
-    tenantId = env.get_tenant_id()
-    path = f"{tenantId}/{tenantId}-{_okapi_permissions_json_fn}"
-    load_result = s3_client.read_json_gz_object(path)
     strategy = StrategyType[role_strategy.upper()].value
-    analysis_result = LoadedDataAnalyzer(load_result, strategy).get_results()
+    if not strategy:
+        _log.error(f"Invalid role strategy: {role_strategy}.")
+        raise ValueError(f"Invalid role strategy: {role_strategy}.")
+
+    tenant_id = env.get_tenant_id()
+    path_prefix = f"{tenant_id}/{tenant_id}"
+    load_result = get_tenant_json_gz(_okapi_permissions_json_fn)
+    if not load_result:
+        raise FileNotFoundError(f"{_okapi_permissions_json_fn} file not found.")
+
+    eureka_load_result = get_tenant_json_gz(_eureka_capabilities_json_fn)
+
+    analysis_result = LoadResultAnalyzer(load_result, eureka_load_result, strategy.value).get_results()
     xlsx_report_bytes = XlsxReportGenerator(analysis_result).get_report_bytes()
 
     if store_locally:
-        write_local_data(analysis_result, store_locally, tenantId, xlsx_report_bytes)
+        write_local_data(analysis_result, store_locally, xlsx_report_bytes)
 
     compressed_json = json_utils.to_gz_json(analysis_result.model_dump())
-    s3_client.upload_file(f"{tenantId}/{tenantId}-{_analysis_result_xlsx_fn}", xlsx_report_bytes)
-    s3_client.upload_file(f"{tenantId}/{tenantId}-{_analysis_result_json_fn}", compressed_json)
+    s3_client.upload_file(f"{path_prefix}-{_analysis_result_xlsx_fn}", xlsx_report_bytes)
+    s3_client.upload_file(f"{path_prefix}-{_analysis_result_json_fn}", compressed_json)
 
 
 @cli.command("download-load-json")
@@ -64,14 +82,14 @@ def generate_report(store_locally: bool = False, role_strategy: str = "distribut
     default="okapi-permissions.json",
 )
 def download_load_json(out_file):
-    permission_data = load_tenant_json("okapi-permissions")
+    permission_data = get_tenant_json_gz("okapi-permissions")
     json_utils.to_formatted_json_file(permission_data, file=out_file)
 
 
 @cli.command("run-eureka-migration")
 def run_eureka_migration():
     """Create Eureka roles based on Okapi permissions."""
-    analysis_result = AnalysisResult(**load_tenant_json("analysis-result"))
+    analysis_result = AnalysisResult(**get_tenant_json_gz("analysis-result"))
     eureka_service.migrate_to_eureka(analysis_result)
     _log.info("Starting creation of Eureka roles based on Okapi permissions...")
 
@@ -81,11 +99,11 @@ def generate_report_2():
     tenantId = env.get_tenant_id()
     path = f"{tenantId}/{tenantId}-{_okapi_permissions_json_fn}"
     load_result = s3_client.read_json_gz_object(path)
-    LoadedDataAnalyzer(load_result).get_results()
+    LoadResultAnalyzer(load_result).get_results()
     _log.info("Analysis finished.")
 
 
-def load_tenant_json(json_name):
+def get_tenant_json_gz(json_name):
     tenant_id = env.get_tenant_id()
     file_path = f"{tenant_id}/{tenant_id}-{json_name}.json.gz"
     _log.info(f"Loading JSON from s3: {file_path}")
@@ -97,7 +115,8 @@ def get_file_path(file_name: str, extension="json", ts=None) -> str:
     return f"{tenant_id}/{tenant_id}-{file_name}{'-' if ts else ''}.{extension}"
 
 
-def write_local_data(analysis_report, store_locally, tenant_id, xlsx_report):
+def write_local_data(analysis_report, store_locally, xlsx_report):
+    tenant_id = env.get_tenant_id()
     directory = f".temp/{tenant_id}"
     if not os.path.exists(directory):
         os.makedirs(directory)

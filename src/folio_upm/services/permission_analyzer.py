@@ -123,6 +123,7 @@ class PermissionAnalyzer:
 
 
 class _Utils:
+
     @staticmethod
     def create_ap(ps: Permission, ps_type: SourceType) -> AnalyzedPermission:
         return AnalyzedPermission(

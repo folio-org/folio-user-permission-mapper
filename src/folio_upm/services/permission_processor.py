@@ -1,27 +1,32 @@
-from folio_upm.dto.results import PermissionAnalysisResult, LoadResult
+from typing import List
+
+from folio_upm.dto.results import PermissionAnalysisResult, LoadResult, UserStatistics
 from folio_upm.utils import log_factory
 
 _log = log_factory.get_logger(__name__)
 
 
-class PermissionProvider:
+class PermissionProcessor:
+
     def __init__(self, load_result: LoadResult, ps_analysis_result: PermissionAnalysisResult):
         self._load_result = load_result
         self._ps_analysis_result = ps_analysis_result
         self.__process_permissions()
 
-    def get_user_stats(self):
+    def get_user_stats(self) -> List[UserStatistics]:
         """
         Returns a list with an analysis result for user permission sets, including the following fields:
             - user id
             - number of mutable permission sets
-            - number of flat permission sets
+            - number of invalid permission sets
+            - number of deprecated permission sets
             - number of okapi permission sets
             - number of all permission sets
 
         :return: a list with data to generate a report page about user permission sets
         """
-        pass
+
+        return self._user_stats
 
     def get_all_permission_sets(self):
         """
@@ -72,5 +77,28 @@ class PermissionProvider:
         self._all_permission_sets = list()
         self._user_permission_sets = list()
         self._parent_permission_sets = list()
-        self._user_stats = list()
+        self._user_stats = list[UserStatistics]()
         _log.info("Permission set data extracted successfully...")
+
+    def __collect_user_stats(self):
+        all_type = "all"
+        for user_permission in self._load_result.allPermissionUsers:
+            counts = dict[str, int]()
+            for ps_name in user_permission.permissions:
+                ps_type = self._ps_analysis_result.identify_permission(ps_name)
+                if ps_type not in counts:
+                    counts[ps_type] = 0
+                if all_type not in counts:
+                    counts[all_type] = 0
+                counts[ps_type] += 1
+                counts[all_type] += 1
+
+            self._user_stats.append(
+                UserStatistics(
+                    userId=user_permission.userId,
+                    mutablePermissionSetsCount=counts.get("mutable", 0),
+                    invalidPermissionSetsCount=counts.get("invalid", 0),
+                    okapiPermissionSetsCount=counts.get("okapi", 0),
+                    allPermissionSetsCount=counts.get(all_type, 0),
+                )
+            )

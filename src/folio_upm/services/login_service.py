@@ -1,32 +1,29 @@
 import os
 
-from folio_upm.integrations import login_client
+from cachetools import TTLCache, cached
 
-_cached_okapi_token = None
-_cached_eureka_token = None
+from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.integrations.login_client import LoginClient
+from folio_upm.utils import env, log_factory
 
-
-def get_okapi_token():
-    global _cached_okapi_token
-    if _cached_okapi_token:
-        return _cached_okapi_token
-
-    username = os.getenv("ADMIN_USERNAME")
-    password = os.getenv("ADMIN_PASSWORD")
-    _cached_okapi_token = __login(username, password)
-    return _cached_okapi_token
+_log = log_factory.get_logger(__name__)
 
 
-def get_eureka_token():
-    global _cached_eureka_token
-    if _cached_eureka_token:
-        return _cached_eureka_token
+class LoginService(metaclass=SingletonMeta):
+    """Service for managing login tokens for Okapi and Eureka."""
 
-    username = os.getenv("EUREKA_ADMIN_USERNAME")
-    password = os.getenv("EUREKA_ADMIN_PASSWORD")
-    _cached_eureka_token = __login(username, password)
-    return _cached_eureka_token
+    def __init__(self):
+        _log.debug("LoginService initialized.")
+        self._login_client = LoginClient()
 
+    @cached(cache=TTLCache(maxsize=10, ttl=env.get_okapi_token_ttl()))
+    def get_okapi_token(self):
+        username = os.getenv("ADMIN_USERNAME")
+        password = os.getenv("ADMIN_PASSWORD")
+        return self._login_client.login_as_admin(env.get_okapi_url(), username, password)
 
-def __login(username: str, password: str):
-    return login_client.login_as_admin(username, password)
+    @cached(cache=TTLCache(maxsize=10, ttl=env.get_okapi_token_ttl()))
+    def get_eureka_token(self):
+        username = os.getenv("EUREKA_ADMIN_USERNAME")
+        password = os.getenv("EUREKA_ADMIN_PASSWORD")
+        return self._login_client.login_as_admin(env.get_eureka_url(), username, password)
