@@ -39,7 +39,7 @@ class PermissionsClient(metaclass=SingletonMeta):
         _log.info(f"Page loaded successfully: {len(permissions)} permission(s) found.")
         return permissions
 
-    def load_user_permissions_by_id(self, ids):
+    def load_user_permissions_by_ids(self, ids):
         """
         Load user permissions from Okapi.
 

@@ -10,9 +10,6 @@ _log = log_factory.get_logger(__name__)
 
 
 class RolesProvider:
-    """
-    Provides methods to manage roles and their relationships with users, permissions, and capabilities.
-    """
 
     def __init__(
         self,
@@ -21,7 +18,6 @@ class RolesProvider:
         eureka_load_result: EurekaLoadResult = None,
         strategy: StrategyType = DISTRIBUTED,
     ):
-        self._load_result = load_result
         self._load_result = load_result
         self._eureka_load_result = eureka_load_result
         self._ps_analysis_result = ps_analysis_result

@@ -15,13 +15,12 @@ from folio_upm.services.roles_provider import RolesProvider
 from folio_upm.utils import log_factory
 from folio_upm.utils.service_utils import ServiceUtils
 
-_log = log_factory.get_logger(__name__)
-
 
 class LoadResultAnalyzer:
 
     def __init__(self, analysis_json: dict, eureka_load_result=Optional[dict], strategy: StrategyType = DISTRIBUTED):
-        _log.debug("LoadResultAnalyzer initialized.")
+        self._log = log_factory.get_logger(__name__)
+        self._log.debug("LoadResultAnalyzer initialized.")
         self._analysis_json = analysis_json
         self._load_result = LoadResult(**analysis_json)
         self._eureka_load_result = eureka_load_result

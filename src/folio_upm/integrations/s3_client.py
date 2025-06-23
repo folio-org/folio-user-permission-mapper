@@ -76,7 +76,7 @@ class UpmS3Client(metaclass=SingletonMeta):
     @staticmethod
     def __init_client() -> S3Client:
         region = env.require_env("AWS_REGION", default_value="us-east-1")
-        endpoint = env.find_env("AWS_S3_ENDPOINT")
+        endpoint = env.get_env("AWS_S3_ENDPOINT")
         if endpoint:
             _log.info(f"Initializing S3 client [awsRegion={region}, endpoint={endpoint}]...")
             return boto3.client("s3", region_name=region, endpoint_url=endpoint)

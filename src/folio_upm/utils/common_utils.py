@@ -1,16 +1,14 @@
-class ListUtils:
+from typing import Sequence
+
+from folio_upm.utils.ordered_set import OrderedSet
+
+
+class IterableUtils:
 
     @staticmethod
-    def partition(list_value, size):
-        """
-        Partitions a list into chunks of a specified size.
-
-        :param list_value: List to be partitioned
-        :param size: Size of each partition
-        :return: Partitioned list as a generator
-        """
-        for i in range(0, len(list_value), size):
-            yield list_value[i: i + size]
+    def partition(data: Sequence, size):
+        _data = data
+        return [_data[i:i + size] for i in range(0, len(_data), size)]
 
 
 class CqlQueryUtils:

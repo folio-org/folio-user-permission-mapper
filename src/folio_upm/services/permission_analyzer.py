@@ -12,12 +12,13 @@ from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.service_utils import ServiceUtils
 
-_log = log_factory.get_logger(__name__)
+
 
 
 class PermissionAnalyzer:
 
     def __init__(self, load_result: LoadResult):
+        self._log = log_factory.get_logger(__name__)
         self._load_result = load_result
         self._analyzed_ps_dict = OrderedDict[str, AnalyzedPermission]()
         self._result = PermissionAnalysisResult()
@@ -109,17 +110,17 @@ class PermissionAnalyzer:
 
     def __log_results(self):
         rs = self._result
-        _log.info(f"Permissions analysis completed. Amount of analyzed permissions: {self._analyzed_permissions}")
-        _log.info(f"System permissions found: {len(rs.okapi)}")
-        _log.info(f"Mutable permissions found: {len(rs.mutable)}")
-        _log.info(f"Questionable permissions found: {len(rs.questionable)}")
-        _log.log(
+        self._log.info(f"Permissions analysis completed. Amount of analyzed permissions: {self._analyzed_permissions}")
+        self._log.info(f"System permissions found: {len(rs.okapi)}")
+        self._log.info(f"Mutable permissions found: {len(rs.mutable)}")
+        self._log.info(f"Questionable permissions found: {len(rs.questionable)}")
+        self._log.log(
             _Utils.get_log_level(rs.invalid),
             f"Invalid permissions found: {len(rs.invalid)}",
         )
-        _log.info(f"Unprocessed permissions found: {len(rs.unprocessed)}")
+        self._log.info(f"Unprocessed permissions found: {len(rs.unprocessed)}")
         for t in [e for e in SourceType]:
-            _log.info(f"System permissions filtered for type '{t.value}': {self._system_perms_count[t]}")
+            self._log.info(f"System permissions filtered for type '{t.value}': {self._system_perms_count[t]}")
 
 
 class _Utils:

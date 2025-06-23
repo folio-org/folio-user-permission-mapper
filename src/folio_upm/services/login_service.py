@@ -6,14 +6,14 @@ from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integrations.login_client import LoginClient
 from folio_upm.utils import env, log_factory
 
-_log = log_factory.get_logger(__name__)
 
 
 class LoginService(metaclass=SingletonMeta):
     """Service for managing login tokens for Okapi and Eureka."""
 
     def __init__(self):
-        _log.debug("LoginService initialized.")
+        self._log = log_factory.get_logger(__name__)
+        self._log.debug("LoginService initialized.")
         self._login_client = LoginClient()
 
     @cached(cache=TTLCache(maxsize=10, ttl=env.get_okapi_token_ttl()))

@@ -4,13 +4,13 @@ import folio_upm.integrations.okapi_client as okapi_client
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 
-_log = log_factory.get_logger(__name__)
 
 
 class OkapiService(metaclass=SingletonMeta):
 
     def __init__(self):
-        _log.info("OkapiService initialized")
+        self._log = log_factory.get_logger(__name__)
+        self._log.info("OkapiService initialized")
         self._client = okapi_client.OkapiClient()
 
     def get_okapi_defined_permissions(self):
@@ -21,7 +21,7 @@ class OkapiService(metaclass=SingletonMeta):
             module_id = descriptor.get("id")
 
             if not permission_sets:
-                _log.debug(f"No permission sets found for module: {module_id}")
+                self._log.debug(f"No permission sets found for module: {module_id}")
             value = OrderedDict(
                 {
                     "id": descriptor.get("id"),

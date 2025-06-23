@@ -44,7 +44,7 @@ def get_http_client_timeout():
 
 
 @cache
-def find_env(env_variable_name, default_value: str | None = None, log_result=True) -> Optional[str]:
+def get_env(env_variable_name, default_value: str | None = None, log_result=True) -> Optional[str]:
     env_variable_value = os.getenv(env_variable_name, default_value)
     if log_result:
         _log.info(f"Resolved value for {env_variable_name}: {env_variable_value}")

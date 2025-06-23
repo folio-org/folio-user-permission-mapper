@@ -3,12 +3,12 @@ from typing import List
 from folio_upm.dto.results import PermissionAnalysisResult, LoadResult, UserStatistics
 from folio_upm.utils import log_factory
 
-_log = log_factory.get_logger(__name__)
 
 
 class PermissionProcessor:
 
     def __init__(self, load_result: LoadResult, ps_analysis_result: PermissionAnalysisResult):
+        self._log = log_factory.get_logger(__name__)
         self._load_result = load_result
         self._ps_analysis_result = ps_analysis_result
         self.__process_permissions()
@@ -73,12 +73,12 @@ class PermissionProcessor:
         """
 
     def __process_permissions(self):
-        _log.info("Extracting permission set data from analysis results...")
+        self._log.info("Extracting permission set data from analysis results...")
         self._all_permission_sets = list()
         self._user_permission_sets = list()
         self._parent_permission_sets = list()
         self._user_stats = list[UserStatistics]()
-        _log.info("Permission set data extracted successfully...")
+        self._log.info("Permission set data extracted successfully...")
 
     def __collect_user_stats(self):
         all_type = "all"
@@ -102,3 +102,21 @@ class PermissionProcessor:
                     allPermissionSetsCount=counts.get(all_type, 0),
                 )
             )
+
+    def enrich_permissions(self, permissions, permission_users):
+        permission_users_map = {}
+        for permission_user in permission_users:
+            user_id = permission_user.get("userId")
+            permission_users_map[permission_user.get("id")] = user_id
+
+        for permission in permissions:
+            granted_to_coll = permission.get("grantedTo", [])
+            assigned_user_ids = []
+            for granted_to in granted_to_coll:
+                resolved_user_id = permission_users_map.get(granted_to, None)
+                if resolved_user_id:
+                    assigned_user_ids.append(resolved_user_id)
+                else:
+                    self._log.warning(f"User ID not found for grantedTo: {granted_to}")
+            permission["assignedUserIds"] = assigned_user_ids
+        return permissions

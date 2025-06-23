@@ -1,17 +1,16 @@
 from typing import List, OrderedDict
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.results import AnalysisResult
 from folio_upm.dto.eureka import Role, Capability
+from folio_upm.dto.results import AnalysisResult
 from folio_upm.integrations import eureka_client
 from folio_upm.utils import common_utils, env, log_factory
-
-_log = log_factory.get_logger(__name__)
 
 
 class EurekaService(metaclass=SingletonMeta):
     def __init__(self):
-        _log.info("EurekaService initialized.")
+        self._log = log_factory.get_logger(__name__)
+        self._log.info("EurekaService initialized.")
         self._client = eureka_client.EurekaClient()
 
     def migrate_to_eureka(self, result: AnalysisResult):
@@ -23,17 +22,17 @@ class EurekaService(metaclass=SingletonMeta):
     def __create_roles(self, roles: List[Role]):
         for role in roles:
             if not role.name:
-                _log.error(f"Role name cannot be empty, skipping role creation for role: {role.id}")
+                self._log.error(f"Role name cannot be empty, skipping role creation for role: {role.id}")
                 continue
-            _log.info(f"Creating role: '{role.name}'...")
+            self._log.info(f"Creating role: '{role.name}'...")
             self._client.post_role(role)
-            _log.info(f"Role is created: id = {role.id}, name={role.name}")
+            self._log.info(f"Role is created: id = {role.id}, name={role.name}")
 
     def __assign_role_users(self, user_roles: OrderedDict[str, List[str]]):
         for role_id, user_ids in user_roles.items():
-            _log.info(f"Assigning users to role: {role_id}...")
+            self._log.info(f"Assigning users to role: {role_id}...")
             self._client.post_role_users(role_id, user_ids)
-            _log.info(f"Users assigned to role: {role_id}...")
+            self._log.info(f"Users assigned to role: {role_id}...")
 
     def __find_capabilities(self, permission_names: List[str]) -> List[Capability]:
         batch_size = int(env.require_env("CAPABILITY_IDS_PARTITION_SIZE", default_value=50, log_result=False))
