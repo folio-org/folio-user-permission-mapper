@@ -7,17 +7,16 @@ from folio_upm.services.permission_service import PermissionService
 from folio_upm.utils import log_factory
 
 
-
-
 class PermissionLoader(metaclass=SingletonMeta):
     def __init__(self):
-        self._log = log_factory.get_logger(__name__)
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._permission_service = PermissionService()
         self._okapi_service = OkapiService()
 
     def load_permission_data(self) -> OrdDict[str, any]:
         self._log.info("Permission loading started...")
         all_records_query = "cql.allRecords=1"
+        pass
 
         okapi_permissions = self._okapi_service.get_okapi_defined_permissions()
         all_perms = self._permission_service.load_all_permissions_by_query(all_records_query, expanded=False)

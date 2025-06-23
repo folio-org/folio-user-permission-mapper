@@ -1,14 +1,12 @@
 from typing import Sequence
 
-from folio_upm.utils.ordered_set import OrderedSet
-
 
 class IterableUtils:
 
     @staticmethod
     def partition(data: Sequence, size):
         _data = data
-        return [_data[i:i + size] for i in range(0, len(_data), size)]
+        return [_data[i : i + size] for i in range(0, len(_data), size)]
 
 
 class CqlQueryUtils:

@@ -1,7 +1,7 @@
 import networkx as nx
 
 from folio_upm.dto.results import AnalysisResult
-from folio_upm.utils import env
+from folio_upm.utils.upm_env import Env
 
 
 def generate_graph(analysis_result: AnalysisResult, ts=None, store: bool = False) -> nx.DiGraph:
@@ -21,6 +21,6 @@ def generate_graph(analysis_result: AnalysisResult, ts=None, store: bool = False
             graph.add_edge(user_id, permission_set_id, t="user-ps")
 
     if store:
-        nx.write_gexf(graph, f"./.temp/{env.get_tenant_id()}/permissionSets-{ts}.gexf")
+        nx.write_gexf(graph, f"./.temp/{Env().get_tenant_id()}/permissionSets-{ts}.gexf")
 
     return graph

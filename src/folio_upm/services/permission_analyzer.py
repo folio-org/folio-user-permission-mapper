@@ -4,21 +4,19 @@ from typing import List
 from typing import OrderedDict as OrdDict
 
 from folio_upm.dto.okapi import Permission
-from folio_upm.dto.results import PermissionAnalysisResult, LoadResult
-from folio_upm.dto.source_type import SourceType, PS, FLAT_PS, OKAPI_PS
-from folio_upm.dto.support import SourcedPermissionSet, AnalyzedPermission
+from folio_upm.dto.results import LoadResult, PermissionAnalysisResult
+from folio_upm.dto.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
+from folio_upm.dto.support import AnalyzedPermission, SourcedPermissionSet
 from folio_upm.services.questionable_ps_validator import QuestionablePermissionValidator
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.service_utils import ServiceUtils
 
 
-
-
 class PermissionAnalyzer:
 
     def __init__(self, load_result: LoadResult):
-        self._log = log_factory.get_logger(__name__)
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._load_result = load_result
         self._analyzed_ps_dict = OrderedDict[str, AnalyzedPermission]()
         self._result = PermissionAnalysisResult()
@@ -28,7 +26,7 @@ class PermissionAnalyzer:
         return self._result
 
     def __analyze_permissions(self):
-        _log.info("Starting permissions analysis...")
+        self._log.info("Starting permissions analysis...")
         self._analyzed_permissions = 0
         self._system_perms_count = dict[SourceType, int]()
         self._system_permission_names = OrderedSet[str]()

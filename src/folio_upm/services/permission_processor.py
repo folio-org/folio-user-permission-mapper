@@ -1,14 +1,13 @@
 from typing import List
 
-from folio_upm.dto.results import PermissionAnalysisResult, LoadResult, UserStatistics
+from folio_upm.dto.results import LoadResult, PermissionAnalysisResult, UserStatistics
 from folio_upm.utils import log_factory
-
 
 
 class PermissionProcessor:
 
     def __init__(self, load_result: LoadResult, ps_analysis_result: PermissionAnalysisResult):
-        self._log = log_factory.get_logger(__name__)
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._load_result = load_result
         self._ps_analysis_result = ps_analysis_result
         self.__process_permissions()

@@ -1,15 +1,16 @@
 from typing import List, OrderedDict
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import Role, Capability
+from folio_upm.dto.eureka import Capability, Role
 from folio_upm.dto.results import AnalysisResult
 from folio_upm.integrations import eureka_client
-from folio_upm.utils import common_utils, env, log_factory
+from folio_upm.utils import common_utils, log_factory
+from folio_upm.utils.upm_env import Env
 
 
 class EurekaService(metaclass=SingletonMeta):
     def __init__(self):
-        self._log = log_factory.get_logger(__name__)
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.info("EurekaService initialized.")
         self._client = eureka_client.EurekaClient()
 
@@ -35,7 +36,7 @@ class EurekaService(metaclass=SingletonMeta):
             self._log.info(f"Users assigned to role: {role_id}...")
 
     def __find_capabilities(self, permission_names: List[str]) -> List[Capability]:
-        batch_size = int(env.require_env("CAPABILITY_IDS_PARTITION_SIZE", default_value=50, log_result=False))
+        batch_size = int(Env().require_env("CAPABILITY_IDS_PARTITION_SIZE", default_value=50, log_result=False))
         partitioned_permission_names = common_utils.partition(permission_names, batch_size)
         capabilities = []
         for partition in partitioned_permission_names:
@@ -43,7 +44,7 @@ class EurekaService(metaclass=SingletonMeta):
         return capabilities
 
     def __find_capability_sets(self, permission_names: List[str]) -> List[Capability]:
-        batch_size = int(env.require_env("CAPABILITY_IDS_PARTITION_SIZE", default_value=50, log_result=False))
+        batch_size = int(Env().require_env("CAPABILITY_IDS_PARTITION_SIZE", default_value=50, log_result=False))
         partitioned_permission_names = common_utils.partition(permission_names, batch_size)
         capability_sets = []
         for partition in partitioned_permission_names:

@@ -5,11 +5,10 @@ from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 
 
-
 class OkapiService(metaclass=SingletonMeta):
 
     def __init__(self):
-        self._log = log_factory.get_logger(__name__)
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.info("OkapiService initialized")
         self._client = okapi_client.OkapiClient()
 

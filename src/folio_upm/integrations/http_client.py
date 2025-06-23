@@ -1,18 +1,18 @@
-from typing import Callable, Any, Optional
+from typing import Any, Callable, Optional
 
 import requests
 
-from folio_upm.utils import env, json_utils, log_factory
-
-_log = log_factory.get_logger(__name__)
+from folio_upm.utils import json_utils, log_factory
+from folio_upm.utils.upm_env import Env
 
 
 class HttpClient:
 
     def __init__(self, base_url: str, auth_func: Callable, client_timeout: int | None = None):
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._base_url = base_url
         self._auth_func = auth_func
-        self._timeout = client_timeout or env.get_http_client_timeout()
+        self._timeout = client_timeout or Env().get_http_client_timeout()
 
     def get_json(self, path: str, params: dict | None = None, handle_404: bool = False) -> Optional[Any]:
         url = self.__prepare_url(path)
@@ -20,7 +20,7 @@ class HttpClient:
         response = requests.get(url, params=params, headers=headers, timeout=self._timeout)
 
         if response.status_code == 404 and handle_404:
-            _log.warn(f"Status if 404 for request: GET {path}")
+            self._log.warn(f"Status if 404 for request: GET {path}")
             return None
 
         response.raise_for_status()
@@ -39,7 +39,10 @@ class HttpClient:
         return response.json()
 
     def __prepare_url(self, path: str) -> str:
-        return f"{self._base_url}/{path}"
+        _path = path
+        if path.startswith("/"):
+            _path = path[1:]
+        return f"{self._base_url}/{_path}"
 
     def __get_access_token(self):
         return self._auth_func()
@@ -48,5 +51,5 @@ class HttpClient:
         return {
             "x-okapi-token": self.__get_access_token(),
             "Content-Type": "application/json",
-            "x-okapi-tenant": env.get_tenant_id(),
+            "x-okapi-tenant": Env().get_tenant_id(),
         }

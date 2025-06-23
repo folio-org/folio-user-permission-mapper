@@ -1,12 +1,10 @@
 from typing import List
 
-from folio_upm.dto.eureka import Role, UserRoles, RoleUsers
-from folio_upm.dto.results import LoadResult, PermissionAnalysisResult, EurekaLoadResult
-from folio_upm.dto.strategy_type import StrategyType, DISTRIBUTED
+from folio_upm.dto.eureka import Role, RoleUsers
+from folio_upm.dto.results import EurekaLoadResult, LoadResult, PermissionAnalysisResult
+from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
 from folio_upm.dto.support import RoleCapabilities
 from folio_upm.utils import log_factory
-
-_log = log_factory.get_logger(__name__)
 
 
 class RolesProvider:
@@ -18,6 +16,7 @@ class RolesProvider:
         eureka_load_result: EurekaLoadResult = None,
         strategy: StrategyType = DISTRIBUTED,
     ):
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._load_result = load_result
         self._eureka_load_result = eureka_load_result
         self._ps_analysis_result = ps_analysis_result
@@ -34,11 +33,11 @@ class RolesProvider:
         return self._role_capabilities
 
     def __init_roles_and_relations(self):
-        _log.info("Generating roles and their relationships...")
+        self._log.info("Generating roles and their relationships...")
         self._roles = self.__create_roles()
         self._role_users = self.__create_role_users()
         self._role_capabilities = self.__create_role_capabilities()
-        _log.info("Roles and relationships generated successfully.")
+        self._log.info("Roles and relationships generated successfully.")
 
     def __create_roles(self) -> List[Role]:
         pass

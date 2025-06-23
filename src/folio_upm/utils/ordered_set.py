@@ -30,6 +30,14 @@ class OrderedSet(Generic[T]):
         else:
             self._data[item] = None
 
+
+    def __iadd__(self, other: Iterable[T]) -> 'OrderedSet[T]':
+        if not isinstance(other, Iterable):
+            raise TypeError(f"Expected an iterable, got {type(other).__name__}")
+        for item in other:
+            self.add(item)
+        return self
+
     def remove(self, item: T) -> None:
         """Remove an item from the set if it exists."""
         self._data.pop(item, None)

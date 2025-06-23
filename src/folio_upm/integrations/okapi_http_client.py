@@ -1,9 +1,9 @@
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integrations.http_client import HttpClient
 from folio_upm.services.login_service import LoginService
-from folio_upm.utils import env, log_factory
+from folio_upm.utils import log_factory
+from folio_upm.utils.upm_env import Env
 
-_log = log_factory.get_logger(__name__)
 
 class OkapiHttpClient(HttpClient, metaclass=SingletonMeta):
     """
@@ -11,9 +11,10 @@ class OkapiHttpClient(HttpClient, metaclass=SingletonMeta):
     """
 
     def __init__(self):
-        _log.debug('OkapiHttpClient initialized.')
+        self._log = log_factory.get_logger(self.__class__.__name__)
+        self._log.debug("OkapiHttpClient initialized.")
         super().__init__(
-            base_url=env.get_okapi_url(),
+            base_url=Env().get_okapi_url(),
             auth_func=LoginService().get_okapi_token,
-            client_timeout=env.get_http_client_timeout()
+            client_timeout=Env().get_http_client_timeout(),
         )

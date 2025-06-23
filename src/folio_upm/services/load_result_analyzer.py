@@ -6,9 +6,9 @@ from typing import Set
 
 from folio_upm.dto.eureka import Role
 from folio_upm.dto.okapi import Permission
-from folio_upm.dto.results import LoadResult, AnalysisResult
+from folio_upm.dto.results import AnalysisResult, LoadResult
 from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
-from folio_upm.dto.support import RoleCapabilities, AnalyzedPermission, UserPermsHolder
+from folio_upm.dto.support import AnalyzedPermission, RoleCapabilities, UserPermsHolder
 from folio_upm.services.permission_analyzer import PermissionAnalyzer
 from folio_upm.services.permission_processor import PermissionProcessor
 from folio_upm.services.roles_provider import RolesProvider
@@ -19,7 +19,7 @@ from folio_upm.utils.service_utils import ServiceUtils
 class LoadResultAnalyzer:
 
     def __init__(self, analysis_json: dict, eureka_load_result=Optional[dict], strategy: StrategyType = DISTRIBUTED):
-        self._log = log_factory.get_logger(__name__)
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("LoadResultAnalyzer initialized.")
         self._analysis_json = analysis_json
         self._load_result = LoadResult(**analysis_json)

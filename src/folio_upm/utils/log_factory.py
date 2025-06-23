@@ -2,6 +2,9 @@ import logging
 import os
 from functools import cache
 
+from folio_upm.utils import upm_env
+
+upm_env.load_dotenv()
 _RESET = "\033[0m"
 _COLORS = {
     "DEBUG": "\033[37m",
@@ -25,12 +28,13 @@ def _get_log_level():
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()
     if log_level not in logging.getLevelNamesMapping():
         raise ValueError(f"Invalid LOG_LEVEL: {log_level}")
+    print(f"Resolved log level: {log_level}")
     return log_level
 
 
 class CustomFormatter(logging.Formatter):
     def __init__(self, fmt=None):
-        super().__init__(fmt or " %(asctime)s %(levelname)-8s %s(name)-20s %(message)s")
+        super().__init__(fmt or " %(asctime)s %(levelname)-8s %(name)-20s %(message)s")
 
     def format(self, record):
         log_color = _COLORS.get(record.levelname, _RESET)
@@ -41,9 +45,13 @@ class CustomFormatter(logging.Formatter):
 def get_logger(name):
     logger = logging.getLogger(name)
     if not logger.hasHandlers():
-        logger.setLevel(_get_log_level())
+        log_level = _get_log_level()
+        print(f"Creating logger for {name}, level: {log_level}")
+        logger.setLevel(log_level)
+        name_pad = 30
+        padded_name = (name[:name_pad]).ljust(name_pad)
         console_handler = logging.StreamHandler()
-        formatter = CustomFormatter("%(asctime)s %(levelname)-8s %(message)s")
+        formatter = CustomFormatter(f"%(asctime)s %(levelname)-8s {padded_name} %(message)s")
         console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
     return logger
