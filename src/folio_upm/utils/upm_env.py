@@ -19,7 +19,6 @@ def load_dotenv():
     Returns:
         None
     """
-    print("Loading dotenv variables...")
     dotenv.load_dotenv()
     dotenv.load_dotenv(os.getenv("DOTENV", ".env"), override=True)
 
@@ -31,7 +30,7 @@ class Env(metaclass=SingletonMeta):
 
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
-        self._log.debug("EnvUtils initialized.")
+        self._log.debug("Env class initialized.")
 
     def get_okapi_url(self):
         return self.require_env("OKAPI_URL", default_value="http://localhost:9130")

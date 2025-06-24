@@ -77,7 +77,7 @@ def generate_report(store_locally: bool = False, role_strategy: str = "distribut
     s3_client.upload_file(f"{path_prefix}-{_analysis_result_json_fn}", compressed_json)
 
 
-@cli.command("download-load-json")
+@cli.command("download-json")
 @click.option(
     "--out-file",
     "out_file",
@@ -99,7 +99,7 @@ def run_eureka_migration():
 
 @cli.command("generate-report-2")
 def generate_report_2():
-    load_result = get_tenant_json_gz(_okapi_permissions_json_fn)
+    load_result = S3TenantStorage().download_json_gz(_okapi_permissions_json_fn)
     LoadResultAnalyzer(load_result).get_results()
     _log.info("Analysis finished.")
 

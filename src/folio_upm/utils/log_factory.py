@@ -28,7 +28,6 @@ def _get_log_level():
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()
     if log_level not in logging.getLevelNamesMapping():
         raise ValueError(f"Invalid LOG_LEVEL: {log_level}")
-    print(f"Resolved log level: {log_level}")
     return log_level
 
 
@@ -46,9 +45,8 @@ def get_logger(name):
     logger = logging.getLogger(name)
     if not logger.hasHandlers():
         log_level = _get_log_level()
-        print(f"Creating logger for {name}, level: {log_level}")
         logger.setLevel(log_level)
-        name_pad = 30
+        name_pad = 25
         padded_name = (name[:name_pad]).ljust(name_pad)
         console_handler = logging.StreamHandler()
         formatter = CustomFormatter(f"%(asctime)s %(levelname)-8s {padded_name} %(message)s")

@@ -11,7 +11,7 @@ from folio_upm.utils.upm_env import Env
 class UpmS3Client(metaclass=SingletonMeta):
 
     def __init__(self):
-        self._log = log_factory.get_logger(__name__)
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("S3Client initialized.")
         self._bucket = Env().get_s3_bucket()
         self._s3_client = self.__init_client()
