@@ -5,10 +5,10 @@ description = ""
 authors = ["Pavel Filippov <pavel_filippov@epam.com>"]
 license = "Apache License 2.0"
 readme = "README.md"
-packages = [{ include = "folio_upm" }]
+packages = [{ include = "folio_upm", from = "src" }]
 
 [tool.poetry.scripts]
-folio-permission-mapper = "folio_upm.cli.__main__:cli"
+folio-permission-mapper = "folio_upm.cli:cli"
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -21,11 +21,7 @@ openpyxl = "^3.1.5"
 pydantic = "^2.11.7"
 networkx = "^3.5"
 graphviz = "^0.21"
-boto3-stubs = {extras = ["s3"], version = "^1.38.41"}
-pre-commit = "^4.2.0"
 cachetools = "^6.1.0"
-types-cachetools = "^6.0.0.20250525"
-
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.2.0"
@@ -33,6 +29,9 @@ flake8-bugbear = "^24.12.12"
 black = "^25.1.0"
 isort = "^6.0.1"
 pytest = "^8.4.1"
+types-cachetools = "^6.0.0.20250525"
+types-click = "^7.1.8"
+boto3-stubs = {extras = ["s3"], version = "^1.38.42"}
 
 [tool.black]
 line-length = 120

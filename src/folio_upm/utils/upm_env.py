@@ -6,24 +6,14 @@ import dotenv
 
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
+from folio_upm.utils.service_utils import ServiceUtils
 
 
 def load_dotenv():
-    """
-    Loads environment variables from .env files.
-
-    This function first loads the default .env file, then attempts to load a file specified
-    by the DOTENV environment variable (if set), overriding any existing values. This allows
-    for flexible configuration via environment files for different environments.
-
-    Returns:
-        None
-    """
+    print("loading dotenv from upm_env.py...")
+    dotenv.load_dotenv()
     dotenv.load_dotenv()
     dotenv.load_dotenv(os.getenv("DOTENV", ".env"), override=True)
-
-
-load_dotenv()
 
 
 class Env(metaclass=SingletonMeta):
@@ -52,6 +42,10 @@ class Env(metaclass=SingletonMeta):
 
     def get_http_client_timeout(self):
         return int(self.require_env("HTTP_CLIENT_TIMEOUT", default_value="60", log_result=False))
+
+    def get_bool(self, env_variable_name: str, default_value: bool = False) -> bool:
+        str_var = self.get_env(env_variable_name, str(default_value))
+        return ServiceUtils.parse_bool(str_var, default_value)
 
     @lru_cache(maxsize=100)
     def get_env(self, env_variable_name, default_value: str | None = None, log_result=True) -> Optional[str]:

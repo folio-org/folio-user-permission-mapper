@@ -11,7 +11,6 @@ class PermissionsClient(metaclass=SingletonMeta):
         self._client = OkapiHttpClient()
 
     def load_perms_page(self, cql_query, limit, offset, expanded=False):
-
         query_params = {
             "query": cql_query,
             "limit": limit,

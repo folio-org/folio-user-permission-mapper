@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-import os
-import time
+from typing import List
 
 import click
 
@@ -12,21 +11,19 @@ from folio_upm.services.permission_loader import PermissionLoader
 from folio_upm.services.xlsx_generator import XlsxReportGenerator
 from folio_upm.storage.s3_client import UpmS3Client
 from folio_upm.storage.s3_tenant_storage import S3TenantStorage
-from folio_upm.utils import upm_env
+from folio_upm.storage.tenant_storage_service import TenantStorageService
+from folio_upm.utils import log_factory
 from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env
-from services import graph_service
-from utils import log_factory
 
-upm_env.load_dotenv()
-
-_okapi_permissions_json_fn = "okapi-permissions.json.gz"
-_eureka_capabilities_json_fn = "eureka-capabilities.json.gz"
-_analysis_result_json_fn = "analysis-result.json.gz"
-_analysis_result_xlsx_fn = "analysis-result.xlsx"
+xlsx_ext = "json.gz"
+json_gz_ext = "json.gz"
+okapi_permissions_fn = "okapi-permissions"
+eureka_capabilities_fn = "eureka-capabilities"
+mixed_analysis_result_fn = "analysis-result"
 
 
-_log = log_factory.get_logger('cli.py')
+_log = log_factory.get_logger("cli.py")
 
 
 @click.group()
@@ -38,43 +35,32 @@ def cli():
 @cli.command("collect-permissions")
 def collect_permissions():
     load_result_object = PermissionLoader().load_permission_data()
-    S3TenantStorage().save_object(_okapi_permissions_json_fn, load_result_object)
+    S3TenantStorage().save_object(okapi_permissions_fn, load_result_object)
 
 
 @cli.command("collect-capabilities")
 def collect_capabilities():
     capability_load_result = EurekaLoadResult()
-    S3TenantStorage().save_object(_analysis_result_json_fn, capability_load_result)
+    S3TenantStorage().save_object(mixed_analysis_result_fn, capability_load_result)
 
 
 @cli.command("generate-report")
-@click.option("--store-locally", is_flag=True, default=False)
-@click.option("--role-strategy", default="distributed")
-def generate_report(store_locally: bool = False, role_strategy: str = "distributed"):
-    strategy = StrategyType[role_strategy.upper()].value
-    if not strategy:
-        _log.error(f"Invalid role strategy: {role_strategy}.")
-        raise ValueError(f"Invalid role strategy: {role_strategy}.")
-
-    tenant_id = Env().get_tenant_id()
-    path_prefix = f"{tenant_id}/{tenant_id}"
-    load_result = get_tenant_json_gz(_okapi_permissions_json_fn)
+@click.option("--storage", "-s", type=click.Choice(["s3", "local"]), multiple=True, default=["s3"])
+@click.option("--role-strategy", type=click.Choice(["distributed", "hybrid", "consolidated"]), default="distributed")
+def generate_report(storage: List[str], role_strategy: str):
+    strategy = StrategyType[role_strategy.upper()]
+    storage_service = TenantStorageService(storage)
+    load_result = storage_service.get_object(okapi_permissions_fn, json_gz_ext)
     if not load_result:
-        raise FileNotFoundError(f"{_okapi_permissions_json_fn} file not found.")
+        raise FileNotFoundError(f"{okapi_permissions_fn} file not found.")
 
-    eureka_load_result = get_tenant_json_gz(_eureka_capabilities_json_fn)
+    eureka_load_result = storage_service.get_object(eureka_capabilities_fn, json_gz_ext)
 
-    analysis_result = LoadResultAnalyzer(load_result, eureka_load_result, strategy.value).get_results()
+    analysis_result = LoadResultAnalyzer(load_result, eureka_load_result, strategy).get_results()
     xlsx_report_bytes = XlsxReportGenerator(analysis_result).get_report_bytes()
 
-    if store_locally:
-        write_local_data(analysis_result, store_locally, xlsx_report_bytes)
-
-    compressed_json = JsonUtils.to_json_gz(analysis_result.model_dump())
-
-    s3_client = UpmS3Client()
-    s3_client.upload_file(f"{path_prefix}-{_analysis_result_xlsx_fn}", xlsx_report_bytes)
-    s3_client.upload_file(f"{path_prefix}-{_analysis_result_json_fn}", compressed_json)
+    storage_service.save_object(mixed_analysis_result_fn, xlsx_ext, xlsx_report_bytes)
+    storage_service.save_object(mixed_analysis_result_fn, json_gz_ext, analysis_result.model_dump())
 
 
 @cli.command("download-json")
@@ -99,7 +85,7 @@ def run_eureka_migration():
 
 @cli.command("generate-report-2")
 def generate_report_2():
-    load_result = S3TenantStorage().download_json_gz(_okapi_permissions_json_fn)
+    load_result = S3TenantStorage().get_object(okapi_permissions_fn, json_gz_ext)
     LoadResultAnalyzer(load_result).get_results()
     _log.info("Analysis finished.")
 
@@ -123,21 +109,17 @@ def get_file_path(file_name: str, extension="json", ts=None) -> str:
     return f"{tenant_id}/{tenant_id}-{file_name}{'-' if ts else ''}.{extension}"
 
 
-def write_local_data(analysis_report, store_locally, xlsx_report):
-    tenant_id = Env().get_tenant_id()
-    directory = f".temp/{tenant_id}"
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    report_time = time.time_ns()
-    with open(f"{directory}/{tenant_id}-analysis-report-{report_time}.xlsx", "wb") as f:
-        f.write(xlsx_report.getbuffer())
-        xlsx_report.seek(0)
-    graph_service.generate_graph(analysis_report, ts=report_time, store=store_locally)
+def validate_and_get_strategy(role_strategy):
+    strategy = StrategyType[role_strategy.upper()]
+    if not strategy:
+        _log.error(f"Invalid role strategy: {role_strategy}.")
+        raise ValueError(f"Invalid role strategy: {role_strategy}.")
+    return strategy
 
 
 if __name__ == "__main__":
     try:
         cli()
     except Exception as e:
-        _log.error(f"Failed to execute CLI command: {e}")
-        raise Exception(e)
+        _log.error(f"Failed to execute CLI command: %s", e.args[0])
+        _log.error(f"Error:", e)

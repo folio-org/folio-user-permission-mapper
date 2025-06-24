@@ -30,8 +30,7 @@ class OrderedSet(Generic[T]):
         else:
             self._data[item] = None
 
-
-    def __iadd__(self, other: Iterable[T]) -> 'OrderedSet[T]':
+    def __iadd__(self, other: Iterable[T]) -> "OrderedSet[T]":
         if not isinstance(other, Iterable):
             raise TypeError(f"Expected an iterable, got {type(other).__name__}")
         for item in other:

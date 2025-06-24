@@ -4,7 +4,6 @@ from functools import cache
 
 from folio_upm.utils import upm_env
 
-upm_env.load_dotenv()
 _RESET = "\033[0m"
 _COLORS = {
     "DEBUG": "\033[37m",
@@ -13,6 +12,8 @@ _COLORS = {
     "ERROR": "\033[1;31m",
     "CRITICAL": "\033[1;31m",
 }
+
+upm_env.load_dotenv()
 
 
 @cache
