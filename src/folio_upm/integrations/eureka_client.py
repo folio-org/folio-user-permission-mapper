@@ -4,7 +4,7 @@ from typing import List, Optional
 import requests
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import Capability, Role
+from folio_upm.dto.eureka import Capability, Role, RoleCapability, RoleCapabilitySet
 from folio_upm.integrations.eureka_http_client import EurekaHttpClient
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import CqlQueryUtils
@@ -25,6 +25,10 @@ class EurekaClient(metaclass=SingletonMeta):
         role_body_str = JsonUtils.to_json(role.model_dump())
         response_json = self._client.post_json("/roles", role_body_str)
         return Role(**response_json)
+
+    def find_roles_by_query(self, role_names_query) -> List[Role]:
+        response = self._client.get_json("/roles", role_names_query)
+        return [Role(**role_dict) for role_dict in response.get("roles", [])]
 
     def get_role_by_name(self, role_name: str) -> Optional[Role]:
         self._log.debug(f"Retrieving role by name: {role_name}")
@@ -50,29 +54,33 @@ class EurekaClient(metaclass=SingletonMeta):
         response = self._client.post_json("/roles/users", request_body=body)
         return response.get("userRoles", []) if response else []
 
-    def post_role_capabilities(role_id: str, capabilities: List[str]):
-        pass
+    def post_role_capabilities(self, role_id: str, capability_ids: List[str]):
+        body = OrderedDict({"roleId": role_id, "capabilitySetIds": capability_ids})
+        response = self._client.post_json("/roles/capabilities", request_body=body)
+        return response.get("roleCapabilities", []) if response else []
 
-    def post_role_capability_sets(role_id, capability_set_ids: List[str]):
-        pass
+    def post_role_capability_sets(self, role_id, capability_set_ids: List[str]):
+        body = OrderedDict({"roleId": role_id, "capabilitySetIds": capability_set_ids})
+        response = self._client.post_json("/roles/capability-sets", request_body=body)
+        return response.get("roleCapabilitySets", []) if response else []
 
-    def get_capabilities_by_names(self, permission_names: list[str]) -> list[Capability]:
-        self._log.info(f"Retrieving capabilities by permissions: {permission_names}")
-        if not permission_names:
-            self._log.warning("No permission names provided, skipping capability retrieval")
-            return []
-        query = CqlQueryUtils.any_match_by_field("permission", permission_names)
-        response = self.__perform_get_request("/capabilities", params={"query": query, "limit": 100})
+    def find_capabilities(self, cql_query: str) -> list[Capability]:
+        response = self._client.get_json("/capabilities", params={"query": cql_query, "limit": 100})
         return response.get("capabilities", []) if response else []
 
-    def get_capability_sets_by_names(self, permission_names: list[str]) -> list[Capability]:
-        self._log.info(f"Retrieving capability sets by permissions: {permission_names}")
-        if not permission_names:
-            self._log.warning("No permission names provided, skipping capability retrieval")
-            return []
-        query = CqlQueryUtils.any_match_by_field("permission", permission_names)
-        response = self.__perform_get_request("/capability-sets", params={"query": query, "limit": 100})
-        return response.get("capabilitySets", []) if response else []
+    def find_capability_sets(self, cql_query: str) -> list[Capability]:
+        response = self._client.get_json("/capability-sets", params={"query": cql_query, "limit": 100})
+        return response.get("capabilities", []) if response else []
+
+    def find_role_capabilities(self, query: str, limit: int, offset: int) -> List[RoleCapability]:
+        query_params = {"query": query, "limit": limit, "offset": offset}
+        response = self._client.get_json("/roles/capabilities", params=query_params)
+        return [RoleCapability(**rc) for rc in response.get("roleCapabilities", [])]
+
+    def find_role_capability_sets(self, query: str, limit: int, offset: int) -> List[RoleCapabilitySet]:
+        query_params = {"query": query, "limit": limit, "offset": offset}
+        response = self._client.get_json("/roles/capabilities", params=query_params)
+        return [RoleCapabilitySet(**rc) for rc in response.get("roleCapabilitySets", [])]
 
     def load_resource_page(self, resource: str, limit: int, offset: int, query: str):
         """Load user permissions from Okapi."""

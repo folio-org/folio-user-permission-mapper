@@ -24,6 +24,16 @@ class RoleUsers(BaseModel):
     userIds: List[str] = []
 
 
+class RoleCapability(BaseModel):
+    roleId: str
+    capabilityId: str
+
+
+class RoleCapabilitySet(BaseModel):
+    roleId: str
+    capabilitySetId: str
+
+
 class Capability(BaseModel):
     id: str
     name: str
