@@ -1,13 +1,12 @@
-from typing import List, OrderedDict, Tuple
+from typing import List, OrderedDict as OrdDict, Tuple
 
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.dto.eureka import Capability, Role
-from folio_upm.dto.results import AnalysisResult
+from folio_upm.dto.results import AnalysisResult, AnalyzedRole
 from folio_upm.integrations import eureka_client
-from folio_upm.utils import common_utils, log_factory
+from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import CqlQueryUtils
 from folio_upm.utils.loading_utils import PartitionedDataLoader, PagedDataLoader
-from folio_upm.utils.upm_env import Env
 
 
 class EurekaService(metaclass=SingletonMeta):
@@ -22,14 +21,14 @@ class EurekaService(metaclass=SingletonMeta):
         self.__assign_role_capabilities(result.roleCapabilities)
         self.__assign_role_capability_sets(result.roleCapabilities)
 
-    def __create_roles(self, roles: List[Role]):
-        self._log.info("Creating %s role(s)...", len(roles))
-        role_names = [role.name for role in roles if role.name]
+    def __create_roles(self, ar: OrdDict[str, AnalyzedRole]):
+        self._log.info("Creating %s role(s)...", len(ar))
+        role_names = [ar.role.name for ar in ar.values() if ar.role.name]
         data_loader = PartitionedDataLoader("roles", role_names, self.__load_roles, self.__any_match_by_name)
-        roles = data_loader.load()
-        existing_role_names = set([role.name for role in roles])
-        for role in roles:
-            role_name = role.name
+        ar = data_loader.load()
+        existing_role_names = set([role.n for role in ar])
+        for role in ar:
+            role_name = role.n
             if not role_name:
                 self._log.error("Role name cannot be empty, skipping role creation for role: %s", role.id)
                 continue
@@ -40,14 +39,14 @@ class EurekaService(metaclass=SingletonMeta):
             else:
                 self._log.info("Role '%s' already exists, skipping creation.", role_name)
 
-    def __assign_role_users(self, user_roles: OrderedDict[str, List[str]]):
+    def __assign_role_users(self, user_roles: OrdDict[str, List[str]]):
         self._log.info("Assigning users to roles...")
         for role_id, user_ids in user_roles.items():
             self._log.info("Assigning users to role: %s...", role_id)
             self._client.post_role_users(role_id, user_ids)
             self._log.info("Users assigned to role: %s...", role_id)
 
-    def __assign_role_capabilities(self, role_capabilities: OrderedDict[str, List[str]]):
+    def __assign_role_capabilities(self, role_capabilities: OrdDict[str, List[str]]):
         self._log.info("Assigning capabilities to roles...")
         for role_id, permissions in role_capabilities.items():
             capabilities = self.__find_capabilities(permissions)
@@ -61,7 +60,7 @@ class EurekaService(metaclass=SingletonMeta):
                 msg_template = "No unassigned capabilities found for role: %s, capabilityIds=%s"
                 self._log.info(msg_template, role_id, capability_ids_tuple[1])
 
-    def __assign_role_capability_sets(self, role_capability_sets: OrderedDict[str, List[str]]):
+    def __assign_role_capability_sets(self, role_capability_sets: OrdDict[str, List[str]]):
         self._log.info("Assigning capability sets to roles...")
         for role_id, permissions in role_capability_sets.items():
             capability_sets = self.__find_capability_sets(permissions)

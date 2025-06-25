@@ -63,7 +63,7 @@ class PermissionAnalyzer:
         if not found_value:
             self._analyzed_ps_dict[name] = _Utils.create_ap(ps, src_type)
         else:
-            found_value.values.append(SourcedPermissionSet(src=src_type, val=ps))
+            found_value.srcPermSets.append(SourcedPermissionSet(src=src_type, val=ps))
 
     def __collect_okapi_permissions(self) -> OrdDict[str, List[PermissionSet]]:
         okapi_permissions = OrderedDict()
@@ -83,7 +83,7 @@ class PermissionAnalyzer:
             self._result.deprecated[ps_name] = ap
             return
 
-        all_sources = set([svh.src for svh in ap.values])
+        all_sources = set([svh.src for svh in ap.srcPermSets])
         if len(all_sources) == 1:
             ap.reasons.append(f"single def in {next(iter(all_sources)).value}")
             self._result.invalid[ps_name] = ap
@@ -95,13 +95,13 @@ class PermissionAnalyzer:
             self._result.questionable[ps_name] = ap
             return
 
-        okapi_sources = set([sp.src for sp in ap.values if sp.src == SourceType.OKAPI_PS])
+        okapi_sources = set([sp.src for sp in ap.srcPermSets if sp.src == SourceType.OKAPI_PS])
         if okapi_sources:
             self._result.okapi[ps_name] = ap
         elif len(all_sources) != 2:
             ap.reasons.append(f"multiple def in {sorted([x.value for x in all_sources])}")
             self._result.invalid[ps_name] = ap
-        elif next(iter(set([sp.val.mutable for sp in ap.values]))):
+        elif next(iter(set([sp.val.mutable for sp in ap.srcPermSets]))):
             self._result.mutable[ps_name] = ap
         else:
             self._result.unprocessed[ps_name] = ap
@@ -127,7 +127,7 @@ class _Utils:
     def create_ap(ps: PermissionSet, ps_type: SourceType) -> AnalyzedPermissionSet:
         return AnalyzedPermissionSet(
             permissionName=ps.permissionName,
-            values=[SourcedPermissionSet(src=ps_type, val=ps)],
+            srcPermSets=[SourcedPermissionSet(src=ps_type, val=ps)],
         )
 
     @staticmethod
@@ -138,16 +138,16 @@ class _Utils:
 
     @staticmethod
     def is_deprecated_ps(ap: AnalyzedPermissionSet) -> bool:
-        deprecated_values_without_okapi = set([sp.val.deprecated for sp in ap.values if sp.src != OKAPI_PS])
+        deprecated_values_without_okapi = set([sp.val.deprecated for sp in ap.srcPermSets if sp.src != OKAPI_PS])
         if len(deprecated_values_without_okapi) == 1 and next(iter(deprecated_values_without_okapi)) is True:
             ap.note = "Deprecated (not in okapi)"
             return True
-        deprecated_values_set = set([sp.val.deprecated for sp in ap.values])
+        deprecated_values_set = set([sp.val.deprecated for sp in ap.srcPermSets])
         return len(deprecated_values_set) == 1 and next(iter(deprecated_values_set)) is True
 
     @staticmethod
     def is_mutable_ps(ap: AnalyzedPermissionSet) -> bool:
-        mutable_values_set = set([sp.val.mutable for sp in ap.values])
+        mutable_values_set = set([sp.val.mutable for sp in ap.srcPermSets])
         return len(mutable_values_set) == 1 and next(iter(mutable_values_set)) is True
 
     @staticmethod

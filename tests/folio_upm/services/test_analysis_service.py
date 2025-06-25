@@ -1,11 +1,15 @@
 import json
+from functools import reduce
 
 from folio_upm.utils.ordered_set import OrderedSet
 
 
 def test_test():
-    assert len([1, 2, 3]) == 3
-    assert {3, 2, 1} == {1, 2, 3}
+    set_a = {1,2,3}
+    set_b = [[1,2,3], [1,2,4]]
+    rs = {}
+    print(list(reduce(lambda x, y: x | y, [set(x) for x in set_b])))
+    assert 1 != 2
 
 
 def test_ordered_set():

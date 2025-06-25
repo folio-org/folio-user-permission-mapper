@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
-from typing import Any
 
+from openpyxl.workbook import Workbook
 from typing_extensions import override
 
 from folio_upm.dto.cls_support import SingletonMeta
@@ -9,6 +9,7 @@ from folio_upm.storage.tenant_storage import TenantStorage
 from folio_upm.utils import log_factory
 from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env
+from folio_upm.utils.xlsx_utils import XlsxUtils
 
 
 class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
@@ -17,6 +18,7 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("LocalTenantStorage initialized.")
         self._out_folder = ".temp"
+        self._skip_json_gz = True
 
     @override
     def _get_json_gz(self, json_name):
@@ -30,12 +32,15 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
 
     @override
     def _save_json_gz(self, file_name, object_data: dict):
+        if self._skip_json_gz:
+            return
         data_bytes = JsonUtils.to_json_gz(object_data)
         self.__save_file_with_latest_included(file_name, data_bytes, self._json_gz_ext)
 
     @override
-    def _save_xlsx(self, file_name, object_data: Any):
-        self.__save_file_with_latest_included(file_name, object_data, self._xlsx_ext)
+    def _save_xlsx(self, file_name, object_data: Workbook):
+        data_bytes = XlsxUtils.get_bytes(object_data)
+        self.__save_file_with_latest_included(file_name, data_bytes, self._xlsx_ext)
 
     @override
     def _get_xlsx(self, file_name):
@@ -44,22 +49,19 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
     def __save_file_with_latest_included(self, file_name, object_data, file_ext: str):
         file_key = self._get_file_key(file_name, file_ext)
         self.__write_binary_data(file_key, object_data)
-        if self._override_reports:
-            latest_file_key = self._get_file_key(file_name, file_ext, include_ts=False)
-            self.__write_binary_data(latest_file_key, object_data)
 
     def __write_binary_data(self, file_key, binary_data: BytesIO):
         self.__create_temp_directory()
         file = f"{self._out_folder}/{file_key}"
-        self._log.info(f"Saving file: '%s' ...", file)
+        self._log.debug(f"Saving file: '%s' ...", file)
 
         if self.__file_exists(file_key):
-            self._log.warning(f"File '%s' already exists, overriding it.", file)
+            self._log.debug(f"File '%s' already exists, overriding it", file)
 
         with open(file, "wb") as f:
             binary_data.seek(0)
             f.write(binary_data.getbuffer())
-            self._log.info(f"Data saved to file '%s'", file)
+            self._log.debug(f"Data saved to file '%s'", file)
 
     def __create_temp_directory(self):
         directory = f"{self._out_folder}/{self._tenant_id}"

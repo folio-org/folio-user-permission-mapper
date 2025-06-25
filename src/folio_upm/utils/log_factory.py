@@ -6,10 +6,10 @@ from folio_upm.utils import upm_env
 
 _RESET = "\033[0m"
 _COLORS = {
-    "DEBUG": "\033[37m",
+    "DEBUG": "\033[90m",
     "INFO": "\033[37m",
-    "WARNING": "\033[97m",
-    "ERROR": "\033[1;31m",
+    "WARNING": "\033[93m",
+    "ERROR": "\033[91m",
     "CRITICAL": "\033[1;31m",
 }
 

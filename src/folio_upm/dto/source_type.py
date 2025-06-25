@@ -3,8 +3,8 @@ from enum import Enum
 
 class SourceType(str, Enum):
     PS = "ps"
-    FLAT_PS = "flat_ps"
-    OKAPI_PS = "okapi_ps"
+    FLAT_PS = "flat"
+    OKAPI_PS = "okapi"
 
 
 PS = SourceType.PS

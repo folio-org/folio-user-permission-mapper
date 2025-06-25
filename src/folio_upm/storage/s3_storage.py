@@ -23,14 +23,10 @@ class S3Storage(metaclass=SingletonMeta):
         bucket = self._bucket
         file_exists = self.check_file_exists(path)
         if file_exists:
-            self._log.warn("File already exists in S3 bucket '%s': %s", bucket, path)
+            self._log.warn("Object exists in S3 bucket '%s': %s, overriding it", bucket, path)
             if not override:
                 raise FileExistsError(f"File already exists in S3 bucket '{bucket}': {path}")
         self._s3_client.upload_fileobj(file_obj, Bucket=bucket, Key=path)
-
-    def put_json_object(self, path, data):
-        json_string = JsonUtils.to_json(data)
-        self.__put_object(path, json_string)
 
     def check_file_exists(self, file):
         try:
@@ -59,20 +55,6 @@ class S3Storage(metaclass=SingletonMeta):
         except Exception as e:
             self._log.warn("Error reading file '%s' from bucket '%s'", file_key, bucket_name, e)
             raise ValueError("Failed to read JSON file from S3: " f"bucker={bucket_name}, path={file_key}, error={e}")
-
-    def __put_object(self, path, content, content_type="application/json"):
-        bucket = self._bucket
-        file_exists = self.check_file_exists(path)
-        if file_exists:
-            self._log.info("File already exists in S3 bucket '%s': %s", bucket, path)
-        self._log.info("Writing JSON to S3 bucket '%s': %s", bucket, path)
-        self._s3_client.put_object(
-            Key=path,
-            Body=content,
-            Bucket=bucket,
-            ContentEncoding="utf-8",
-            ContentType=content_type,
-        )
 
     def __init_client(self) -> S3Client:
         region = Env().require_env("AWS_REGION", default_value="us-east-1")

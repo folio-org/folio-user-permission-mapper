@@ -9,6 +9,7 @@ from folio_upm.storage.s3_storage import S3Storage
 from folio_upm.storage.tenant_storage import TenantStorage
 from folio_upm.utils import log_factory
 from folio_upm.utils.json_utils import JsonUtils
+from folio_upm.utils.xlsx_utils import XlsxUtils
 
 
 class S3TenantStorage(TenantStorage, metaclass=SingletonMeta):
@@ -27,9 +28,9 @@ class S3TenantStorage(TenantStorage, metaclass=SingletonMeta):
     @override
     def _save_json_gz(self, object_name, object_data: dict):
         file_key = self._get_file_key(object_name, self._json_gz_ext)
-        self._log.info(f"Uploading data to s3: {file_key}...")
+        self._log.debug(f"Uploading compressed JSON to s3: {file_key}...")
         self._storage.upload_file(file_key, JsonUtils.to_json_gz(object_data))
-        self._log.info(f"Data saved to s3: {file_key}")
+        self._log.info(f"Compressed JSON saved to s3: {file_key}")
 
     @override
     def _get_xlsx(self, object_name) -> Workbook:
@@ -37,12 +38,14 @@ class S3TenantStorage(TenantStorage, metaclass=SingletonMeta):
         return self.__get_s3_object(file_key, lambda body: body)
 
     @override
-    def _save_xlsx(self, object_name, xlsx_bytes: BytesIO):
-        xlsx_bytes.seek(0)
-        self._storage.upload_file(object_name, xlsx_bytes)
+    def _save_xlsx(self, object_name, xlsx_bytes: Workbook):
+        file_key = self._get_file_key(object_name, self._json_gz_ext)
+        self._log.debug(f"Uploading xlsx file to s3: {file_key}...")
+        self._storage.upload_file(object_name, XlsxUtils.get_bytes(xlsx_bytes))
+        self._log.info(f"xlsx file saved to s3: {file_key}")
 
     def __get_s3_object(self, file_key: str, mapper_func: Callable[[Any], Any]) -> Any:
-        self._log.info(f"Downloading file from s3: {file_key}...")
+        self._log.debug(f"Downloading file from s3: {file_key}...")
         object_body = self._storage.read_object(file_key)
         if object_body is not None:
             try:

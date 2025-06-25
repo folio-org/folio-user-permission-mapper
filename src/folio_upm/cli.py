@@ -8,15 +8,15 @@ from folio_upm.dto.strategy_type import StrategyType
 from folio_upm.services.eureka_service import EurekaService
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
 from folio_upm.services.permission_loader import PermissionLoader
-from folio_upm.services.xlsx_generator import XlsxReportGenerator
 from folio_upm.storage.s3_storage import S3Storage
 from folio_upm.storage.s3_tenant_storage import S3TenantStorage
 from folio_upm.storage.tenant_storage_service import TenantStorageService
 from folio_upm.utils import log_factory
 from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env
+from folio_upm.xlsx.excel_result_generator import ExcelResultGenerator
 
-xlsx_ext = "json.gz"
+xlsx_ext = "xlsx"
 json_gz_ext = "json.gz"
 okapi_permissions_fn = "okapi-permissions"
 eureka_capabilities_fn = "eureka-capabilities"
@@ -54,15 +54,16 @@ def generate_report(storage: Tuple, role_strategy: str):
     strategy = StrategyType[role_strategy.upper()]
     storage_service = TenantStorageService(get_storages_list(storage))
     load_result = storage_service.get_object(okapi_permissions_fn, json_gz_ext)
+
     if not load_result:
         raise FileNotFoundError(f"{okapi_permissions_fn} file not found.")
 
     eureka_load_result = storage_service.get_object(eureka_capabilities_fn, json_gz_ext)
 
     analysis_result = LoadResultAnalyzer(load_result, eureka_load_result, strategy).get_results()
-    xlsx_report_bytes = XlsxReportGenerator(analysis_result).get_report_bytes()
+    workbook = ExcelResultGenerator(analysis_result).generate_report()
 
-    storage_service.save_object(mixed_analysis_result_fn, xlsx_ext, xlsx_report_bytes)
+    storage_service.save_object(mixed_analysis_result_fn, xlsx_ext, workbook)
     storage_service.save_object(mixed_analysis_result_fn, json_gz_ext, analysis_result.model_dump())
 
 
@@ -127,5 +128,4 @@ if __name__ == "__main__":
     try:
         cli()
     except Exception as e:
-        _log.error(f"Failed to execute CLI command: %s", e.args[0] if len(e.args) > 1 else e.args)
-        _log.error(f"Error:", e)
+        _log.error(e, exc_info=True)

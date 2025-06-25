@@ -2,9 +2,9 @@ import uuid
 from typing import List, OrderedDict as OrdDict
 from collections import OrderedDict
 from folio_upm.dto.eureka import Role, RoleUsers
-from folio_upm.dto.results import EurekaLoadResult, LoadResult, PermissionAnalysisResult
+from folio_upm.dto.results import EurekaLoadResult, LoadResult, PermissionAnalysisResult, AnalyzedRole
 from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
-from folio_upm.dto.support import RoleCapabilities, AnalyzedPermissionSet, AnalyzedRole
+from folio_upm.dto.support import RoleCapabilities, AnalyzedPermissionSet
 from folio_upm.utils import log_factory
 
 
@@ -52,7 +52,7 @@ class RolesProvider:
         name = analyzed_ps.get_first_value(lambda x: x.displayName)
         description = analyzed_ps.get_first_value(lambda x: x.description)
         role = Role(id=str(uuid.uuid4()), name=name, description=description)
-        return AnalyzedRole(role=role, src=analyzed_ps.permissionName)
+        return AnalyzedRole(role=role, source=analyzed_ps.permissionName)
 
     def __create_role_users(self) -> List[RoleUsers]:
         pass

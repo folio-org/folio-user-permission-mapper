@@ -10,7 +10,7 @@ from folio_upm.dto.results import AnalysisResult, LoadResult
 from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
 from folio_upm.dto.support import AnalyzedPermissionSet, RoleCapabilities, UserPermsHolder
 from folio_upm.services.permission_analyzer import PermissionAnalyzer
-from folio_upm.services.permission_processor import PermissionProcessor
+from folio_upm.services.permission_processor import PermSetProcessor
 from folio_upm.services.roles_provider import RolesProvider
 from folio_upm.utils import log_factory
 from folio_upm.utils.service_utils import ServiceUtils
@@ -33,7 +33,7 @@ class LoadResultAnalyzer:
 
     def __analyze_results(self) -> AnalysisResult:
         roles_provider = RolesProvider(self._lr, self._ps_ar, self._eureka_lr, self._strategy)
-        ps_processor = PermissionProcessor(self._lr, self._ps_ar)
+        ps_processor = PermSetProcessor(self._lr, self._ps_ar)
 
         # all_ps = __get_all_ps_desc(load_result)
         # mutable_ps = set([name for name, value in all_ps.items() if value.mutable])
@@ -43,6 +43,7 @@ class LoadResultAnalyzer:
 
         return AnalysisResult(
             userStatistics=ps_processor.get_user_stats(),
+            psStatistics=ps_processor.get_permission_set_stats(),
             roles=roles_provider.get_roles(),
         )
 
