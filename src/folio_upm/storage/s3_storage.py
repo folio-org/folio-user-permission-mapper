@@ -1,3 +1,5 @@
+from io import BytesIO
+
 import boto3
 from botocore.exceptions import ClientError
 from mypy_boto3_s3 import S3Client
@@ -8,7 +10,7 @@ from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env
 
 
-class UpmS3Client(metaclass=SingletonMeta):
+class S3Storage(metaclass=SingletonMeta):
 
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
@@ -16,12 +18,14 @@ class UpmS3Client(metaclass=SingletonMeta):
         self._bucket = Env().get_s3_bucket()
         self._s3_client = self.__init_client()
 
-    def upload_file(self, path, file_obj):
+    def upload_file(self, path, file_obj: BytesIO, override: bool = True):
+        file_obj.seek(0)
         bucket = self._bucket
         file_exists = self.check_file_exists(path)
         if file_exists:
-            self._log.info(f"File already exists in S3 bucket '{bucket}': {path}")
-
+            self._log.warn("File already exists in S3 bucket '%s': %s", bucket, path)
+            if not override:
+                raise FileExistsError(f"File already exists in S3 bucket '{bucket}': {path}")
         self._s3_client.upload_fileobj(file_obj, Bucket=bucket, Key=path)
 
     def put_json_object(self, path, data):
@@ -43,27 +47,25 @@ class UpmS3Client(metaclass=SingletonMeta):
 
     def read_object(self, file_key):
         if not self.check_file_exists(file_key):
-            self._log.info(f"File not found in S3 bucket '{self._bucket}': {file_key}")
             return None
 
         return self.__get_object(file_key)
 
     def __get_object(self, file_key):
-        self._log.info(f"Retrieving object from S3: {file_key}...")
         bucket_name = self._bucket
         try:
             response = self._s3_client.get_object(Bucket=bucket_name, Key=file_key)
             return response["Body"]
         except Exception as e:
-            self._log.error(f"Error reading file '{file_key}' from bucket '{bucket_name}': {e}")
+            self._log.warn("Error reading file '%s' from bucket '%s'", file_key, bucket_name, e)
             raise ValueError("Failed to read JSON file from S3: " f"bucker={bucket_name}, path={file_key}, error={e}")
 
     def __put_object(self, path, content, content_type="application/json"):
         bucket = self._bucket
         file_exists = self.check_file_exists(path)
         if file_exists:
-            self._log.info(f"File already exists in S3 bucket '{bucket}': {path}")
-        self._log.info(f"Writing JSON to S3 bucket '{bucket}': {path}")
+            self._log.info("File already exists in S3 bucket '%s': %s", bucket, path)
+        self._log.info("Writing JSON to S3 bucket '%s': %s", bucket, path)
         self._s3_client.put_object(
             Key=path,
             Body=content,

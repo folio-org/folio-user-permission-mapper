@@ -3,10 +3,10 @@ from logging import INFO, WARN
 from typing import List
 from typing import OrderedDict as OrdDict
 
-from folio_upm.dto.okapi import Permission
+from folio_upm.dto.okapi import PermissionSet
 from folio_upm.dto.results import LoadResult, PermissionAnalysisResult
 from folio_upm.dto.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
-from folio_upm.dto.support import AnalyzedPermission, SourcedPermissionSet
+from folio_upm.dto.support import AnalyzedPermissionSet, SourcedPermissionSet
 from folio_upm.services.questionable_ps_validator import QuestionablePermissionValidator
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
@@ -18,7 +18,7 @@ class PermissionAnalyzer:
     def __init__(self, load_result: LoadResult):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._load_result = load_result
-        self._analyzed_ps_dict = OrderedDict[str, AnalyzedPermission]()
+        self._analyzed_ps_dict = OrderedDict[str, AnalyzedPermissionSet]()
         self._result = PermissionAnalysisResult()
         self.__analyze_permissions()
 
@@ -47,7 +47,7 @@ class PermissionAnalyzer:
         for descriptor in self._load_result.okapiPermissions:
             self.__process_ps_list(OKAPI_PS, descriptor.permissionSets)
 
-    def __process_ps_list(self, src_type: SourceType, permissions: List[Permission]):
+    def __process_ps_list(self, src_type: SourceType, permissions: List[PermissionSet]):
         self._system_perms_count[src_type] = 0
         for ps in permissions:
             self._analyzed_permissions += 1
@@ -57,7 +57,7 @@ class PermissionAnalyzer:
             else:
                 self.__process_permission(ps, src_type)
 
-    def __process_permission(self, ps: Permission, src_type: SourceType):
+    def __process_permission(self, ps: PermissionSet, src_type: SourceType):
         name = ps.permissionName
         found_value = self._analyzed_ps_dict.get(name)
         if not found_value:
@@ -65,7 +65,7 @@ class PermissionAnalyzer:
         else:
             found_value.values.append(SourcedPermissionSet(src=src_type, val=ps))
 
-    def __collect_okapi_permissions(self) -> OrdDict[str, List[Permission]]:
+    def __collect_okapi_permissions(self) -> OrdDict[str, List[PermissionSet]]:
         okapi_permissions = OrderedDict()
         for module_desc in self._load_result.okapiPermissions:
             for permission in module_desc.permissionSets:
@@ -78,7 +78,7 @@ class PermissionAnalyzer:
         for ps_name, ap in self._analyzed_ps_dict.items():
             self.__put_permission_in_bucket(ps_name, ap)
 
-    def __put_permission_in_bucket(self, ps_name: str, ap: AnalyzedPermission):
+    def __put_permission_in_bucket(self, ps_name: str, ap: AnalyzedPermissionSet):
         if _Utils.is_deprecated_ps(ap):
             self._result.deprecated[ps_name] = ap
             return
@@ -124,8 +124,8 @@ class PermissionAnalyzer:
 class _Utils:
 
     @staticmethod
-    def create_ap(ps: Permission, ps_type: SourceType) -> AnalyzedPermission:
-        return AnalyzedPermission(
+    def create_ap(ps: PermissionSet, ps_type: SourceType) -> AnalyzedPermissionSet:
+        return AnalyzedPermissionSet(
             permissionName=ps.permissionName,
             values=[SourcedPermissionSet(src=ps_type, val=ps)],
         )
@@ -137,7 +137,7 @@ class _Utils:
         return []
 
     @staticmethod
-    def is_deprecated_ps(ap: AnalyzedPermission) -> bool:
+    def is_deprecated_ps(ap: AnalyzedPermissionSet) -> bool:
         deprecated_values_without_okapi = set([sp.val.deprecated for sp in ap.values if sp.src != OKAPI_PS])
         if len(deprecated_values_without_okapi) == 1 and next(iter(deprecated_values_without_okapi)) is True:
             ap.note = "Deprecated (not in okapi)"
@@ -146,7 +146,7 @@ class _Utils:
         return len(deprecated_values_set) == 1 and next(iter(deprecated_values_set)) is True
 
     @staticmethod
-    def is_mutable_ps(ap: AnalyzedPermission) -> bool:
+    def is_mutable_ps(ap: AnalyzedPermissionSet) -> bool:
         mutable_values_set = set([sp.val.mutable for sp in ap.values])
         return len(mutable_values_set) == 1 and next(iter(mutable_values_set)) is True
 

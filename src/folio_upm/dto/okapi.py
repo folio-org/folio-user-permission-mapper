@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class Permission(BaseModel):
+class PermissionSet(BaseModel):
     id: Optional[str] = None
     permissionName: str
     subPermissions: List[str] = []
@@ -22,4 +22,4 @@ class ModuleDescriptor(BaseModel):
     id: str
     name: str = None
     description: str = None
-    permissionSets: List[Permission] = []
+    permissionSets: List[PermissionSet] = []

@@ -24,7 +24,6 @@ class JsonUtils:
             json_str = json.dumps(json_object)
             gzip_file.write(json_str.encode("utf-8"))
 
-        gzip_buffer.seek(0)
         return gzip_buffer
 
     @staticmethod

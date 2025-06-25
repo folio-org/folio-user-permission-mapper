@@ -5,10 +5,10 @@ from typing import OrderedDict as OrdDict
 from typing import Set
 
 from folio_upm.dto.eureka import Role
-from folio_upm.dto.okapi import Permission
+from folio_upm.dto.okapi import PermissionSet
 from folio_upm.dto.results import AnalysisResult, LoadResult
 from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
-from folio_upm.dto.support import AnalyzedPermission, RoleCapabilities, UserPermsHolder
+from folio_upm.dto.support import AnalyzedPermissionSet, RoleCapabilities, UserPermsHolder
 from folio_upm.services.permission_analyzer import PermissionAnalyzer
 from folio_upm.services.permission_processor import PermissionProcessor
 from folio_upm.services.roles_provider import RolesProvider
@@ -22,25 +22,24 @@ class LoadResultAnalyzer:
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("LoadResultAnalyzer initialized.")
         self._analysis_json = analysis_json
-        self._load_result = LoadResult(**analysis_json)
-        self._eureka_load_result = eureka_load_result
+        self._lr = LoadResult(**analysis_json)
+        self._eureka_lr = eureka_load_result
         self._strategy = strategy
-        self._ps_analysis_result = PermissionAnalyzer(self._load_result).get_analysis_result()
+        self._ps_ar = PermissionAnalyzer(self._lr).get_analysis_result()
         self._result = self.__analyze_results()
 
     def get_results(self) -> AnalysisResult:
         return self._result
 
     def __analyze_results(self) -> AnalysisResult:
-        load_result = self._load_result
-        roles_provider = RolesProvider(self._load_result, self._ps_analysis_result, self._strategy)
-        ps_processor = PermissionProcessor(self._load_result, self._ps_analysis_result)
+        roles_provider = RolesProvider(self._lr, self._ps_ar, self._eureka_lr, self._strategy)
+        ps_processor = PermissionProcessor(self._lr, self._ps_ar)
 
-        all_ps = __get_all_ps_desc(load_result)
-        mutable_ps = set([name for name, value in all_ps.items() if value.mutable])
-        ps_nesting = __get_mutable_permission_set_nesting(load_result)
-        user_permission_sets = __get_user_permission_sets(load_result, all_ps, mutable_ps)
-        mutable_ps_users = __get_permission_set_users(load_result)
+        # all_ps = __get_all_ps_desc(load_result)
+        # mutable_ps = set([name for name, value in all_ps.items() if value.mutable])
+        # ps_nesting = __get_mutable_permission_set_nesting(load_result)
+        # user_permission_sets = __get_user_permission_sets(load_result, all_ps, mutable_ps)
+        # mutable_ps_users = __get_permission_set_users(load_result)
 
         return AnalysisResult(
             userStatistics=ps_processor.get_user_stats(),
@@ -51,7 +50,7 @@ class LoadResultAnalyzer:
 class _Utils:
 
     @staticmethod
-    def get_all_ps_desc(report: LoadResult) -> OrdDict[str, List[Permission]]:
+    def get_all_ps_desc(report: LoadResult) -> OrdDict[str, List[PermissionSet]]:
         result = OrderedDict()
         for permission in report.allPermissions:
             name = permission.permissionName
@@ -64,14 +63,14 @@ class _Utils:
         return result
 
     @staticmethod
-    def create_roles(mutable_perms: List[AnalyzedPermission]) -> List[Role]:
+    def create_roles(mutable_perms: List[AnalyzedPermissionSet]) -> List[Role]:
         result = []
         for ap in mutable_perms:
             result.append(_Utils.create_role(ap))
         return result
 
     @staticmethod
-    def create_role(ps: AnalyzedPermission) -> Role:
+    def create_role(ps: AnalyzedPermissionSet) -> Role:
         return Role(
             id=str(uuid.uuid4()),
             name=next(iter(set(vh.val for vh in ps.displayNames))),
@@ -92,7 +91,7 @@ class _Utils:
         return result
 
     def __get_user_permission_sets(
-        report: LoadResult, all_perms: OrdDict[str, Permission], mutable_perm_names: Set[str]
+        report: LoadResult, all_perms: OrdDict[str, PermissionSet], mutable_perm_names: Set[str]
     ) -> OrdDict[str, UserPermsHolder]:
         result = OrderedDict()
         flat_ps_pss = __get_flatten_ps_pss(report)
@@ -113,7 +112,7 @@ class _Utils:
         return result
 
 
-def __get_perm_set_perm_sets(permissions: List[Permission]) -> OrdDict[str, List[str]]:
+def __get_perm_set_perm_sets(permissions: List[PermissionSet]) -> OrdDict[str, List[str]]:
     result = OrderedDict()
     for permission in permissions:
         permission_name = permission.permissionName
@@ -150,7 +149,7 @@ def __create_role_users(roles: List[Role], psu: OrdDict[str, List[str]], strateg
     return OrderedDict()
 
 
-def __create_role_capabilities(roles: List[Role], p: OrdDict[str, Permission]) -> OrdDict[str, RoleCapabilities]:
+def __create_role_capabilities(roles: List[Role], p: OrdDict[str, PermissionSet]) -> OrdDict[str, RoleCapabilities]:
     result = OrderedDict()
     for role in roles:
         src_ps = role.source
@@ -196,7 +195,7 @@ def __has_mutable_permission(permission: str, mutable_user_pss: Set[str], flat_p
     return False
 
 
-def __collect_okapi_permissions(load_result: LoadResult) -> OrdDict[str, List[Permission]]:
+def __collect_okapi_permissions(load_result: LoadResult) -> OrdDict[str, List[PermissionSet]]:
     okapi_permissions = OrderedDict()
     for module_desc in load_result.okapiPermissions:
         for permission in module_desc.permissionSets:

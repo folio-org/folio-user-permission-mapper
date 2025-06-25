@@ -1,4 +1,4 @@
-import time
+from datetime import datetime, UTC
 from typing import Any
 
 from folio_upm.utils import log_factory
@@ -55,8 +55,9 @@ class TenantStorage:
     def _save_xlsx(self, object_name: str, object_data: Any):
         pass
 
-    def _get_file_key(self, file_name, extension) -> str:
+    def _get_file_key(self, file_name, extension, include_ts = True) -> str:
         file_name = f"{self._tenant_id}-{file_name}"
-        if self._override_reports:
-            file_name += f"-{time.time_ns() / 10**6}"
+        if include_ts and self._override_reports:
+            now = datetime.now(tz=UTC)
+            file_name += f"-{now.strftime("%Y%m%d%H%M%S") + f"{now.microsecond // 1000:03d}"}"
         return f"{self._tenant_id}/{file_name}.{extension}"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from typing import List
+from typing import List, Tuple
 
 import click
 
@@ -9,7 +9,7 @@ from folio_upm.services.eureka_service import EurekaService
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
 from folio_upm.services.permission_loader import PermissionLoader
 from folio_upm.services.xlsx_generator import XlsxReportGenerator
-from folio_upm.storage.s3_client import UpmS3Client
+from folio_upm.storage.s3_storage import S3Storage
 from folio_upm.storage.s3_tenant_storage import S3TenantStorage
 from folio_upm.storage.tenant_storage_service import TenantStorageService
 from folio_upm.utils import log_factory
@@ -33,23 +33,26 @@ def cli():
 
 
 @cli.command("collect-permissions")
-def collect_permissions():
-    load_result_object = PermissionLoader().load_permission_data()
-    S3TenantStorage().save_object(okapi_permissions_fn, load_result_object)
+@click.option("--storage", "-s", type=click.Choice(["s3", "local"]), multiple=True, default=["s3"])
+def collect_permissions(storage: Tuple):
+    perms_load_result = PermissionLoader().load_permission_data()
+    storage_service = TenantStorageService(get_storages_list(storage))
+    storage_service.save_object(okapi_permissions_fn, json_gz_ext, perms_load_result)
 
 
 @cli.command("collect-capabilities")
-def collect_capabilities():
+@click.option("--storage", "-s", type=click.Choice(["s3", "local"]), multiple=True, default=["s3"])
+def collect_capabilities(storage: Tuple):
     capability_load_result = EurekaLoadResult()
-    S3TenantStorage().save_object(mixed_analysis_result_fn, capability_load_result)
-
+    storage_service = TenantStorageService(get_storages_list(storage))
+    storage_service.save_object(eureka_capabilities_fn, json_gz_ext, capability_load_result)
 
 @cli.command("generate-report")
 @click.option("--storage", "-s", type=click.Choice(["s3", "local"]), multiple=True, default=["s3"])
 @click.option("--role-strategy", type=click.Choice(["distributed", "hybrid", "consolidated"]), default="distributed")
-def generate_report(storage: List[str], role_strategy: str):
+def generate_report(storage: Tuple, role_strategy: str):
     strategy = StrategyType[role_strategy.upper()]
-    storage_service = TenantStorageService(storage)
+    storage_service = TenantStorageService(get_storages_list(storage))
     load_result = storage_service.get_object(okapi_permissions_fn, json_gz_ext)
     if not load_result:
         raise FileNotFoundError(f"{okapi_permissions_fn} file not found.")
@@ -94,14 +97,14 @@ def get_tenant_json_gz(json_name):
     tenant_id = Env().get_tenant_id()
     file_path = f"{tenant_id}/{tenant_id}-{json_name}.json.gz"
     _log.info(f"Loading JSON from s3: {file_path}")
-    return UpmS3Client().read_object(file_path)
+    return S3Storage().read_object(file_path)
 
 
 def upload_tenant_json_gz(json_name):
     tenant_id = Env().get_tenant_id()
     file_path = f"{tenant_id}/{tenant_id}-{json_name}.json.gz"
     _log.info(f"Loading JSON from s3: {file_path}")
-    return UpmS3Client().read_object(file_path)
+    return S3Storage().read_object(file_path)
 
 
 def get_file_path(file_name: str, extension="json", ts=None) -> str:
@@ -116,10 +119,13 @@ def validate_and_get_strategy(role_strategy):
         raise ValueError(f"Invalid role strategy: {role_strategy}.")
     return strategy
 
+def get_storages_list(storage):
+    return [i for i in storage]
+
 
 if __name__ == "__main__":
     try:
         cli()
     except Exception as e:
-        _log.error(f"Failed to execute CLI command: %s", e.args[0])
+        _log.error(f"Failed to execute CLI command: %s", e.args[0] if len(e.args) > 1 else e.args)
         _log.error(f"Error:", e)

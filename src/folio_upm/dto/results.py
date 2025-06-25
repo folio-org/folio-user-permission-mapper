@@ -1,17 +1,18 @@
-from typing import List, Optional, OrderedDict
+from typing import List, Optional, OrderedDict as OrdDict
+from collections import OrderedDict
 
 from pydantic import BaseModel
 
 from folio_upm.dto.eureka import Capability, CapabilitySet, Role, RoleUsers, UserPermission
-from folio_upm.dto.okapi import ModuleDescriptor, Permission
-from folio_upm.dto.support import AnalyzedPermission, RoleCapabilities, UserPermsHolder
+from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet
+from folio_upm.dto.support import AnalyzedPermissionSet, RoleCapabilities, UserPermsHolder, AnalyzedRole
 from folio_upm.utils.ordered_set import OrderedSet
 
 
 class LoadResult(BaseModel):
     okapiPermissions: List[ModuleDescriptor] = []
-    allPermissions: List[Permission] = []
-    allPermissionsExpanded: List[Permission] = []
+    allPermissions: List[PermissionSet] = []
+    allPermissionsExpanded: List[PermissionSet] = []
     allPermissionUsers: List[UserPermission] = []
 
 
@@ -21,12 +22,12 @@ class EurekaLoadResult(BaseModel):
 
 
 class PermissionAnalysisResult(BaseModel):
-    mutable: OrderedDict[str, AnalyzedPermission] = OrderedDict()
-    okapi: OrderedDict[str, AnalyzedPermission] = OrderedDict()
-    invalid: OrderedDict[str, AnalyzedPermission] = OrderedDict()
-    deprecated: OrderedDict[str, AnalyzedPermission] = OrderedDict()
-    questionable: OrderedDict[str, AnalyzedPermission] = OrderedDict()
-    unprocessed: OrderedDict[str, AnalyzedPermission] = OrderedDict()
+    mutable: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
+    okapi: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
+    invalid: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
+    deprecated: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
+    questionable: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
+    unprocessed: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
     systemPermissionNames: OrderedSet[str] = []
 
     def identify_permission(self, ps_name: str) -> Optional[str]:
@@ -63,13 +64,13 @@ class UserStatistics(BaseModel):
 class AnalysisResult(BaseModel):
     userStatistics: List[UserStatistics] = list[UserStatistics]()
     permsAnalysisResult: PermissionAnalysisResult = None
-    mutablePermissionSets: OrderedDict[str, List[Permission]] = OrderedDict()
-    flatPermissionSets: OrderedDict[str, List[str]] = OrderedDict()
-    permissionSetsNesting: OrderedDict[str, List[str]] = OrderedDict()
-    usersPermissionSets: OrderedDict[str, UserPermsHolder] = OrderedDict()
-    permissionSetUsers: OrderedDict[str, List[str]] = OrderedDict()
-    permissionPermissionSets: OrderedDict[str, List[str]] = OrderedDict()
-    permissionFlatPermissionSets: OrderedDict[str, List[str]] = OrderedDict()
-    roles: List[Role] = list[Role]()
+    mutablePermissionSets: OrdDict[str, List[PermissionSet]] = OrderedDict()
+    flatPermissionSets: OrdDict[str, List[str]] = OrderedDict()
+    permissionSetsNesting: OrdDict[str, List[str]] = OrderedDict()
+    usersPermissionSets: OrdDict[str, UserPermsHolder] = OrderedDict()
+    permissionSetUsers: OrdDict[str, List[str]] = OrderedDict()
+    permissionPermissionSets: OrdDict[str, List[str]] = OrderedDict()
+    permissionFlatPermissionSets: OrdDict[str, List[str]] = OrderedDict()
+    roles: OrdDict[str, AnalyzedRole] = OrderedDict[str, AnalyzedRole] ()
     roleUsers: List[RoleUsers] = list[RoleUsers]()
     roleCapabilities: List[RoleCapabilities] = list[RoleCapabilities]()

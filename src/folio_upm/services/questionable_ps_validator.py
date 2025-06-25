@@ -1,12 +1,12 @@
 from typing import List, Tuple
 
 from folio_upm.dto.source_type import FLAT_PS
-from folio_upm.dto.support import AnalyzedPermission
+from folio_upm.dto.support import AnalyzedPermissionSet
 
 
 class QuestionablePermissionValidator:
 
-    def __init__(self, ps: AnalyzedPermission):
+    def __init__(self, ps: AnalyzedPermissionSet):
         self._ps = ps
         self._reasons = list[str]()
         self._verifiers = [
