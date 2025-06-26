@@ -81,24 +81,10 @@ class EurekaClient(metaclass=SingletonMeta):
         response = self._client.get_json("/roles/capabilities", params=query_params)
         return [RoleCapabilitySet(**rc) for rc in response.get("roleCapabilitySets", [])]
 
-    def load_resource_page(self, resource: str, limit: int, offset: int, query: str):
-        """Load user permissions from Okapi."""
-        self._log.info(f"Loading {resource} page: query='{query}', limit={limit}, offset={offset}")
-
+    def load_page(self, resource: str, path: str, query: str, limit: int, offset: int):
         query_params = {"query": query, "limit": limit, "offset": offset}
-
-        response = requests.get(
-            url=f"{Env().get_okapi_url()}/{resource}",
-            params=query_params,
-        )
-
-        if response.status_code == 200:
-            entities = response.json().get(self.__to_camel_case(resource), [])
-            self._log.info(f"Page loaded successfully: {len(entities)} permission(s) found.")
-            return entities
-        else:
-            self._log.error(f"Failed to load '{resource}': {response.status_code} {response.text}")
-            raise Exception(f"Failed to load '{resource}': {response.status_code} {response.text}")
+        response_json = self._client.get_json(path, params=query_params)
+        return response_json.get(resource, [])
 
     def __perform_get_request(self, path: str, params: dict = None):
         try:

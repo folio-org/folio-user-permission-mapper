@@ -2,13 +2,11 @@ from typing import Optional
 from typing import OrderedDict as OrdDict
 from typing import override
 
-from networkx.algorithms.flow import capacity_scaling
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
-from folio_upm.dto.results import AnalyzedRole
-from folio_upm.dto.support import RoleCapabilityHolder
+from folio_upm.dto.support import RoleCapabilitiesHolder
 from folio_upm.xlsx import constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
@@ -45,7 +43,7 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
         Column[RoleCapabilityRow](w=22, n="Capability Type", f=lambda x: x.capabilityType),
     ]
 
-    def __init__(self, ws: Worksheet, data: OrdDict[str, RoleCapabilityHolder]):
+    def __init__(self, ws: Worksheet, data: OrdDict[str, RoleCapabilitiesHolder]):
         super().__init__(ws, self._title, data, self._columns)
 
         self._red_types = ["invalid", "mutable"]
@@ -59,7 +57,7 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
                 roleName=role_capability.roleName,
                 resolvedType=capability.resolvedType,
                 source=capability.permissionName,
-                sourceDisplayName = capability.displayName,
+                sourceDisplayName=capability.displayName,
                 sourceType=capability.permissionType,
                 name=capability.name,
                 resource=capability.resource,

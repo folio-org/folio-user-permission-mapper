@@ -86,33 +86,52 @@ poetry run folio-permission-mapper <command>
 
 **Description**:
 
-This command will:
-
-1. Fetch permissions defined in the Okapi module descriptors.
-2. Load all mutable permissions and their associated users.
-3. Enrich the permissions with user data.
-4. Save the results to an S3 bucket in JSON format.
+- Loads permissions from Okapi module descriptors and user assignments.
+- Saves the result as a gzipped JSON file to the configured storage (S3 or local).
 
 **Output**:
 
-- A JSON file named `okapi-permissions.json.gz` is saved to the S3 bucket under the path
-  `<tenant_id>/<tenant_id>-okapi-permissions.json.gz`. JSON is archived using gzip for compression.
+- `<tenant_id>/<tenant_id>-okapi-permissions.json.gz`
+
+---
+
+### `collect-capabilities`
+
+**Description**:
+
+- Collects Eureka capabilities and saves them as a gzipped JSON file to the configured storage.
+
+**Output**:
+
+- `<tenant_id>/<tenant_id>-eureka-capabilities.json.gz`
+
+---
 
 ### `generate-report`
 
 **Description**:
 
-This command will:
-
-1. Fetch file from s3 storage generated using `collect-permissions` command.
-2. Generate an Excel file from the JSON data.
+- Loads Okapi permissions and Eureka capabilities from storage.
+- Analyzes and combines the data.
+- Generates both an Excel report and a gzipped JSON analysis result.
 
 **Output**:
 
-- A JSON file named `analysis-result.xlsx` is saved to the S3 bucket under the path
-  `<tenant_id>/<tenant_id>-analysis-result.xlsx`.
+- `<tenant_id>/<tenant_id>-analysis-result.xlsx`
+- `<tenant_id>/<tenant_id>-analysis-result.json.gz`
 
 ---
+
+### `download-json`
+
+**Description**:
+
+- Downloads the `okapi-permissions` data from S3 and writes it as a formatted JSON file locally.
+
+**Usage**:
+
+```bash
+poetry run folio-permission-mapper download-json --out-file <output-file>
 
 ## Configuration
 

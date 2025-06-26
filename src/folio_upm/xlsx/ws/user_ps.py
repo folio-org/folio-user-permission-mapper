@@ -1,4 +1,4 @@
-from typing import Optional, override, List
+from typing import List, Optional, override
 
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet

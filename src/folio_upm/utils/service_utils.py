@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Optional, Sequence, Any
+from typing import Any, Optional, Sequence
 
 from folio_upm.dto.okapi import PermissionSet
 

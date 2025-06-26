@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from typing import List
 
-from folio_upm.dto.results import LoadResult, PermissionAnalysisResult, AnalyzedParentPermSets
+from folio_upm.dto.results import AnalyzedParentPermSets, LoadResult, PermissionAnalysisResult
 from folio_upm.dto.source_type import FLAT_PS
 from folio_upm.dto.support import AnalyzedPermissionSet
 from folio_upm.utils import log_factory
@@ -28,7 +28,7 @@ class ParentPermSetCollector:
                 result += self.__get_analyzed_parent_perm_set(ap, ps_type)
 
         skipped_perms_count = len(self._skipped_service_permissions)
-        self._log.info(f"Skipped parent service permissions: %s ", skipped_perms_count)
+        self._log.info("Skipped parent service permissions: %s ", skipped_perms_count)
         return result
 
     def __get_analyzed_parent_perm_set(self, ap: AnalyzedPermissionSet, ps_type: str) -> List[AnalyzedParentPermSets]:

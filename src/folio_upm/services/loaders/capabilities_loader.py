@@ -4,6 +4,7 @@ from typing import OrderedDict as OrdDict
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory
+from folio_upm.utils.loading_utils import PagedDataLoader
 
 
 class CapabilitiesLoader(metaclass=SingletonMeta):
@@ -14,37 +15,33 @@ class CapabilitiesLoader(metaclass=SingletonMeta):
 
     def load_capabilities(self) -> OrdDict[str, any]:
         self._log.info("Starting eureka data loading...")
-        capabilities = self.__load_data_by_query("capabilities", "cql.allRecords=1")
-        capability_sets = self.__load_data_by_query("capability-sets", "cql.allRecords=1")
-        role_users = self.__load_data_by_query("role-users", "cql.allRecords=1")
-        role_capabilities = self.__load_data_by_query("role-capabilities", "cql.allRecords=1")
-        role_capability_sets = self.__load_data_by_query("role-capability-sets", "cql.allRecords=1")
+        cql_all_query = "cql.allRecords=1"
+        roles = self.__load_data_by_query("roles", "/roles", cql_all_query)
+        capabilities = self.__load_data_by_query("capabilities", "/capabilities", cql_all_query)
+        capability_sets = self.__load_data_by_query("capabilitySets", "/capability-sets", cql_all_query)
+        role_users = self.__load_data_by_query("userRoles", "/roles/users", cql_all_query)
+        role_capabilities = self.__load_data_by_query("roleCapabilities", "/roles/capabilities", cql_all_query)
+        role_capability_sets = self.__load_data_by_query("roleCapabilitySets", "/roles/capability-sets", cql_all_query)
+        user_capabilities = self.__load_data_by_query("userCapabilities", "/users/capability-sets", cql_all_query)
+        user_capability_sets = self.__load_data_by_query("userCapabilitySets", "/users/capability-sets", cql_all_query)
 
         self._log.info("Eureka data loaded successfully.")
 
         return OrderedDict(
             {
+                "roles": roles,
                 "capabilities": capabilities,
                 "capabilitySets": capability_sets,
                 "roleUsers": role_users,
                 "roleCapabilities": role_capabilities,
+                "userCapabilities": user_capabilities,
                 "roleCapabilitySets": role_capability_sets,
+                "userCapabilitySets": user_capability_sets,
             }
         )
 
-    def __load_data_by_query(self, resource: str, query: str) -> OrdDict[str, any]:
-        self._log.info(f"Loading all '{resource}' by query: query='{query}'")
-        result = []
-        limit = 500
-        last_offset = 0
+    def __load_data_by_query(self, resource: str, path: str, query: str):
+        return PagedDataLoader(resource, self.__load_resource_page(resource, path), query).load()
 
-        while True:
-            page = self._eureka_client.load_resource_page(resource, limit, last_offset, query)
-            last_load_size = len(page)
-            result += page
-            last_offset += limit
-            if last_load_size < limit:
-                self._log.info(f"All '{resource} loaded: total={len(result)}")
-                break
-
-        return result
+    def __load_resource_page(self, resource: str, path: str):
+        return lambda query, limit, offset: self._eureka_client.load_page(resource, path, query, limit, offset)

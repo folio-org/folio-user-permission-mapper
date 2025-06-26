@@ -1,4 +1,4 @@
-from folio_upm.dto.results import LoadResult, PermissionAnalysisResult, AnalyzedUserPermissionSet
+from folio_upm.dto.results import AnalyzedUserPermissionSet, LoadResult, PermissionAnalysisResult
 
 
 class UserPermSetCollector:

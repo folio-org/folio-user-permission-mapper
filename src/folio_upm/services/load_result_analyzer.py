@@ -37,8 +37,6 @@ class LoadResultAnalyzer:
             userPermissionSets=UserPermSetCollector(load_result, ps_result).get(),
             permSetNesting=ParentPermSetCollector(load_result, ps_result).get(),
             roles=roles_provider.get_roles(),
-            # todo: add role users
             roleUsers=roles_provider.get_role_users(),
-            # todo: add role capabilities
             roleCapabilities=roles_provider.get_role_capabilities(),
         )

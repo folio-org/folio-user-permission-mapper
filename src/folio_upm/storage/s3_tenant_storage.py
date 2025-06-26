@@ -20,27 +20,23 @@ class S3TenantStorage(TenantStorage, metaclass=SingletonMeta):
         self._storage = S3Storage()
 
     @override
-    def _get_json_gz(self, object_name) -> dict | None:
-        file_key = self._get_file_key(object_name, self._json_gz_ext)
+    def _get_json_gz(self, file_key) -> dict | None:
         return self.__get_s3_object(file_key, lambda body: JsonUtils.from_json_gz(body))
 
     @override
-    def _save_json_gz(self, object_name, object_data: dict):
-        file_key = self._get_file_key(object_name, self._json_gz_ext)
+    def _save_json_gz(self, file_key, object_data: dict):
         self._log.debug(f"Uploading compressed JSON to s3: {file_key}...")
         self._storage.upload_file(file_key, JsonUtils.to_json_gz(object_data))
         self._log.info(f"Compressed JSON saved to s3: {file_key}")
 
     @override
-    def _get_xlsx(self, object_name) -> Workbook:
-        file_key = self._get_file_key(object_name, self._json_gz_ext)
+    def _get_xlsx(self, file_key) -> Workbook:
         return self.__get_s3_object(file_key, lambda body: body)
 
     @override
-    def _save_xlsx(self, object_name, xlsx_bytes: Workbook):
-        file_key = self._get_file_key(object_name, self._json_gz_ext)
+    def _save_xlsx(self, file_key, xlsx_bytes: Workbook):
         self._log.debug(f"Uploading xlsx file to s3: {file_key}...")
-        self._storage.upload_file(object_name, XlsxUtils.get_bytes(xlsx_bytes))
+        self._storage.upload_file(file_key, XlsxUtils.get_bytes(xlsx_bytes))
         self._log.info(f"xlsx file saved to s3: {file_key}")
 
     def __get_s3_object(self, file_key: str, mapper_func: Callable[[Any], Any]) -> Any:
@@ -51,5 +47,5 @@ class S3TenantStorage(TenantStorage, metaclass=SingletonMeta):
                 return mapper_func(object_body)
             finally:
                 object_body.close()
-        self._log.warn(f"Object is not found in S3 bucket: '%s'", file_key)
+        self._log.warn("Object is not found in S3 bucket: '%s'", file_key)
         return None

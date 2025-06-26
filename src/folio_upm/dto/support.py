@@ -25,7 +25,7 @@ class CapabilityPlaceholder(BaseModel):
     capabilityType: Optional[str]
 
 
-class RoleCapabilityHolder(BaseModel):
+class RoleCapabilitiesHolder(BaseModel):
     roleId: str
     roleName: str
     capabilities: List[CapabilityPlaceholder]

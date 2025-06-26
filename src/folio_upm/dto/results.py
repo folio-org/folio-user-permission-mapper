@@ -1,12 +1,12 @@
 from collections import OrderedDict
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from typing import OrderedDict as OrdDict
 
 from pydantic import BaseModel, field_serializer
 
-from folio_upm.dto.eureka import Capability, CapabilitySet, Role, UserPermission, RoleUsers
+from folio_upm.dto.eureka import Capability, CapabilitySet, Role, RoleUsers, UserPermission
 from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet
-from folio_upm.dto.support import AnalyzedPermissionSet, UserPermsHolder, RoleCapabilityHolder, ExpandedPermissionSet
+from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet, RoleCapabilitiesHolder
 from folio_upm.utils.ordered_set import OrderedSet
 
 
@@ -41,7 +41,7 @@ class PermissionAnalysisResult(BaseModel):
         for ps_type in self._all_types:
             if ps_name in getattr(self, ps_type):
                 return ps_type
-        return 'unknown'
+        return "unknown"
 
     def get_types(self):
         return self._all_types
@@ -114,7 +114,7 @@ class AnalyzedParentPermSets(BaseModel):
     parentPsSources: OrderedSet[str]
 
     def get_parent_types_str(self):
-        return ", ".join(sorted(self.parentPsTypes)) or 'not found'
+        return ", ".join(sorted(self.parentPsTypes)) or "not found"
 
     def get_parent_sources_str(self):
         return ", ".join(sorted(self.parentPsSources))
@@ -144,4 +144,4 @@ class AnalysisResult(BaseModel):
     permSetNesting: List[AnalyzedParentPermSets]
     roles: OrdDict[str, AnalyzedRole]
     roleUsers: List[RoleUsers]
-    roleCapabilities: List[RoleCapabilityHolder]
+    roleCapabilities: List[RoleCapabilitiesHolder]

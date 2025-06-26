@@ -1,12 +1,9 @@
-from typing import Optional, override, List
+from typing import List, Optional, override
 
-from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
 from folio_upm.dto.eureka import RoleUsers
-from folio_upm.dto.results import AnalyzedUserPermissionSet
-from folio_upm.xlsx import constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 

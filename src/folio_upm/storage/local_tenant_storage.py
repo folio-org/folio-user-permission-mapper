@@ -22,32 +22,27 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
 
     @override
     def _get_json_gz(self, json_name):
-        file_key = self._get_file_key(json_name, self._json_gz_ext, include_ts=False)
-        if not self.__file_exists(file_key):
-            self._log.warn("File '%s/%s' does not exist.", self._out_folder, file_key)
-            return None
-
-        with open(f"{self._out_folder}/{file_key}", "rb") as f:
-            return JsonUtils.from_json_gz(f)
+        self._log.debug("LocalTenantStorage._get_json_gz is not available.")
+        return None
 
     @override
-    def _save_json_gz(self, file_name, object_data: dict):
+    def _save_json_gz(self, file_key, object_data: dict):
         if self._skip_json_gz:
             return
         data_bytes = JsonUtils.to_json_gz(object_data)
-        self.__save_file_with_latest_included(file_name, data_bytes, self._json_gz_ext)
+        self.__save_file_with_latest_included(file_key, data_bytes)
 
     @override
-    def _save_xlsx(self, file_name, object_data: Workbook):
+    def _save_xlsx(self, file_key, object_data: Workbook):
         data_bytes = XlsxUtils.get_bytes(object_data)
-        self.__save_file_with_latest_included(file_name, data_bytes, self._xlsx_ext)
+        self.__save_file_with_latest_included(file_key, data_bytes)
 
     @override
-    def _get_xlsx(self, file_name):
+    def _get_xlsx(self, file_key):
+        self._log.debug("LocalTenantStorage._get_xlsx is not available.")
         return None
 
-    def __save_file_with_latest_included(self, file_name, object_data, file_ext: str):
-        file_key = self._get_file_key(file_name, file_ext)
+    def __save_file_with_latest_included(self, file_key, object_data):
         self.__write_binary_data(file_key, object_data)
 
     def __write_binary_data(self, file_key, binary_data: BytesIO):
@@ -70,5 +65,5 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
             os.makedirs(directory)
         return directory
 
-    def __file_exists(self, file_name):
-        return os.path.exists(f"{self._out_folder}/{file_name}")
+    def __file_exists(self, file_key):
+        return os.path.exists(f"{self._out_folder}/{file_key}")

@@ -44,7 +44,6 @@ class PagedDataLoader:
         loader_func: Callable[[str, int, int], List[Any]],
         query: str = "cql.allRecords=1",
         batch_limit: int = 500,
-        extra_params: Optional[dict] = None,
     ):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._resource = resource

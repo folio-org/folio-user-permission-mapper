@@ -16,31 +16,44 @@ class TenantStorage:
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._override_reports = override_reports
 
-    def save_object(self, object_name: str, object_ext: str = "json.gz", object_data: Any = None):
+    def save_object(self, object_name: str, object_ext: str, object_data: Any = None):
+        file_key = self._get_file_key(object_name, object_ext)
         if object_ext == "json.gz":
-            self._save_json_gz(object_name, object_data)
+            self._save_json_gz(file_key, object_data)
         elif object_ext == "json":
-            self._save_json(object_name, object_data)
+            self._save_json(file_key, object_data)
         elif object_ext == "xlsx":
-            self._save_xlsx(object_name, object_data)
+            self._save_xlsx(file_key, object_data)
         else:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
 
-    def get_object(self, object_name: str, object_ext: str = "json.gz"):
+    def get_object(self, object_name: str, object_ext: str):
+        file_key = self._get_file_key(object_name, object_ext)
         if object_ext == "json.gz":
-            return self._get_json_gz(object_name)
+            return self._get_json_gz(file_key)
         elif object_ext == "json":
-            return self._get_json(object_name)
+            return self._get_json(file_key)
         elif object_ext == "xlsx":
-            return self._get_xlsx(object_name)
+            return self._get_xlsx(file_key)
         else:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
             return None
 
-    def _get_json(self, object_name: str):
+    def get_ref_object_by_key(self, ref_key, object_ext):
+        if object_ext.endswith("json.gz"):
+            return self._get_json_gz(ref_key)
+        elif object_ext.endswith("json"):
+            return self._get_json(ref_key)
+        elif object_ext.endswith("xlsx"):
+            return self._get_xlsx(ref_key)
+        else:
+            self._log.error("Unsupported object type: %s, file=%s", object_ext, ref_key)
+        return None
+
+    def _get_json(self, file_key: str):
         pass
 
-    def _save_json(self, object_name: str, object_data: Any):
+    def _save_json(self, file_key: str, object_data: Any):
         pass
 
     def _get_json_gz(self, object_name: str):

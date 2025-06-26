@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Generic, Iterable, Iterator, List, TypeVar, Optional
+from typing import Any, Generic, Iterable, Iterator, List, Optional, TypeVar
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import CoreSchema, core_schema

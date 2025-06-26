@@ -68,7 +68,7 @@ class PermSetStatisticsCollector:
     def __get_sub_perms_count_by_type(ap: AnalyzedPermissionSet, src_types: Set[SourceType]) -> int:
         unique_sub_permissions = set()
         for src_ps in ap.sourcePermSets:
-            if not src_ps.src in src_types:
+            if src_ps.src not in src_types:
                 continue
             unique_sub_permissions |= set(src_ps.val.subPermissions)
         return len(unique_sub_permissions)
