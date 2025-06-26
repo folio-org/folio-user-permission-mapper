@@ -1,4 +1,4 @@
-from folio_upm.integrations.okapi_http_client import OkapiHttpClient
+from folio_upm.integration.clients.base.okapi_http_client import OkapiHttpClient
 from folio_upm.utils import log_factory
 from folio_upm.utils.upm_env import Env
 

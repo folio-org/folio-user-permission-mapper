@@ -12,12 +12,11 @@ class UserPsWorksheet(AbstractWorksheet):
     _columns = [
         Column(w=40, n="User Id", f=lambda x: x.role.id),
         Column(w=60, n="PS Name", f=lambda x: x.role.name),
-        Column(w=60, n="PS Type", f=lambda x: x.role.name)
+        Column(w=60, n="PS Type", f=lambda x: x.role.name),
     ]
 
     def __init__(self, ws: Worksheet, data: OrdDict[str, AnalyzedRole]):
         super().__init__(ws, self._title, data, self._columns)
-
 
     @override
     def _get_iterable_data(self):

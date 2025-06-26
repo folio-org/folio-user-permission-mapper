@@ -1,13 +1,12 @@
-from typing import List, Optional, Any, TypeVar, Generic
+from typing import Any, Generic, List, Optional, TypeVar
 
 from black.lines import Callable
-from openpyxl.styles import Alignment, PatternFill
+from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
 from folio_upm.utils import log_factory
 from folio_upm.xlsx import constants
-
 
 T = TypeVar("T")
 

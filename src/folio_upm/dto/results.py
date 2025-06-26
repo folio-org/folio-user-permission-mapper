@@ -1,11 +1,12 @@
 from collections import OrderedDict
-from typing import List, Optional, OrderedDict as OrdDict
+from typing import List, Optional, Tuple
+from typing import OrderedDict as OrdDict
 
 from pydantic import BaseModel
 
-from folio_upm.dto.eureka import Capability, CapabilitySet, Role, RoleUsers, UserPermission
+from folio_upm.dto.eureka import Capability, CapabilitySet, Role, UserPermission
 from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet
-from folio_upm.dto.support import AnalyzedPermissionSet, RoleCapabilities, UserPermsHolder
+from folio_upm.dto.support import AnalyzedPermissionSet, UserPermsHolder
 from folio_upm.utils.ordered_set import OrderedSet
 
 
@@ -46,11 +47,11 @@ class PermissionAnalysisResult(BaseModel):
 
 class UserStatistics(BaseModel):
     userId: str
-    mutablePermissionSetsCount: int = 0
-    invalidPermissionSetsCount: int = 0
-    okapiPermissionSetsCount: int = 0
-    deprecatedPermissionSetsCount: int = 0
-    allPermissionSetsCount: int = 0
+    mutablePermissionSetsCount: int
+    invalidPermissionSetsCount: int
+    okapiPermissionSetsCount: int
+    deprecatedPermissionSetsCount: int
+    allPermissionSetsCount: int
 
 
 class AnalyzedRole(BaseModel):
@@ -58,10 +59,10 @@ class AnalyzedRole(BaseModel):
     users: List[str] = list[str]()
     source: str
     excluded: bool = False
-    assignedUsersCount: int = 0
-    permissionsCount: int = 0
-    flatPermissionsCount: int = 0
-    totalPermissionsCount: int = 0
+    assignedUsersCount: int
+    permissionsCount: int
+    flatPermissionsCount: int
+    totalPermissionsCount: int
 
 
 class PsStatistics(BaseModel):
@@ -94,9 +95,10 @@ class PsStatistics(BaseModel):
 
 
 class AnalyzedPermSetPermSets(BaseModel):
-    userId: str
     permissionName: str
     permissionType: str
+    parentPermissionName: str
+    parentPermissionTypes: List[str]
 
 
 class AnalyzedUserPermissionSet(BaseModel):

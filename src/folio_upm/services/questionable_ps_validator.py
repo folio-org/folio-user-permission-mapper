@@ -34,19 +34,19 @@ class QuestionablePermissionValidator:
         self._reasons.append(field)
 
     def __check_multiple_mutable_values(self) -> Tuple[bool, str]:
-        return len(set([sp.val.mutable for sp in self._ps.srcPermSets])) > 1, "mutable"
+        return len(set([sp.val.mutable for sp in self._ps.sourcePermSets])) > 1, "mutable"
 
     def __check_multiple_deprecated_values(self):
-        return len(set([vh.val.deprecated for vh in self._ps.srcPermSets])) > 1, "deprecated"
+        return len(set([vh.val.deprecated for vh in self._ps.sourcePermSets])) > 1, "deprecated"
 
     def __has_multiple_display_names(self):
-        return len(set([ps.val.displayName for ps in self._ps.srcPermSets])) > 1, "displayName"
+        return len(set([ps.val.displayName for ps in self._ps.sourcePermSets])) > 1, "displayName"
 
     def __has_multiple_descriptors(self):
-        return len(set([ps.val.description for ps in self._ps.srcPermSets if ps.val.description])) > 1, "description"
+        return len(set([ps.val.description for ps in self._ps.sourcePermSets if ps.val.description])) > 1, "description"
 
     def __check_different_sub_permissions(self) -> Tuple[bool, str]:
-        values = self._ps.srcPermSets
+        values = self._ps.sourcePermSets
         sub_permissions_sets = [frozenset(sp.val.subPermissions) for sp in values if sp.src != FLAT_PS]
         f_sub_perms_sets = [x for x in sub_permissions_sets if len(x) > 0]
         flat_sub_permissions_sets = [frozenset(sp.val.subPermissions) for sp in values if sp.src == FLAT_PS]

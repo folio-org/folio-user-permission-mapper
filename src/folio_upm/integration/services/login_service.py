@@ -3,7 +3,7 @@ import os
 from cachetools import TTLCache, cached
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.integrations.login_client import LoginClient
+from folio_upm.integration.clients.login_client import LoginClient
 from folio_upm.utils import log_factory
 from folio_upm.utils.upm_env import Env
 

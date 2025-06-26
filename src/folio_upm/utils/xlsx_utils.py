@@ -1,5 +1,4 @@
 from io import BytesIO
-from typing import io
 
 from openpyxl.workbook import Workbook
 

@@ -1,4 +1,4 @@
-from typing import Iterable, Any, Callable, List, Optional
+from typing import Any, Callable, Iterable, List, Optional
 
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import IterableUtils

@@ -1,19 +1,21 @@
-from typing import List, OrderedDict as OrdDict, Tuple
+from typing import List
+from typing import OrderedDict as OrdDict
+from typing import Tuple
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import Capability, Role
+from folio_upm.dto.eureka import Capability
 from folio_upm.dto.results import AnalysisResult, AnalyzedRole
-from folio_upm.integrations import eureka_client
+from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import CqlQueryUtils
-from folio_upm.utils.loading_utils import PartitionedDataLoader, PagedDataLoader
+from folio_upm.utils.loading_utils import PagedDataLoader, PartitionedDataLoader
 
 
 class EurekaService(metaclass=SingletonMeta):
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.info("EurekaService initialized.")
-        self._client = eureka_client.EurekaClient()
+        self._client = EurekaClient()
 
     def migrate_to_eureka(self, result: AnalysisResult):
         self.__create_roles(result.roles)
@@ -38,6 +40,9 @@ class EurekaService(metaclass=SingletonMeta):
                 self._log.info("Role is created: id=%s, name=%s", created_role.id, role_name)
             else:
                 self._log.info("Role '%s' already exists, skipping creation.", role_name)
+
+    def __load_roles(self, role_names_query):
+        return self._client.find_roles_by_query(role_names_query)
 
     def __assign_role_users(self, user_roles: OrdDict[str, List[str]]):
         self._log.info("Assigning users to roles...")
@@ -97,23 +102,26 @@ class EurekaService(metaclass=SingletonMeta):
 
     def __find_capabilities(self, ps_names: List[str]) -> List[Capability]:
         self._log.info("Retrieving capabilities by permission names: %s...", ps_names)
-        data_loader_func = lambda query: self._client.find_capabilities(query)
-        data_loader = PartitionedDataLoader("capabilities", ps_names, data_loader_func, self.__get_query_builder)
+        loader = self.__find_capabilities_by_query
+        data_loader = PartitionedDataLoader("capabilities", ps_names, loader, self.build_any_match_query)
         return data_loader.load()
+
+    def __find_capabilities_by_query(self, query: str) -> List[Capability]:
+        return self._client.find_capabilities(query)
 
     def __find_capability_sets(self, ps_names: List[str]) -> List[Capability]:
         self._log.info("Retrieving capability sets by permission names: %s...", ps_names)
-        data_loader_func = lambda query: self._client.find_capability_sets(query)
-        data_loader = PartitionedDataLoader("capability-sets", ps_names, data_loader_func, self.__get_query_builder)
+        loader = lambda query: self._client.find_capability_sets(query)
+        data_loader = PartitionedDataLoader("capability-sets", ps_names, loader, self.build_any_match_query)
         return data_loader.load()
 
-    def __load_roles(self, role_names_query):
-        return self._client.find_roles_by_query(role_names_query)
+    def __find_capability_sets_by_query(self, query: str) -> List[Capability]:
+        return self._client.find_capability_sets(query)
 
     @staticmethod
     def __any_match_by_name(values: List[str]) -> str:
         return CqlQueryUtils.any_match_by_field("name", values)
 
     @staticmethod
-    def __get_query_builder(permission_names: List[str]) -> str:
+    def build_any_match_query(permission_names: List[str]) -> str:
         return CqlQueryUtils.any_match_by_field("permission", permission_names)

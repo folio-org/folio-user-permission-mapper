@@ -2,7 +2,7 @@ from collections import OrderedDict
 from typing import OrderedDict as OrdDict
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.integrations.eureka_client import EurekaClient
+from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory
 
 

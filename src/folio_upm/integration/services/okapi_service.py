@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
-import folio_upm.integrations.okapi_client as okapi_client
 from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.integration.clients.okapi_client import OkapiClient
 from folio_upm.utils import log_factory
 
 
@@ -10,7 +10,7 @@ class OkapiService(metaclass=SingletonMeta):
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.info("OkapiService initialized")
-        self._client = okapi_client.OkapiClient()
+        self._client = OkapiClient()
 
     def get_okapi_defined_permissions(self):
         module_descriptors = self._client.read_module_descriptors()

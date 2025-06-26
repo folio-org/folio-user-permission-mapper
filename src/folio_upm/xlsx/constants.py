@@ -1,4 +1,4 @@
-from openpyxl.styles import Font, Side, Border, PatternFill, Alignment
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 almost_white = "f2f2f2"
 light_red = "ffe1e5"

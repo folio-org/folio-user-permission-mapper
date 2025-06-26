@@ -1,7 +1,8 @@
 import io
 from collections import OrderedDict
-from typing import Callable, List, Tuple
+from typing import Callable, List
 from typing import OrderedDict as OrdDict
+from typing import Tuple
 
 from openpyxl import Workbook
 from openpyxl.formatting.rule import FormulaRule

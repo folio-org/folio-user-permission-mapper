@@ -1,4 +1,7 @@
 from collections import OrderedDict
+from typing import Optional
+
+from folio_upm.dto.okapi import PermissionSet
 
 
 class ServiceUtils:
@@ -21,3 +24,13 @@ class ServiceUtils:
         elif value in ("false", "no", "0"):
             return False
         return default_val
+
+    @staticmethod
+    def get_module_id(permission_set: PermissionSet) -> Optional[str]:
+        module_name = permission_set.moduleName
+        if not module_name:
+            return None
+        module_version = permission_set.moduleVersion
+        if not module_version:
+            return module_name
+        return f"{module_name}-{module_version}"

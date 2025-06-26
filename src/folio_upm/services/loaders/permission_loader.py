@@ -2,8 +2,8 @@ from collections import OrderedDict
 from typing import OrderedDict as OrdDict
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.services.okapi_service import OkapiService
-from folio_upm.services.permission_service import PermissionService
+from folio_upm.integration.services.okapi_service import OkapiService
+from folio_upm.integration.services.permission_service import PermissionService
 from folio_upm.utils import log_factory
 
 

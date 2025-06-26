@@ -1,4 +1,3 @@
-from io import BytesIO
 from typing import Any, Callable
 
 from openpyxl.workbook import Workbook

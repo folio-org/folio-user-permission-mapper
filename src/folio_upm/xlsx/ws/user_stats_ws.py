@@ -37,9 +37,5 @@ class UserStatsWorksheet(AbstractWorksheet):
     def _get_iterable_data(self) -> List[UserStatistics]:
         return sorted(
             self._data,
-            key=lambda x: (
-                -x.mutablePermissionSetsCount,
-                -x.invalidPermissionSetsCount,
-                -x.okapiPermissionSetsCount
-            )
+            key=lambda x: (-x.mutablePermissionSetsCount, -x.invalidPermissionSetsCount, -x.okapiPermissionSetsCount),
         )

@@ -1,9 +1,9 @@
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.integrations.permissions_client import PermissionsClient
+from folio_upm.integration.clients.permissions_client import PermissionsClient
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import CqlQueryUtils
+from folio_upm.utils.loading_utils import PagedDataLoader, PartitionedDataLoader
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.loading_utils import PartitionedDataLoader, PagedDataLoader
 from folio_upm.utils.upm_env import Env
 
 
@@ -36,4 +36,4 @@ class PermissionService(metaclass=SingletonMeta):
         return partitioned_data_loader.load()
 
     def __load_ps_page(self, expanded=False):
-        return lambda q, l, o: self._client.load_perms_page(q, l, o, expanded)
+        return lambda query, limit, offset: self._client.load_perms_page(query, limit, offset, expanded)

@@ -1,10 +1,12 @@
 import uuid
-from typing import List, OrderedDict as OrdDict
 from collections import OrderedDict
+from typing import List
+from typing import OrderedDict as OrdDict
+
 from folio_upm.dto.eureka import Role, RoleUsers
-from folio_upm.dto.results import EurekaLoadResult, LoadResult, PermissionAnalysisResult, AnalyzedRole
+from folio_upm.dto.results import AnalyzedRole, EurekaLoadResult, LoadResult, PermissionAnalysisResult
 from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
-from folio_upm.dto.support import RoleCapabilities, AnalyzedPermissionSet
+from folio_upm.dto.support import AnalyzedPermissionSet, RoleCapabilities
 from folio_upm.utils import log_factory
 
 
@@ -42,7 +44,7 @@ class RolesProvider:
 
     def __create_roles(self) -> OrdDict[str, AnalyzedRole]:
         result = OrderedDict[str, AnalyzedRole]()
-        for ps_name, analyzed_ps in self._ps_analysis_result.mutable.items():
+        for analyzed_ps in self._ps_analysis_result.mutable.values():
             ar = RolesProvider.__create_role(analyzed_ps)
             result[ar.role.id] = ar
         return result
@@ -52,7 +54,19 @@ class RolesProvider:
         name = analyzed_ps.get_first_value(lambda x: x.displayName)
         description = analyzed_ps.get_first_value(lambda x: x.description)
         role = Role(id=str(uuid.uuid4()), name=name, description=description)
-        return AnalyzedRole(role=role, source=analyzed_ps.permissionName)
+        return AnalyzedRole(
+            role=role,
+            source=analyzed_ps.permissionName,
+            excluded=False,
+            # todo: This should be calculated based on role_users
+            assignedUsersCount=0,
+            # todo: This should be calculated based on role_capabilities
+            permissionsCount=0,
+            # todo: This should be calculated based on role_capabilities
+            flatPermissionsCount=0,
+            # todo: This should be calculated based on role_capabilities
+            totalPermissionsCount=0,
+        )
 
     def __create_role_users(self) -> List[RoleUsers]:
         pass

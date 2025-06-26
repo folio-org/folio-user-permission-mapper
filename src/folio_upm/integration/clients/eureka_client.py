@@ -5,7 +5,7 @@ import requests
 
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.dto.eureka import Capability, Role, RoleCapability, RoleCapabilitySet
-from folio_upm.integrations.eureka_http_client import EurekaHttpClient
+from folio_upm.integration.clients.base.eureka_http_client import EurekaHttpClient
 from folio_upm.utils import log_factory
 from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env

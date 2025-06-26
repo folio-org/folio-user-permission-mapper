@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Callable
+from typing import Callable, List, Optional, Tuple
 
 from pydantic import BaseModel
 
@@ -26,10 +26,8 @@ class AnalyzedPermissionSet(BaseModel):
     note: Optional[str] = None
     reasons: List[str] = []
     permissionName: str = None
-    srcPermSets: List[SourcedPermissionSet] = []
+    sourcePermSets: List[SourcedPermissionSet] = []
 
     def get_first_value(self, value_extractor: Callable[[PermissionSet], str]) -> Optional[str]:
-        extracted_values = [value_extractor(i.val) for i in self.srcPermSets]
+        extracted_values = [value_extractor(i.val) for i in self.sourcePermSets]
         return extracted_values[0] if len(extracted_values) > 1 else None
-
-

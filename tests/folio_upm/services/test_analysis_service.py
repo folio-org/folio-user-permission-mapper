@@ -5,10 +5,6 @@ from folio_upm.utils.ordered_set import OrderedSet
 
 
 def test_test():
-    set_a = {1,2,3}
-    set_b = [[1,2,3], [1,2,4]]
-    rs = {}
-    print(list(reduce(lambda x, y: x | y, [set(x) for x in set_b])))
     assert 1 != 2
 
 

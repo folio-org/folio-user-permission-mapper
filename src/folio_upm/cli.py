@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-from typing import List, Tuple
+from typing import Tuple
 
 import click
 
 from folio_upm.dto.results import AnalysisResult, EurekaLoadResult
 from folio_upm.dto.strategy_type import StrategyType
-from folio_upm.services.eureka_service import EurekaService
+from folio_upm.integration.services.eureka_service import EurekaService
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
-from folio_upm.services.permission_loader import PermissionLoader
+from folio_upm.services.loaders.permission_loader import PermissionLoader
 from folio_upm.storage.s3_storage import S3Storage
 from folio_upm.storage.s3_tenant_storage import S3TenantStorage
 from folio_upm.storage.tenant_storage_service import TenantStorageService
@@ -46,6 +46,7 @@ def collect_capabilities(storage: Tuple):
     capability_load_result = EurekaLoadResult()
     storage_service = TenantStorageService(get_storages_list(storage))
     storage_service.save_object(eureka_capabilities_fn, json_gz_ext, capability_load_result)
+
 
 @cli.command("generate-report")
 @click.option("--storage", "-s", type=click.Choice(["s3", "local"]), multiple=True, default=["s3"])
@@ -119,6 +120,7 @@ def validate_and_get_strategy(role_strategy):
         _log.error(f"Invalid role strategy: {role_strategy}.")
         raise ValueError(f"Invalid role strategy: {role_strategy}.")
     return strategy
+
 
 def get_storages_list(storage):
     return [i for i in storage]
