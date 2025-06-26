@@ -52,7 +52,6 @@ def collect_capabilities(storage: Tuple):
 
 @cli.command("generate-report")
 @click.option("--storage", "-s", type=click.Choice(["s3", "local"]), multiple=True, default=["s3"])
-
 def generate_report(storage: Tuple):
     storages = get_storages_list(storage)
     storage_service = TenantStorageService(storages)

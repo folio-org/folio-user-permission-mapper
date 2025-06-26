@@ -1,9 +1,10 @@
 import uuid
 from collections import OrderedDict
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from typing import OrderedDict as OrdDict
+from typing import Tuple
 
-from folio_upm.dto.eureka import Role, RoleUsers, CapabilitySet, Capability
+from folio_upm.dto.eureka import Capability, CapabilitySet, Role, RoleUsers
 from folio_upm.dto.results import AnalyzedRole, EurekaLoadResult, LoadResult, PermissionAnalysisResult
 from folio_upm.dto.support import (
     AnalyzedPermissionSet,

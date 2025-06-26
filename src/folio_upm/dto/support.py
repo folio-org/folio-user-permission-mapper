@@ -2,7 +2,6 @@ from typing import Callable, List, Optional, Tuple
 
 from pydantic import BaseModel
 
-from folio_upm.dto.capability_type import CapabilityType
 from folio_upm.dto.okapi import PermissionSet
 from folio_upm.dto.source_type import SourceType
 from folio_upm.utils.ordered_set import OrderedSet
