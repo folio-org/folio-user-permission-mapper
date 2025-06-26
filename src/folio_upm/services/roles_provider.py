@@ -15,7 +15,6 @@ from folio_upm.dto.support import (
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.service_utils import ServiceUtils
 from folio_upm.utils.system_roles_provider import SystemGeneratedRolesProvider
 
 

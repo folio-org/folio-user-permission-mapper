@@ -5,12 +5,14 @@ from folio_upm.storage.local_tenant_storage import LocalTenantStorage
 from folio_upm.storage.s3_tenant_storage import S3TenantStorage
 from folio_upm.storage.tenant_storage import TenantStorage
 from folio_upm.utils import log_factory
+from folio_upm.utils.upm_env import Env
 
 
 class TenantStorageService(metaclass=SingletonMeta):
 
-    def __init__(self, storages: List[str]):
+    def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
+        storages = Env().get_enabled_storages()
         self._log.debug("Initializing TenantStorageService: storages: %s", storages)
         self._storage_names = [storage.lower() for storage in storages]
         self._storages = list[TenantStorage]()
@@ -36,7 +38,7 @@ class TenantStorageService(metaclass=SingletonMeta):
             found_object = storage.get_object(object_name, object_ext)
             if found_object is not None:
                 return found_object
-        raise FileNotFoundError(f'File not found in storages {self._storage_names}: {object_name}.{object_ext}.')
+        raise FileNotFoundError(f"File not found in storages {self._storage_names}: {object_name}.{object_ext}.")
 
     def get_ref_object_by_key(self, object_name: str):
         for storage in self._storages:

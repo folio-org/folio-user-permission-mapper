@@ -58,8 +58,8 @@ class Env(metaclass=SingletonMeta):
         storages = self.get_env("ENABLED_STORAGES", default_value="local")
         parsed_storages = [x.strip() for x in storages.split(",")]
         allowed_values = {"s3", "local"}
-        if set(parsed_storages) <= allowed_values:
-            raise ValueError(f"Invalid storage types provided. Allowed values are: {allowed_values}'.")
+        if not set(parsed_storages) <= allowed_values:
+            raise ValueError(f"Invalid storages: '{parsed_storages}'. Allowed values are: {allowed_values}'.")
         return parsed_storages
 
     @lru_cache(maxsize=100)
