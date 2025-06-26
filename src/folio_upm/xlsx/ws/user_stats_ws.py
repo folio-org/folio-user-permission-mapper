@@ -35,7 +35,12 @@ class UserStatsWorksheet(AbstractWorksheet):
         return constants.almost_white_fill
 
     def _get_iterable_data(self) -> List[UserStatistics]:
-        return sorted(
-            self._data,
-            key=lambda x: (-x.mutablePermissionSetsCount, -x.invalidPermissionSetsCount, -x.okapiPermissionSetsCount),
+        return sorted(self._data, key=self.__get_sort_order)
+
+    @staticmethod
+    def __get_sort_order(user_stats: UserStatistics) -> tuple:
+        return (
+            -user_stats.mutablePermissionSetsCount,
+            -user_stats.invalidPermissionSetsCount,
+            -user_stats.okapiPermissionSetsCount,
         )

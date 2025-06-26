@@ -31,6 +31,7 @@ class AbstractWorksheet:
         self._log.debug("Worksheet fill initialized: '%s'...", self._ws.title)
         self._populate_headers()
         self._fill_rows()
+        self._ws.freeze_panes = "A2"
         self._ws.auto_filter.ref = self._ws.dimensions
         self._log.debug("Worksheet filled with data: '%s'", self._ws.title)
 

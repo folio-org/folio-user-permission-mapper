@@ -43,11 +43,11 @@ class PermSetStatisticsCollector:
     def __get_stats_for_analyzed_ps(self, ap: AnalyzedPermissionSet, ps_type: str) -> PsStatistics:
         return PsStatistics(
             name=ap.permissionName,
-            displayNames=list(OrderedSet([x.val.displayName for x in ap.sourcePermSets if x.val.displayName])),
+            displayNames=list(OrderedSet[str]([x.val.displayName for x in ap.sourcePermSets if x.val.displayName])),
             type=ps_type,
             note=ap.note,
             reasons=ap.reasons,
-            uniqueSources=list(OrderedSet([x.src for x in ap.sourcePermSets])),
+            uniqueSources=list(OrderedSet[str]([x.src for x in ap.sourcePermSets])),
             refCount=len(ap.sourcePermSets),
             uniqueModules=self.__get_uq_module_ids(ap),
             subPermsCount=self.__get_sub_perms_count_by_type(ap, {PS, OKAPI_PS}),
@@ -61,7 +61,7 @@ class PermSetStatisticsCollector:
         for x in ap.sourcePermSets:
             module_id = ServiceUtils.get_module_id(x.val)
             if module_id:
-                module_ids.add(module_id)
+                module_ids.append(module_id)
         return module_ids.to_list()
 
     @staticmethod

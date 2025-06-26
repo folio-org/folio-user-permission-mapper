@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Generic, Iterable, Iterator, List, TypeVar
+from typing import Any, Generic, Iterable, Iterator, List, TypeVar, Optional
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import CoreSchema, core_schema
@@ -9,21 +9,26 @@ T = TypeVar("T")
 
 
 class OrderedSet(Generic[T]):
-    def __init__(self, iterable: Iterable[T] = None) -> None:
+    def __init__(self, value: Optional[T | Iterable[T]] = None) -> None:
         """
         Initialize the OrderedSet. Optionally populate it with elements from an iterable.
 
         Args:
-            iterable (iterable, optional): An iterable to initialize the OrderedSet with.
+            value (iterable, optional): An iterable to initialize the OrderedSet with.
         """
         self._data: OrderedDict[T, None] = OrderedDict()
-        if iterable:
-            for item in iterable:
-                self.add(item)
+        if value is None:
+            return
 
-    def add(self, item: T | Iterable[T]) -> None:
+        if self.__is_iterable(value):
+            for item in value:
+                self.append(item)
+        else:
+            self.append(value)
+
+    def append(self, item: T | Iterable[T]) -> None:
         """Add an item to the set."""
-        if isinstance(item, Iterable) and not isinstance(item, str):
+        if self.__is_iterable(item):
             for sub_item in item:
                 if sub_item not in self._data:
                     self._data[sub_item] = None
@@ -31,10 +36,10 @@ class OrderedSet(Generic[T]):
             self._data[item] = None
 
     def __iadd__(self, other: Iterable[T]) -> "OrderedSet[T]":
-        if not isinstance(other, Iterable):
+        if not self.__is_iterable(other):
             raise TypeError(f"Expected an iterable, got {type(other).__name__}")
         for item in other:
-            self.add(item)
+            self.append(item)
         return self
 
     def remove(self, item: T) -> None:
@@ -69,7 +74,7 @@ class OrderedSet(Generic[T]):
         """Create an OrderedSet from a list."""
         ordered_set = cls()
         for item in items:
-            ordered_set.add(item)
+            ordered_set.append(item)
         return ordered_set
 
     @classmethod
@@ -86,3 +91,7 @@ class OrderedSet(Generic[T]):
         if not isinstance(value, list):
             raise TypeError(f"Expected a list, got {type(value).__name__}")
         return cls(value)
+
+    @staticmethod
+    def __is_iterable(item):
+        return isinstance(item, Iterable) and not isinstance(item, str)

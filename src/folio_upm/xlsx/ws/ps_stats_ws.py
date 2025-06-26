@@ -11,11 +11,11 @@ from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 class PermissionStatsWorksheet(AbstractWorksheet):
 
     title = "PS Stats"
-    _yellow_types = ["deprecated", "questionable", "unprocessed"]
+
     _columns = [
         Column[PsStatistics](w=80, n="PS Name", f=lambda x: x.name),
         Column[PsStatistics](w=100, n="Display Name", f=lambda x: x.get_uq_display_names_str()),
-        Column[PsStatistics](w=15, n="PS Type", f=lambda x: x.type),
+        Column[PsStatistics](w=18, n="PS Type", f=lambda x: x.type),
         Column[PsStatistics](w=16, n="# of Parent", f=lambda x: x.parentPermsCount),
         Column[PsStatistics](w=16, n="# of Sub PS", f=lambda x: x.subPermsCount),
         Column[PsStatistics](w=23, n="# of Flat Sub PS", f=lambda x: x.flatPermCount),
@@ -28,6 +28,7 @@ class PermissionStatsWorksheet(AbstractWorksheet):
 
     def __init__(self, ws: Worksheet, data: List[PsStatistics]):
         super().__init__(ws, self.title, data, self._columns)
+        self._yellow_types = ["deprecated", "questionable", "unprocessed"]
         self._data = data
 
     @override

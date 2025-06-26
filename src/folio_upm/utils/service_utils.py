@@ -1,10 +1,16 @@
 from collections import OrderedDict
-from typing import Optional
+from typing import Optional, Sequence, Any
 
 from folio_upm.dto.okapi import PermissionSet
 
 
 class ServiceUtils:
+
+    @staticmethod
+    def last(value: Sequence[Any | None]):
+        if value is not None and len(value) > 0:
+            return value[-1]
+        return None
 
     @staticmethod
     def is_system_permission(permission: str) -> bool:

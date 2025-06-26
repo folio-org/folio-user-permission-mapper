@@ -21,7 +21,8 @@ class UserRoles(BaseModel):
 
 class RoleUsers(BaseModel):
     roleId: str
-    userIds: List[str] = []
+    roleName: Optional[str]
+    userIds: List[str]
 
 
 class RoleCapability(BaseModel):
