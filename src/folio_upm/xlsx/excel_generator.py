@@ -13,6 +13,7 @@ from folio_upm.dto.results import AnalysisResult
 from folio_upm.utils import log_factory
 from folio_upm.xlsx.ws.ps_stats_ws import PermissionStatsWorksheet
 from folio_upm.xlsx.ws.roles_ws import RolesAbstractWorksheet
+from folio_upm.xlsx.ws.user_ps import UserPermissionSetsWorksheet
 from folio_upm.xlsx.ws.user_stats_ws import UserStatsWorksheet
 
 _light_green_fill = PatternFill(start_color="c6efe3", end_color="c6efe3", fill_type="darkHorizontal")
@@ -34,6 +35,7 @@ class ExcelResultGenerator:
     _worksheet_definitions = [
         (UserStatsWorksheet, lambda ar: ar.userStatistics),
         (PermissionStatsWorksheet, lambda ar: ar.psStatistics),
+        (UserPermissionSetsWorksheet, lambda ar: ar.userPermissionSets),
         (RolesAbstractWorksheet, lambda ar: ar.roles),
     ]
 

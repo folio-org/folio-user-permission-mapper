@@ -14,7 +14,7 @@ from folio_upm.storage.tenant_storage_service import TenantStorageService
 from folio_upm.utils import log_factory
 from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env
-from folio_upm.xlsx.excel_result_generator import ExcelResultGenerator
+from folio_upm.xlsx.excel_generator import ExcelResultGenerator
 
 xlsx_ext = "xlsx"
 json_gz_ext = "json.gz"

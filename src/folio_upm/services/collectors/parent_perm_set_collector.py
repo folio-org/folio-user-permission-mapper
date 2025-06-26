@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from folio_upm.dto.results import LoadResult, PermissionAnalysisResult, AnalyzedPermSetPermSets
+from folio_upm.dto.source_type import FLAT_PS
 from folio_upm.dto.support import AnalyzedPermissionSet
 
 
@@ -15,7 +16,7 @@ class ParentPermSetCollector:
         self._parent_perm_sets = self.__collect_data()
 
     def get(self):
-        return self._parent_perm_sets
+        return []
 
     def __collect_data(self):
         result = []
@@ -27,7 +28,9 @@ class ParentPermSetCollector:
     def __get_analyzed_parent_perm_set(self, ap: AnalyzedPermissionSet, ps_type: str) -> AnalyzedPermSetPermSets:
         result = []
         parent_ps_dict = OrderedDict()
-        for sourcePermSet in ap.sourcePermSets:
-            sourcePermSet.
-            result.append(analyzed_value)
+        for source_perm_set in ap.sourcePermSets:
+            if source_perm_set.src == FLAT_PS:
+                continue
+            ps = source_perm_set.val.childOf
+
         return result

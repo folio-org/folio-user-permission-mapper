@@ -68,18 +68,7 @@ class PermSetProcessor:
         return self._all_permission_sets
 
     def get_user_permission_sets(self):
-        """
-        Returns a list with an analysis result for user permission sets, including the following fields:
-            - user id
-            - permission set name
-            - permission set source type
-            - is permission being mutable
-            - is permission being deprecated
-            - is permission being valid
-            - has sub permissions
 
-        :return: a list with data to generate a report page about user mutable permission sets
-        """
         return self._user_permission_sets
 
     def get_parent_permission_sets(self):

@@ -9,6 +9,10 @@ from folio_upm.dto.okapi import PermissionSet
 from folio_upm.dto.results import AnalysisResult, LoadResult
 from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
 from folio_upm.dto.support import AnalyzedPermissionSet, RoleCapabilities, UserPermsHolder
+from folio_upm.services.collectors.parent_perm_set_collector import ParentPermSetCollector
+from folio_upm.services.collectors.perm_set_stats_collector import PermSetStatisticsCollector
+from folio_upm.services.collectors.user_perm_set_collector import UserPermSetCollector
+from folio_upm.services.collectors.user_stats_collector import UserStatsCollector
 from folio_upm.services.permission_analyzer import PermissionAnalyzer
 from folio_upm.services.permission_processor import PermSetProcessor
 from folio_upm.services.roles_provider import RolesProvider
@@ -32,8 +36,10 @@ class LoadResultAnalyzer:
         return self._result
 
     def __analyze_results(self) -> AnalysisResult:
-        roles_provider = RolesProvider(self._lr, self._ps_ar, self._eureka_lr, self._strategy)
-        ps_processor = PermSetProcessor(self._lr, self._ps_ar)
+        load_result = self._lr
+        ps_result = self._ps_ar
+        roles_provider = RolesProvider(load_result, ps_result, self._eureka_lr, self._strategy)
+        ps_processor = PermSetProcessor(load_result, ps_result)
 
         # all_ps = __get_all_ps_desc(load_result)
         # mutable_ps = set([name for name, value in all_ps.items() if value.mutable])
@@ -42,8 +48,10 @@ class LoadResultAnalyzer:
         # mutable_ps_users = __get_permission_set_users(load_result)
 
         return AnalysisResult(
-            userStatistics=ps_processor.get_user_stats(),
-            psStatistics=ps_processor.get_permission_set_stats(),
+            userStatistics=UserStatsCollector(load_result, ps_result).get(),
+            psStatistics=PermSetStatisticsCollector(ps_result).get(),
+            userPermissionSets=UserPermSetCollector(load_result, ps_result).get(),
+            permSetNesting=ParentPermSetCollector(load_result, ps_result).get(),
             roles=roles_provider.get_roles(),
         )
 

@@ -35,7 +35,7 @@ class UserStatsCollector:
         counts = dict[str, int]()
 
         for ps_name in user_permission.permissions:
-            ps_type = self._ps_analysis_result.identify_permission(ps_name)
+            ps_type = self._ps_analysis_result.identify_permission_type(ps_name)
             if ps_type not in counts:
                 counts[ps_type] = 0
             if self._all_type not in counts:

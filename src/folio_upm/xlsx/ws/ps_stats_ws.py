@@ -32,10 +32,11 @@ class PermissionStatsWorksheet(AbstractWorksheet):
 
     @override
     def _get_row_fill_color(self, ps_stats: PsStatistics) -> Optional[PatternFill]:
-        if ps_stats.refCount > ps_stats.get_uq_sources_num() or ps_stats.type == "invalid":
+        ps_type = ps_stats.type
+        if ps_stats.refCount > ps_stats.get_uq_sources_num() or ps_type == "invalid":
             return constants.light_red_fill
-        if ps_stats.type == "mutable":
+        if ps_type == "mutable":
             return constants.light_green_fill
-        if ps_stats.type in self._yellow_types:
+        if ps_type in self._yellow_types:
             return constants.light_yellow_fill
         return constants.almost_white_fill

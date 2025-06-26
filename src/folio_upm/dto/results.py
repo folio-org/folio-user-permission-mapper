@@ -35,7 +35,7 @@ class PermissionAnalysisResult(BaseModel):
     def __getitem__(self, key: str) -> OrdDict[str, "AnalyzedPermissionSet"]:
         return getattr(self, key)
 
-    def identify_permission(self, ps_name: str) -> Optional[str]:
+    def identify_permission_type(self, ps_name: str) -> Optional[str]:
         for ps_type in self._all_types:
             if ps_name in getattr(self, ps_type):
                 return ps_type
@@ -103,8 +103,8 @@ class AnalyzedPermSetPermSets(BaseModel):
 
 class AnalyzedUserPermissionSet(BaseModel):
     userId: str
-    permissionName: str
-    permissionType: str
+    psName: str
+    psType: str
 
 
 class AnalyzedRoleUsers(BaseModel):
@@ -122,8 +122,8 @@ class AnalyzedRoleCapabilities(BaseModel):
 class AnalysisResult(BaseModel):
     psStatistics: List[PsStatistics]
     userStatistics: List[UserStatistics]
-    userPermissionSets: List[AnalyzedUserPermissionSet] = []
-    permSetPermSets: List[AnalyzedPermSetPermSets] = []
+    userPermissionSets: List[AnalyzedUserPermissionSet]
+    permSetNesting: List[AnalyzedPermSetPermSets]
     roles: OrdDict[str, AnalyzedRole] = []
     roleUsers: List[AnalyzedRoleUsers] = []
     roleCapabilities: List[AnalyzedRoleCapabilities] = []
