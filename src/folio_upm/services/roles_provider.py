@@ -13,6 +13,7 @@ from folio_upm.dto.support import (
     RoleCapabilitiesHolder,
 )
 from folio_upm.utils import log_factory
+from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.service_utils import ServiceUtils
 from folio_upm.utils.system_roles_provider import SystemGeneratedRolesProvider
@@ -112,9 +113,9 @@ class RolesProvider:
 
     def __find_capability_or_capability_set(self, ps_name: str) -> Tuple[Optional[Capability | CapabilitySet], str]:
         if ps_name in self._capability_sets_by_name:
-            return ServiceUtils.first(self._capability_sets_by_name.get(ps_name, [])), "capability-set"
+            return IterableUtils.first(self._capability_sets_by_name.get(ps_name, [])), "capability-set"
         if ps_name in self._capabilities_by_name:
-            return ServiceUtils.first(self._capabilities_by_name.get(ps_name, [])), "capability"
+            return IterableUtils.first(self._capabilities_by_name.get(ps_name, [])), "capability"
         return None, "unknown"
 
     def __collect_users_by_ps_name(self) -> dict[str, OrderedSet[str]]:
@@ -133,7 +134,7 @@ class RolesProvider:
             if permission_name in exp_list:
                 continue
             ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
-            expanded_from = ServiceUtils.last(exp_list)
+            expanded_from = IterableUtils.last(exp_list)
             result.append(ExpandedPermissionSet(permissionName=permission_name, expandedFrom=expanded_from))
             if ps_type == "mutable":
                 found_child_ap = self._ps_analysis_result[ps_type].get(permission_name, None)

@@ -12,6 +12,7 @@ class TenantStorageService(metaclass=SingletonMeta):
     def __init__(self, storages: List[str]):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("Initializing TenantStorageService: storages: %s", storages)
+        self._storage_names = [storage.lower() for storage in storages]
         self._storages = list[TenantStorage]()
         storages_set = set(storages)
         if "s3" in storages_set:
@@ -29,6 +30,13 @@ class TenantStorageService(metaclass=SingletonMeta):
             if found_object is not None:
                 return found_object
         return None
+
+    def require_object(self, object_name: str, object_ext: str):
+        for storage in self._storages:
+            found_object = storage.get_object(object_name, object_ext)
+            if found_object is not None:
+                return found_object
+        raise FileNotFoundError(f'File not found in storages {self._storage_names}: {object_name}.{object_ext}.')
 
     def get_ref_object_by_key(self, object_name: str):
         for storage in self._storages:
