@@ -39,15 +39,15 @@ class TenantStorage:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
             return None
 
-    def get_ref_object_by_key(self, ref_key, object_ext):
-        if object_ext.endswith("json.gz"):
+    def get_ref_object_by_key(self, ref_key):
+        if ref_key.endswith("json.gz"):
             return self._get_json_gz(ref_key)
-        elif object_ext.endswith("json"):
+        elif ref_key.endswith("json"):
             return self._get_json(ref_key)
-        elif object_ext.endswith("xlsx"):
+        elif ref_key.endswith("xlsx"):
             return self._get_xlsx(ref_key)
         else:
-            self._log.error("Unsupported object type: %s, file=%s", object_ext, ref_key)
+            self._log.error("Unsupported object type: %s, file=%s", ref_key, ref_key)
         return None
 
     def _get_json(self, file_key: str):

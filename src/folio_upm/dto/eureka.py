@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Role(BaseModel):
@@ -38,7 +38,7 @@ class RoleCapabilitySet(BaseModel):
 class Capability(BaseModel):
     id: str
     name: str
-    description: Optional[str]
+    description: Optional[str] = None
     resource: str
     action: str
     applicationId: str
@@ -46,22 +46,20 @@ class Capability(BaseModel):
     permission: str
     endpoints: List[Endpoint] = []
     dummyCapability: bool
-    type: str
-    visible: bool
+    capability_type: str = Field(..., alias="type", serialization_alias="type")
 
 
 class CapabilitySet(BaseModel):
     id: str
     name: str
-    description: Optional[str]
+    description: Optional[str] = None
     resource: str
     action: str
     applicationId: str
     moduleId: str
     permission: str
     capabilities: Optional[List[str]] = []
-    type: str
-    visible: bool
+    capability_type: str = Field(..., alias="type", serialization_alias="type")
 
 
 class UserPermission(BaseModel):

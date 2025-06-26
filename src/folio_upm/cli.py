@@ -8,6 +8,7 @@ from folio_upm.dto.strategy_type import StrategyType
 from folio_upm.integration.services.eureka_service import EurekaService
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
 from folio_upm.services.loaders.capabilities_loader import CapabilitiesLoader
+from folio_upm.services.loaders.eureka_result_loader import EurekaResultLoader
 from folio_upm.services.loaders.permission_loader import PermissionLoader
 from folio_upm.storage.s3_storage import S3Storage
 from folio_upm.storage.s3_tenant_storage import S3TenantStorage
@@ -51,25 +52,17 @@ def collect_capabilities(storage: Tuple):
 
 @cli.command("generate-report")
 @click.option("--storage", "-s", type=click.Choice(["s3", "local"]), multiple=True, default=["s3"])
-@click.option("--role-strategy", type=click.Choice(["distributed", "hybrid", "consolidated"]), default="distributed")
-def generate_report(storage: Tuple, role_strategy: str):
-    strategy = StrategyType[role_strategy.upper()]
-    storage_service = TenantStorageService(get_storages_list(storage))
+
+def generate_report(storage: Tuple):
+    storages = get_storages_list(storage)
+    storage_service = TenantStorageService(storages)
     load_result = storage_service.get_object(okapi_permissions_fn, json_gz_ext)
 
     if not load_result:
         raise FileNotFoundError(f"{okapi_permissions_fn} file not found.")
 
-    eureka_load_result = storage_service.get_object(eureka_capabilities_fn, json_gz_ext)
-    if eureka_load_result is None:
-        ref_capabilities_file_path = Env().get_env("REF_CAPABILITIES_FILE_PATH")
-        if ref_capabilities_file_path:
-            _log.info(f"Loading reference capabilities from: {ref_capabilities_file_path}")
-            eureka_load_result = JsonUtils.from_json_file(ref_capabilities_file_path)
-        else:
-            raise FileNotFoundError(f"{eureka_capabilities_fn} file not found.")
-
-    analysis_result = LoadResultAnalyzer(load_result, eureka_load_result, strategy).get_results()
+    eureka_load_result = EurekaResultLoader(storages).get_load_result()
+    analysis_result = LoadResultAnalyzer(load_result, eureka_load_result).get_results()
     workbook = ExcelResultGenerator(analysis_result).generate_report()
 
     storage_service.save_object(mixed_analysis_result_fn, xlsx_ext, workbook)
@@ -89,7 +82,8 @@ def download_load_json(out_file):
 
 
 @cli.command("run-eureka-migration")
-def run_eureka_migration():
+@click.option("--role-strategy", type=click.Choice(["distributed", "consolidated"]), default="distributed")
+def run_eureka_migration(strategy: str):
     """Create Eureka roles based on Okapi permissions."""
     analysis_result = AnalysisResult(**get_tenant_json_gz("analysis-result"))
     EurekaService().migrate_to_eureka(analysis_result)

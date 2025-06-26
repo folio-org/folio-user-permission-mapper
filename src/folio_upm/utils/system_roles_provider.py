@@ -25,11 +25,11 @@ class SystemGeneratedRolesProvider(metaclass=SingletonMeta):
             return dict[str, str]()
         result_dict = {}
         for pair in system_generated_roles.split(","):
-            pairs = pair.strip().split(":")
-            if len(pairs) != 2:
+            okapi_ps_and_role = pair.strip().split(":")
+            if len(okapi_ps_and_role) != 2:
                 self._log.warning(f"Invalid system-generated role mapping: {pair}")
                 continue
-            result_dict[pair[0].strip()] = pair[1].strip()
+            result_dict[okapi_ps_and_role[0].strip()] = okapi_ps_and_role[1].strip()
 
         for okapi_ps, eureka_role_name in result_dict.items():
             self._log.info(f"System-generated role mapping: {okapi_ps} -> {eureka_role_name}")

@@ -34,4 +34,6 @@ class RolesWorksheet(AbstractWorksheet):
 
     @override
     def _get_row_fill_color(self, value: AnalyzedRole) -> Optional[PatternFill]:
+        if value.excluded:
+            return constants.light_yellow_fill
         return constants.almost_white_fill

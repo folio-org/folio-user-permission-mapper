@@ -30,9 +30,9 @@ class TenantStorageService(metaclass=SingletonMeta):
                 return found_object
         return None
 
-    def get_ref_object_by_key(self, object_name: str, object_ext: str):
+    def get_ref_object_by_key(self, object_name: str):
         for storage in self._storages:
-            found_object = storage.get_ref_object_by_key(object_name, object_ext)
+            found_object = storage.get_ref_object_by_key(object_name)
             if found_object is not None:
                 return found_object
         return None

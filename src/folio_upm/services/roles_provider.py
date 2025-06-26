@@ -1,12 +1,10 @@
 import uuid
 from collections import OrderedDict
-from typing import List
+from typing import List, Optional, Tuple
 from typing import OrderedDict as OrdDict
 
-from folio_upm.dto.capability_type import UNKNOWN
-from folio_upm.dto.eureka import Role, RoleUsers
+from folio_upm.dto.eureka import Role, RoleUsers, CapabilitySet, Capability
 from folio_upm.dto.results import AnalyzedRole, EurekaLoadResult, LoadResult, PermissionAnalysisResult
-from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
 from folio_upm.dto.support import (
     AnalyzedPermissionSet,
     CapabilityPlaceholder,
@@ -16,6 +14,7 @@ from folio_upm.dto.support import (
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.utils.system_roles_provider import SystemGeneratedRolesProvider
 
 
 class RolesProvider:
@@ -25,13 +24,13 @@ class RolesProvider:
         load_result: LoadResult,
         ps_analysis_result: PermissionAnalysisResult,
         eureka_load_result: EurekaLoadResult = None,
-        strategy: StrategyType = DISTRIBUTED,
     ):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._load_result = load_result
         self._eureka_load_result = eureka_load_result
         self._ps_analysis_result = ps_analysis_result
-        self._strategy = strategy
+        self._capabilities_by_name = self.__get_capabilities_by_name()
+        self._capability_sets_by_name = self.__get_capability_sets_by_name()
         self._users_by_ps_names = self.__collect_users_by_ps_name()
         self.__init_roles_and_relations()
 
@@ -71,7 +70,7 @@ class RolesProvider:
             source=source_ps_name,
             users=self._users_by_ps_names.get(source_ps_name, OrderedSet()),
             permissionSets=expanded_sub_permissions,
-            excluded=False,
+            excluded=SystemGeneratedRolesProvider().has_system_generated_ps(source_ps_name),
             originalPermissionsCount=len(analyzed_ps.get_sub_permissions()),
             totalPermissionsCount=len(expanded_sub_permissions),
         )
@@ -96,18 +95,26 @@ class RolesProvider:
         permission_name = expanded_ps.permissionName
         permission_type = self._ps_analysis_result.identify_permission_type(permission_name)
         analyzed_ps = self._ps_analysis_result[permission_type].get(permission_name, None)
+        capability_or_set, resolved_type = self.__find_capability_or_capability_set(permission_name)
         return CapabilityPlaceholder(
-            resolvedType=UNKNOWN,
+            resolvedType=resolved_type,
             permissionName=permission_name,
             permissionType=permission_type,
             expandedFrom=expanded_ps.expandedFrom,
             displayName=analyzed_ps and analyzed_ps.get_uq_display_names_str(),
             # todo: collect this data from eureka capabilities
-            name=None,
-            resource=None,
-            action=None,
-            capabilityType=None,
+            name=capability_or_set and capability_or_set.name,
+            resource=capability_or_set and capability_or_set.resource,
+            action=capability_or_set and capability_or_set.action,
+            capabilityType=capability_or_set and capability_or_set.capability_type,
         )
+
+    def __find_capability_or_capability_set(self, ps_name: str) -> Tuple[Optional[Capability | CapabilitySet], str]:
+        if ps_name in self._capability_sets_by_name:
+            return ServiceUtils.first(self._capability_sets_by_name.get(ps_name, [])), "capability-set"
+        if ps_name in self._capabilities_by_name:
+            return ServiceUtils.first(self._capabilities_by_name.get(ps_name, [])), "capability"
+        return None, "unknown"
 
     def __collect_users_by_ps_name(self) -> dict[str, OrderedSet[str]]:
         users_by_ps_name = dict()
@@ -133,3 +140,23 @@ class RolesProvider:
                     exp_list.append(permission_name)
                     result += self.__expand_sub_permissions(found_child_ap, exp_list=exp_list)
         return result
+
+    def __get_capabilities_by_name(self):
+        capabilities = self._eureka_load_result.capabilities
+        capabilities_by_name = OrderedDict()
+        for capability in capabilities:
+            if capability.name in capabilities_by_name:
+                capabilities_by_name[capability.permission].append(capability)
+            else:
+                capabilities_by_name[capability.permission] = [capability]
+        return capabilities_by_name
+
+    def __get_capability_sets_by_name(self):
+        capabilities = self._eureka_load_result.capabilitySets
+        capabilities_by_name = OrderedDict()
+        for capability_set in capabilities:
+            if capability_set.name in capabilities_by_name:
+                capabilities_by_name[capability_set.permission].append(capability_set)
+            else:
+                capabilities_by_name[capability_set.permission] = [capability_set]
+        return capabilities_by_name

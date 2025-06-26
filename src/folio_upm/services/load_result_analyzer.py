@@ -1,7 +1,6 @@
 from typing import Optional
 
 from folio_upm.dto.results import AnalysisResult, LoadResult
-from folio_upm.dto.strategy_type import DISTRIBUTED, StrategyType
 from folio_upm.services.collectors.parent_perm_set_collector import ParentPermSetCollector
 from folio_upm.services.collectors.perm_set_stats_collector import PermSetStatisticsCollector
 from folio_upm.services.collectors.user_perm_set_collector import UserPermSetCollector
@@ -13,13 +12,12 @@ from folio_upm.utils import log_factory
 
 class LoadResultAnalyzer:
 
-    def __init__(self, analysis_json: dict, eureka_load_result=Optional[dict], strategy: StrategyType = DISTRIBUTED):
+    def __init__(self, analysis_json: dict, eureka_load_result=Optional[dict]):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("LoadResultAnalyzer initialized.")
         self._analysis_json = analysis_json
         self._lr = LoadResult(**analysis_json)
         self._eureka_lr = eureka_load_result
-        self._strategy = strategy
         self._ps_ar = PermissionAnalyzer(self._lr).get_analysis_result()
         self._result = self.__analyze_results()
 
@@ -29,7 +27,7 @@ class LoadResultAnalyzer:
     def __analyze_results(self) -> AnalysisResult:
         load_result = self._lr
         ps_result = self._ps_ar
-        roles_provider = RolesProvider(load_result, ps_result, self._eureka_lr, self._strategy)
+        roles_provider = RolesProvider(load_result, ps_result, self._eureka_lr)
 
         return AnalysisResult(
             userStatistics=UserStatsCollector(load_result, ps_result).get(),

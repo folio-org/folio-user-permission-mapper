@@ -12,6 +12,7 @@ class PermissionNestingWorksheet(AbstractWorksheet):
     _title = "PS Nesting"
     _columns = [
         Column[AnalyzedParentPermSets](w=80, n="PS", f=lambda x: x.permissionName),
+        Column[AnalyzedParentPermSets](w=80, n="PS Name", f=lambda x: x.displayName),
         Column[AnalyzedParentPermSets](w=18, n="PS Type", f=lambda x: x.permissionType),
         Column[AnalyzedParentPermSets](w=80, n="Parent PS", f=lambda x: x.parentPermissionName),
         Column[AnalyzedParentPermSets](w=80, n="Parent Name", f=lambda x: x.parentDisplayName),

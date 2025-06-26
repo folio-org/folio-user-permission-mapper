@@ -7,6 +7,12 @@ from folio_upm.dto.okapi import PermissionSet
 class ServiceUtils:
 
     @staticmethod
+    def first(value: Sequence[Any | None]):
+        if value is not None and len(value) > 0:
+            return value[0]
+        return None
+
+    @staticmethod
     def last(value: Sequence[Any | None]):
         if value is not None and len(value) > 0:
             return value[-1]

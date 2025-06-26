@@ -108,6 +108,7 @@ class PsStatistics(BaseModel):
 class AnalyzedParentPermSets(BaseModel):
     permissionName: str
     permissionType: str
+    displayName: Optional[str]
     parentPermissionName: str
     parentDisplayName: Optional[str]
     parentPsTypes: OrderedSet[str]

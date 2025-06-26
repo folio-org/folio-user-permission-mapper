@@ -47,6 +47,7 @@ class ParentPermSetCollector:
                     parent_ps_dict[parent_ps] = AnalyzedParentPermSets(
                         permissionName=ap.permissionName,
                         permissionType=ps_type,
+                        displayName=ap.get_uq_display_names_str(),
                         parentPermissionName=parent_ps,
                         parentDisplayName=analyzed_ps and analyzed_ps.get_uq_display_names_str(),
                         parentPsTypes=OrderedSet(parent_ps_type),

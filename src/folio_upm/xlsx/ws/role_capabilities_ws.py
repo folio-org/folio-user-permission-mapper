@@ -48,6 +48,7 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
 
         self._red_types = ["invalid", "mutable"]
         self._yellow_types = ["deprecated", "questionable", "unprocessed"]
+        self._yellow_res_types = ["deprecated", "questionable", "unprocessed"]
 
     @override
     def _get_iterable_data(self):
@@ -74,6 +75,6 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
     def _get_row_fill_color(self, value: RoleCapabilityRow) -> Optional[PatternFill]:
         if value.sourceType in self._red_types or value.sourceType is None:
             return constants.light_red_fill
-        if value.excluded or (value.sourceType in self._yellow_types):
+        if value.excluded or (value.sourceType in self._yellow_types) or value.resolvedType == "unknown":
             return constants.light_yellow_fill
         return constants.almost_white_fill
