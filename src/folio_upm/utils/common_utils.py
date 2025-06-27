@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Sequence
+from typing import Any, Sequence, List
 
 
 class IterableUtils:
@@ -27,6 +27,10 @@ class IterableUtils:
 
 
 class CqlQueryUtils:
+
+    @staticmethod
+    def any_match_by_name(values: List[str]) -> str:
+        return CqlQueryUtils.any_match_by_field("name", values)
 
     @staticmethod
     def any_match_by_field(field: str, values: list[str]) -> str:

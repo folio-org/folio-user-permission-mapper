@@ -96,7 +96,13 @@ The command will do the following actions:
     - user permissions relations from `mod-permissions`
 - Save the result as a gzipped JSON file to the configured storage (S3 or local).
 
-**Output**:
+#### Requires
+
+- Access to the Okapi-based environment.
+- User credentials with read access to the `mod-permissions` and `okapi` modules.
+- Access to the AWS S3 bucket or local storage where the `okapi-permissions` load result will be stored.
+
+#### Output
 
 - `<tenant_id>/<tenant_id>-okapi-permissions.json.gz`
 
@@ -137,6 +143,7 @@ The command will do the following actions:
 #### Requires
 
 - Access to the Eureka-based environment.
+- User credentials with read access to the `mod-roles-keycloak` module.
 - Access to the AWS S3 bucket or local storage where the `eureka-capabilities` load result will be stored.
 
 #### Output
@@ -166,7 +173,7 @@ The command will do the following actions:
 The command will do the following actions:
 
 - Load `okapi-permissions.gson.gz` and _(optionally)_ `eureka-capabilities` from storage.
-- Analyze and combine the data.
+- Analyze and combine the data to provide report and data for eureka migration.
 - Generate both an Excel report and a gzipped JSON analysis result.
 - Store generated files in the configured storage (s3, local).
 
@@ -182,15 +189,16 @@ The command will do the following actions:
 
 ### Environment Variables
 
-| Env Variable                   | Default Value | Required | Description                                                                                                           |
-|:-------------------------------|:--------------|:---------|:----------------------------------------------------------------------------------------------------------------------|
-| AWS_ACCESS_KEY_ID              |               | true     | AWS access key                                                                                                        |
-| AWS_SECRET_ACCESS_KEY          |               | true     | AWS secret key                                                                                                        |
-| AWS_REGION                     | `us-east-1`   | false    | AWS S3 Region                                                                                                         |
-| AWS_S3_ENDPOINT                |               | false    | Custom AWS S3 Endpoint (for example, if MinIO is used )                                                               |
-| TENANT_ID                      |               | true     | The tenant ID for the FOLIO environment                                                                               |
-| SYSTEM_GENERATED_PERM_MAPPINGS |               | false    | Comma-separated list of system-generated permission mappings to highlight in analysis (e.g., `folio_admin:AdminRole`) |
-| DOTENV                         | .env          | false    | Custom `.env` file                                                                                                    |
+| Env Variable                   | Default Value | Required | Description                                                                                                                                 |
+|:-------------------------------|:--------------|:---------|:--------------------------------------------------------------------------------------------------------------------------------------------|
+| AWS_ACCESS_KEY_ID              |               | true     | AWS access key                                                                                                                              |
+| AWS_SECRET_ACCESS_KEY          |               | true     | AWS secret key                                                                                                                              |
+| AWS_REGION                     | `us-east-1`   | false    | AWS S3 Region                                                                                                                               |
+| AWS_S3_ENDPOINT                |               | false    | Custom AWS S3 Endpoint (for example, if MinIO is used )                                                                                     |
+| TENANT_ID                      |               | true     | The tenant ID for the FOLIO environment                                                                                                     |
+| SYSTEM_GENERATED_PERM_MAPPINGS |               | false    | Comma-separated list of system-generated permission mappings to highlight in analysis (e.g., `folio_admin:AdminRole`)                       |
+| REF_CAPABILITIES_FILE_KEY      |               | false    | File key in storage that can be used as reference for capabilities (Recommended to pull this data for tenant with all applications enabled) |
+| DOTENV                         | .env          | false    | Custom `.env` file                                                                                                                          |
 
 ---
 
@@ -240,7 +248,34 @@ The command will do the following actions:
 | SYSTEM_GENERATED_PERM_MAPPINGS |                       | false    | Comma-separated list of system-generated permission mappings that will be applied differently (see: command description) (e.g., `folio_admin:AdminRole`) |
 | CAPABILITY_IDS_PARTITION_SIZE  | 50                    | false    | The max number of permission names provided for capability/capability-set querying                                                                       |
 
---- 
+
+---
+
+### `download-json`
+
+#### Description
+
+The command will do the following actions:
+
+- Load `source_file` file and save it on local drive using `out_file` argument
+
+#### Requires
+
+- Access to the AWS S3 bucket or local storage where `source_file` is stored.
+
+#### Output
+
+- `out_file` file with the content of `source_file`
+
+### Environment Variables
+
+| Env Variable          | Default Value | Required | Description    |
+|:----------------------|:--------------|:---------|:---------------|
+| AWS_ACCESS_KEY_ID     |               | true     | AWS access key |
+| AWS_SECRET_ACCESS_KEY |               | true     | AWS secret key |
+| AWS_REGION            | `us-east-1`   | false    | AWS S3 Region  |
+
+---
 
 ## Development Tips
 

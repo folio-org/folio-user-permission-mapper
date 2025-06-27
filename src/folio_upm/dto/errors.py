@@ -11,7 +11,7 @@ class HttpReqErr(BaseModel):
     responseBody: str = ""
 
 
-class HttpCallResult(BaseModel):
+class EntityMigrationResult(BaseModel):
     status: str
     entityName: str
     entityId: str
@@ -19,8 +19,8 @@ class HttpCallResult(BaseModel):
     error: HttpReqErr | None = []
 
     @staticmethod
-    def for_role(role: Role, status: str, reason: str | None = None, error: HttpReqErr | None = None) -> "HttpCallResult":
-        return HttpCallResult(
+    def for_role(role: Role, status: str, reason: str | None = None, error: HttpReqErr | None = None) -> "EntityMigrationResult":
+        return EntityMigrationResult(
             status=status,
             entityName="role",
             entityId=role.id,

@@ -4,7 +4,7 @@ import json
 import click
 
 from folio_upm.dto.results import AnalysisResult
-from folio_upm.integration.services.eureka_service import EurekaService
+from folio_upm.integration.services.eureka_migration_service import EurekaMigrationService
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
 from folio_upm.services.loaders.capabilities_loader import CapabilitiesLoader
 from folio_upm.services.loaders.eureka_result_loader import EurekaResultLoader
@@ -62,7 +62,7 @@ def run_eureka_migration():
     storage_service = TenantStorageService()
     analysis_result_dict = storage_service.get_object(mixed_analysis_result_fn, json_gz_ext)
     analysis_result = AnalysisResult(**analysis_result_dict)
-    migration_result = EurekaService().migrate_to_eureka(analysis_result)
+    migration_result = EurekaMigrationService().migrate_to_eureka(analysis_result)
     migration_result_report = MigrationResultService(migration_result).generate_report()
     storage_service.save_object(eureka_migration_result_fn, json_gz_ext, migration_result.model_dump())
     storage_service.save_object(eureka_migration_result_fn, xlsx_ext, migration_result_report, include_ts=True)
