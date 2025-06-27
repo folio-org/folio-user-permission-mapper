@@ -23,7 +23,7 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
     @override
     def _get_json_gz(self, file_key):
         json_bytes_buffer = self.__read_binary_data(file_key)
-        return JsonUtils.from_json_gz(json_bytes_buffer)
+        return json_bytes_buffer and JsonUtils.from_json_gz(json_bytes_buffer)
 
     @override
     def _save_json_gz(self, file_key, object_data: dict):

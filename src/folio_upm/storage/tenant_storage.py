@@ -16,15 +16,13 @@ class TenantStorage:
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._override_reports = override_reports
 
-    def save_object(self, object_name: str, object_ext: str, object_data: Any = None):
+    def save_object(self, object_name: str, object_ext: str, object_data: Any = None, include_ts: bool = False):
+        file_key = self._get_file_key(object_name, object_ext, include_ts)
         if object_ext == "json.gz":
-            file_key = self._get_file_key(object_name, object_ext, include_ts=False)
             self._save_json_gz(file_key, object_data)
         elif object_ext == "json":
-            file_key = self._get_file_key(object_name, object_ext, include_ts=False)
             self._save_json(file_key, object_data)
         elif object_ext == "xlsx":
-            file_key = self._get_file_key(object_name, object_ext, include_ts=True)
             self._save_xlsx(file_key, object_data)
         else:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)

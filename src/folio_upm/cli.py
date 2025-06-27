@@ -53,7 +53,7 @@ def generate_report():
     analysis_result = LoadResultAnalyzer(load_result, eureka_load_result).get_results()
     workbook = PermissionResultService(analysis_result).generate_report()
 
-    storage_service.save_object(mixed_analysis_result_fn, xlsx_ext, workbook)
+    storage_service.save_object(mixed_analysis_result_fn, xlsx_ext, workbook, include_ts=True)
     storage_service.save_object(mixed_analysis_result_fn, json_gz_ext, analysis_result.model_dump())
 
 
@@ -64,7 +64,8 @@ def run_eureka_migration():
     analysis_result = AnalysisResult(**analysis_result_dict)
     migration_result = EurekaService().migrate_to_eureka(analysis_result)
     migration_result_report = MigrationResultService(migration_result).generate_report()
-    storage_service.save_object(eureka_migration_result_fn, xlsx_ext, migration_result_report)
+    storage_service.save_object(eureka_migration_result_fn, json_gz_ext, migration_result.model_dump())
+    storage_service.save_object(eureka_migration_result_fn, xlsx_ext, migration_result_report, include_ts=True)
 
 
 @cli.command("download-json")
@@ -77,6 +78,7 @@ def download_json(source_file, out_file):
         raise FileNotFoundError(f"File not found: {source_file}")
     with open(out_file, "w") as f:
         json.dump(analysis_result_dict, f, indent=2)
+
 
 if __name__ == "__main__":
     try:

@@ -19,9 +19,7 @@ class EurekaClient(metaclass=SingletonMeta):
         self._client = EurekaHttpClient()
 
     def post_role(self, role: Role) -> Role:
-        self._log.debug("Creating role: name=%s", role.name)
-        role_body_str = JsonUtils.to_json(role.model_dump())
-        response_json = self._client.post_json("/roles", role_body_str)
+        response_json = self._client.post_json("/roles", role.model_dump())
         return Role(**response_json)
 
     def find_roles_by_query(self, role_names_query) -> List[Role]:

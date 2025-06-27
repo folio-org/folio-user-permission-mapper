@@ -32,7 +32,7 @@ class HttpClient:
         response = requests.post(
             self.__prepare_url(path),
             params=params,
-            json=body_json_str,
+            data=body_json_str,
             headers=self.__get_headers(),
             timeout=self._timeout,
         )

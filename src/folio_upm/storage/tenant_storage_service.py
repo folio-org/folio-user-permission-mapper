@@ -22,9 +22,9 @@ class TenantStorageService(metaclass=SingletonMeta):
         if "local" in storages_set:
             self._storages.append(LocalTenantStorage())
 
-    def save_object(self, object_name: str, object_ext: str, object_data: Any = None):
+    def save_object(self, object_name: str, object_ext: str, object_data: Any = None, include_ts: bool = False):
         for storage in self._storages:
-            storage.save_object(object_name, object_ext, object_data)
+            storage.save_object(object_name, object_ext, object_data, include_ts)
 
     def get_object(self, object_name: str, object_ext: str):
         for storage in self._storages:

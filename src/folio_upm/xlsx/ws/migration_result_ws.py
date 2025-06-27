@@ -11,16 +11,14 @@ from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 class MigrationResultWorksheet(AbstractWorksheet):
 
-    title = "Roles"
-
     _columns = [
-        Column[PsStatistics](w=40, n="Entity Id", f=lambda x: x.entityId),
-        Column[PsStatistics](w=15, n="Entity Name", f=lambda x: x.entityName),
-        Column[PsStatistics](w=18, n="status", f=lambda x: x.status),
-        Column[PsStatistics](w=30, n="reason", f=lambda x: x.reason),
-        Column[PsStatistics](w=30, n="Error Message", f=lambda x: x.error and x.error.message),
-        Column[PsStatistics](w=15, n="Error Http Status", f=lambda x: x.error and x.error.status),
-        Column[PsStatistics](w=80, n="Error Response Body", f=lambda x: x.error and x.error.responseBody)
+        Column[HttpCallResult](w=40, n="Entity Id", f=lambda x: x.entityId),
+        Column[HttpCallResult](w=15, n="Entity Name", f=lambda x: x.entityName),
+        Column[HttpCallResult](w=18, n="Status", f=lambda x: x.status),
+        Column[HttpCallResult](w=30, n="Reason", f=lambda x: x.reason),
+        Column[HttpCallResult](w=25, n="Error Http Status", f=lambda x: x.error and x.error.status),
+        Column[HttpCallResult](w=100, n="Error Message", f=lambda x: x.error and x.error.message),
+        Column[HttpCallResult](w=100, n="Error Response Body", f=lambda x: x.error and x.error.responseBody)
     ]
 
     def __init__(self, ws: Worksheet, title: str, data: List[HttpCallResult]):
