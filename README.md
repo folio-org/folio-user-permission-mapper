@@ -100,9 +100,7 @@ The command will do the following actions:
 
 - `<tenant_id>/<tenant_id>-okapi-permissions.json.gz`
 
-### Used environment variables
-
-_Can be passed via `.env` file or environment variables._
+### Environment Variables
 
 | Env Variable                  | Default Value         | Required | Description                                                       |
 |:------------------------------|:----------------------|:---------|:------------------------------------------------------------------|
@@ -145,9 +143,7 @@ The command will do the following actions:
 
 - `<tenant_id>/<tenant_id>-eureka-capabilities.json.gz`
 
-### Used environment variables
-
-_Can be passed via `.env` file or environment variables._
+### Environment Variables
 
 | Env Variable          | Default Value         | Required | Description                                                       |
 |:----------------------|:----------------------|:---------|:------------------------------------------------------------------|
@@ -184,9 +180,7 @@ The command will do the following actions:
 - `<tenant_id>/<tenant_id>-analysis-result.xlsx`
 - `<tenant_id>/<tenant_id>-analysis-result.json.gz`
 
-### Used environment variables
-
-_Can be passed via `.env` file or environment variables._
+### Environment Variables
 
 | Env Variable                   | Default Value | Required | Description                                                                                                           |
 |:-------------------------------|:--------------|:---------|:----------------------------------------------------------------------------------------------------------------------|
@@ -230,9 +224,7 @@ The command will do the following actions:
 - new role capability-set relations
 - `<tenant_id>/<tenant_id>-eureka-migration-report.json.gz`
 
-### Used environment variables:
-
-_Can be passed via `.env` file or environment variables._
+### Environment Variables:
 
 | Env Variable                   | Default Value         | Required | Description                                                                                                                                              |
 |:-------------------------------|:----------------------|:---------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|

@@ -24,7 +24,7 @@ class EurekaService(metaclass=SingletonMeta):
     def migrate_to_eureka(self, result: AnalysisResult) -> EurekaMigrationResult:
         self._log.info("Eureka migration started...")
         migration_result = EurekaMigrationResult(
-            # roleUsers=self.__create_roles(result.roles),
+            roleUsers=self.__create_roles(result.roles),
             # self.__assign_role_caps_by_ps(result.roleCapabilities)
             # self.__assign_role_users(result.roleUsers)
         )
