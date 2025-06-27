@@ -17,24 +17,24 @@ class TenantStorage:
         self._override_reports = override_reports
 
     def save_object(self, object_name: str, object_ext: str, object_data: Any = None):
-        file_key = self._get_file_key(object_name, object_ext)
         if object_ext == "json.gz":
+            file_key = self._get_file_key(object_name, object_ext, include_ts=False)
             self._save_json_gz(file_key, object_data)
         elif object_ext == "json":
+            file_key = self._get_file_key(object_name, object_ext, include_ts=False)
             self._save_json(file_key, object_data)
         elif object_ext == "xlsx":
+            file_key = self._get_file_key(object_name, object_ext, include_ts=True)
             self._save_xlsx(file_key, object_data)
         else:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
 
     def get_object(self, object_name: str, object_ext: str):
-        file_key = self._get_file_key(object_name, object_ext)
+        file_key = self._get_file_key(object_name, object_ext, include_ts=False)
         if object_ext == "json.gz":
             return self._get_json_gz(file_key)
         elif object_ext == "json":
             return self._get_json(file_key)
-        elif object_ext == "xlsx":
-            return self._get_xlsx(file_key)
         else:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
             return None
@@ -44,8 +44,6 @@ class TenantStorage:
             return self._get_json_gz(ref_key)
         elif ref_key.endswith("json"):
             return self._get_json(ref_key)
-        elif ref_key.endswith("xlsx"):
-            return self._get_xlsx(ref_key)
         else:
             self._log.error("Unsupported object type: %s, file=%s", ref_key, ref_key)
         return None
@@ -68,9 +66,9 @@ class TenantStorage:
     def _save_xlsx(self, object_name: str, object_data: Any):
         pass
 
-    def _get_file_key(self, file_name, extension) -> str:
+    def _get_file_key(self, file_name, extension, include_ts: bool = False) -> str:
         file_name = f"{self._tenant_id}-{file_name}"
-        if not self._override_reports:
+        if include_ts:
             now = datetime.now(tz=UTC)
             file_name += f"-{now.strftime("%Y%m%d%H%M%S") + f"{now.microsecond // 1000:03d}"}"
         return f"{self._tenant_id}/{file_name}.{extension}"

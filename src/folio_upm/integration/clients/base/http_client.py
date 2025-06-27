@@ -3,6 +3,7 @@ from typing import Any, Callable, Optional
 import requests
 
 from folio_upm.utils import json_utils, log_factory
+from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env
 
 
@@ -27,7 +28,7 @@ class HttpClient:
         return response.json()
 
     def post_json(self, path, request_body: Any, params: dict | None = None) -> Optional[Any]:
-        body_json_str = json_utils.to_json(request_body)
+        body_json_str = JsonUtils.to_json(request_body)
         response = requests.post(
             self.__prepare_url(path),
             params=params,

@@ -19,29 +19,15 @@ class EurekaClient(metaclass=SingletonMeta):
         self._client = EurekaHttpClient()
 
     def post_role(self, role: Role) -> Role:
-        self._log.info(f"Creating role: name={role.name}, id={role.id}")
-
+        self._log.debug("Creating role: name=%s", role.name)
         role_body_str = JsonUtils.to_json(role.model_dump())
         response_json = self._client.post_json("/roles", role_body_str)
         return Role(**response_json)
 
     def find_roles_by_query(self, role_names_query) -> List[Role]:
+        self._log.debug("Retrieving roles by query: query=%s", role_names_query)
         response = self._client.get_json("/roles", role_names_query)
         return [Role(**role_dict) for role_dict in response.get("roles", [])]
-
-    def get_role_by_name(self, role_name: str) -> Optional[Role]:
-        self._log.debug(f"Retrieving role by name: {role_name}")
-
-        query_params = {"query": f'name=="{role_name}"', "limit": 1, "offset": 0}
-        response_json = self._client.get_json("/roles", params=query_params)
-        roles = response_json.get("roles", [])
-
-        if roles:
-            self._log.debug(f"Role found by name: {role_name}")
-            return Role(**JsonUtils.from_json(roles[0]))
-        else:
-            self._log.warning(f"Role not found by name: {role_name}")
-            return None
 
     def post_role_users(self, role_id: str, users_ids: list[str]):
         self._log.info(f"Creating role-users assignments: roleId={role_id}, userIds={users_ids}")

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import json
 
 import click
 
@@ -8,17 +9,17 @@ from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
 from folio_upm.services.loaders.capabilities_loader import CapabilitiesLoader
 from folio_upm.services.loaders.eureka_result_loader import EurekaResultLoader
 from folio_upm.services.loaders.permission_loader import PermissionLoader
-from folio_upm.storage.s3_storage import S3Storage
 from folio_upm.storage.tenant_storage_service import TenantStorageService
 from folio_upm.utils import log_factory
-from folio_upm.utils.upm_env import Env
-from folio_upm.xlsx.excel_generator import ExcelResultGenerator
+from folio_upm.xlsx.migration_result_service import MigrationResultService
+from folio_upm.xlsx.permission_result_service import PermissionResultService
 
 xlsx_ext = "xlsx"
 json_gz_ext = "json.gz"
 okapi_permissions_fn = "okapi-permissions"
 eureka_capabilities_fn = "eureka-capabilities"
 mixed_analysis_result_fn = "analysis-result"
+eureka_migration_result_fn = "migration-result"
 
 
 _log = log_factory.get_logger("cli.py")
@@ -50,7 +51,7 @@ def generate_report():
     load_result = storage_service.require_object(okapi_permissions_fn, json_gz_ext)
     eureka_load_result = EurekaResultLoader().get_load_result()
     analysis_result = LoadResultAnalyzer(load_result, eureka_load_result).get_results()
-    workbook = ExcelResultGenerator(analysis_result).generate_report()
+    workbook = PermissionResultService(analysis_result).generate_report()
 
     storage_service.save_object(mixed_analysis_result_fn, xlsx_ext, workbook)
     storage_service.save_object(mixed_analysis_result_fn, json_gz_ext, analysis_result.model_dump())
@@ -58,21 +59,24 @@ def generate_report():
 
 @cli.command("run-eureka-migration")
 def run_eureka_migration():
-    analysis_result = AnalysisResult(**get_tenant_json_gz("analysis-result"))
-    EurekaService().migrate_to_eureka(analysis_result)
-    _log.info("Starting creation of Eureka roles based on Okapi permissions...")
+    storage_service = TenantStorageService()
+    analysis_result_dict = storage_service.get_object(mixed_analysis_result_fn, json_gz_ext)
+    analysis_result = AnalysisResult(**analysis_result_dict)
+    migration_result = EurekaService().migrate_to_eureka(analysis_result)
+    migration_result_report = MigrationResultService(migration_result).generate_report()
+    storage_service.save_object(eureka_migration_result_fn, xlsx_ext, migration_result_report)
 
 
-def get_tenant_json_gz(json_name):
-    tenant_id = Env().get_tenant_id()
-    file_path = f"{tenant_id}/{tenant_id}-{json_name}.json.gz"
-    _log.info(f"Loading JSON from s3: {file_path}")
-    return S3Storage().read_object(file_path)
-
-
-def get_storages_list(storage):
-    return [i for i in storage]
-
+@cli.command("download-json")
+@click.argument("source_file", type=str)
+@click.argument("out_file", type=str)
+def download_json(source_file, out_file):
+    storage_service = TenantStorageService()
+    analysis_result_dict = storage_service.get_ref_object_by_key(source_file)
+    if analysis_result_dict is None:
+        raise FileNotFoundError(f"File not found: {source_file}")
+    with open(out_file, "w") as f:
+        json.dump(analysis_result_dict, f, indent=2)
 
 if __name__ == "__main__":
     try:

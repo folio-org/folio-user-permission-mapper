@@ -4,6 +4,7 @@ from typing import OrderedDict as OrdDict
 
 from pydantic import BaseModel, field_serializer
 
+from folio_upm.dto.errors import HttpCallResult
 from folio_upm.dto.eureka import Capability, CapabilitySet, Role, RoleUsers, UserPermission
 from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet
 from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet, RoleCapabilitiesHolder
@@ -108,9 +109,9 @@ class PsStatistics(BaseModel):
 class AnalyzedParentPermSets(BaseModel):
     permissionName: str
     permissionType: str
-    displayName: Optional[str]
+    displayName: Optional[str] = None
     parentPermissionName: str
-    parentDisplayName: Optional[str]
+    parentDisplayName: Optional[str] = None
     parentPsTypes: OrderedSet[str]
     parentPsSources: OrderedSet[str]
 
@@ -146,3 +147,9 @@ class AnalysisResult(BaseModel):
     roles: OrdDict[str, AnalyzedRole]
     roleUsers: List[RoleUsers]
     roleCapabilities: List[RoleCapabilitiesHolder]
+
+
+class EurekaMigrationResult(BaseModel):
+    roles: List[HttpCallResult] = []
+    roleUsers: List[HttpCallResult] = []
+    roleCapabilities: List[HttpCallResult] = []

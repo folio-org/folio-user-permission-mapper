@@ -1,5 +1,4 @@
 from openpyxl import Workbook
-from openpyxl.styles import Border, Font, PatternFill, Side
 
 from folio_upm.dto.results import AnalysisResult
 from folio_upm.utils import log_factory
@@ -11,21 +10,8 @@ from folio_upm.xlsx.ws.roles_ws import RolesWorksheet
 from folio_upm.xlsx.ws.user_ps import UserPermissionSetsWorksheet
 from folio_upm.xlsx.ws.user_stats_ws import UserStatsWorksheet
 
-_light_green_fill = PatternFill(start_color="c6efe3", end_color="c6efe3", fill_type="darkHorizontal")
-_light_red_fill = PatternFill(start_color="ffe1e5", end_color="ffe1e5", fill_type="darkHorizontal")
-_list_yellow_fill = PatternFill(start_color="ffffcc", end_color="ffffcc", fill_type="darkHorizontal")
-_thin_border = Border(
-    left=Side(style="thin", color="bababa"),
-    right=Side(style="thin", color="bababa"),
-    top=Side(style="thin", color="bababa"),
-    bottom=Side(style="thin", color="bababa"),
-)
 
-_cells_font = Font(name="Consolas", bold=False, italic=False, size=11)
-_header_font = Font(name="Consolas", bold=True, size=11)
-
-
-class ExcelResultGenerator:
+class PermissionResultService:
 
     _worksheet_definitions = [
         (UserStatsWorksheet, lambda ar: ar.userStatistics),

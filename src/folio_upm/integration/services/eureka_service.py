@@ -2,9 +2,12 @@ from typing import List
 from typing import OrderedDict as OrdDict
 from typing import Tuple
 
+import requests
+
 from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.dto.errors import HttpCallResult, HttpReqErr
 from folio_upm.dto.eureka import Capability, RoleUsers
-from folio_upm.dto.results import AnalysisResult, AnalyzedRole
+from folio_upm.dto.results import AnalysisResult, AnalyzedRole, EurekaMigrationResult
 from folio_upm.dto.support import RoleCapabilitiesHolder
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory
@@ -18,31 +21,46 @@ class EurekaService(metaclass=SingletonMeta):
         self._log.info("EurekaService initialized.")
         self._client = EurekaClient()
 
-    def migrate_to_eureka(self, result: AnalysisResult):
-        self.__create_roles(result.roles)
-        self.__assign_role_caps_by_ps(result.roleCapabilities)
-        self.__assign_role_users(result.roleUsers)
+    def migrate_to_eureka(self, result: AnalysisResult) -> EurekaMigrationResult:
+        self._log.info("Eureka migration started...")
+        migration_result = EurekaMigrationResult(
+            # roleUsers=self.__create_roles(result.roles),
+            # self.__assign_role_caps_by_ps(result.roleCapabilities)
+            # self.__assign_role_users(result.roleUsers)
+        )
+        return migration_result
 
-    def __create_roles(self, ar: OrdDict[str, AnalyzedRole]):
-        self._log.info("Creating %s role(s)...", len(ar))
-        role_names = [ar.role.name for ar in ar.values() if ar.role.name]
-        data_loader = PartitionedDataLoader("roles", role_names, self.__load_roles, self.__any_match_by_name)
-        ar = data_loader.load()
-        existing_role_names = set([role.n for role in ar])
-        for role in ar:
-            role_name = role.n
+    def __create_roles(self, analyzed_roles: OrdDict[str, AnalyzedRole]):
+        self._log.info("Creating %s role(s)...", len(analyzed_roles))
+        role_names = [ar.role.name for ar in analyzed_roles.values() if ar.role.name]
+        data_loader = PartitionedDataLoader(
+            "roles", role_names, self._client.find_roles_by_query, self.__any_match_by_name
+        )
+        loaded_roles = data_loader.load()
+        existing_role_names = set([role.name for role in loaded_roles])
+        load_rs = []
+        for ar in analyzed_roles.values():
+            role = ar.role
+            role_name = role.name
             if not role_name:
                 self._log.error("Role name cannot be empty, skipping role creation for role: %s", role.id)
+                load_rs.append(HttpCallResult.for_role(role, "skipped", "role name is empty"))
                 continue
-            if role_name in existing_role_names:
-                self._log.info(f"Creating role: '{role_name}'...")
-                created_role = self._client.post_role(role)
-                self._log.info("Role is created: id=%s, name=%s", created_role.id, role_name)
+            if role_name not in existing_role_names:
+                try:
+                    created_role = self._client.post_role(role)
+                    load_rs.append(HttpCallResult.for_role(created_role, "success"))
+                    self._log.info("Role is created: id=%s, name=%s", created_role.id, role_name)
+                except requests.HTTPError as e:
+                    resp = e.response
+                    error = HttpReqErr(message=str(e), status=resp.status_code, responseBody=resp.text)
+                    request_result = HttpCallResult.for_role(role, "error", "Failed to perform request", error)
+                    load_rs.append(request_result)
+                    self._log.error("Failed to create role '%s': %s", role_name, e)
             else:
                 self._log.info("Role '%s' already exists, skipping creation.", role_name)
-
-    def __load_roles(self, role_names_query):
-        return self._client.find_roles_by_query(role_names_query)
+                load_rs.append(HttpCallResult.for_role(role, "skipped", "already exists"))
+        return load_rs
 
     def __assign_role_users(self, role_users: List[RoleUsers]):
         self._log.info("Assigning users to roles...")
