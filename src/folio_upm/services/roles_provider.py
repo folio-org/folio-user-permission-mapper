@@ -61,7 +61,7 @@ class RolesProvider:
     def __create_role(self, analyzed_ps: AnalyzedPermissionSet) -> AnalyzedRole:
         name = analyzed_ps.get_first_value(lambda x: x.displayName)
         description = analyzed_ps.get_first_value(lambda x: x.description)
-        role = Role(id=str(uuid.uuid4()), name=name and name.strip(), description=description)
+        role = Role(name=name and name.strip(), description=description)
         source_ps_name = analyzed_ps.permissionName
 
         expanded_sub_permissions = self.__expand_sub_permissions(analyzed_ps, [])

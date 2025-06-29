@@ -16,16 +16,15 @@ class CapabilityPlaceholder(BaseModel):
     resolvedType: str
     permissionName: str
     permissionType: str
-    displayName: Optional[str]
-    expandedFrom: Optional[str]
-    name: Optional[str]
-    resource: Optional[str]
-    action: Optional[str]
-    capabilityType: Optional[str]
+    displayName: Optional[str]= None
+    expandedFrom: Optional[str] = None
+    name: Optional[str] = None
+    resource: Optional[str] = None
+    action: Optional[str] =  None
+    capabilityType: Optional[str] = None
 
 
 class RoleCapabilitiesHolder(BaseModel):
-    roleId: str
     roleName: str
     capabilities: List[CapabilityPlaceholder]
 
@@ -37,7 +36,7 @@ class SourcedPermissionSet(BaseModel):
 
 class ExpandedPermissionSet(BaseModel):
     permissionName: str
-    expandedFrom: Optional[str]
+    expandedFrom: Optional[str] = None
 
 
 class AnalyzedPermissionSet(BaseModel):

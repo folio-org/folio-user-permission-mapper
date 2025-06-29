@@ -17,7 +17,7 @@ from folio_upm.utils.ordered_set import OrderedSet
 class RoleCapabilityService(RoleEntityService, metaclass=SingletonMeta):
 
     def __init__(self):
-        super().__init__("capability")
+        super().__init__("capabilities")
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.info("RoleService initialized.")
 
@@ -31,16 +31,16 @@ class RoleCapabilityService(RoleEntityService, metaclass=SingletonMeta):
 
     @override
     def _assign_entities_to_role(self, role_id, capability_set_ids) -> List[RoleCapability]:
-        return self._client.post_role_capability(role_id, capability_set_ids)
+        return self._client.post_role_capabilities(role_id, capability_set_ids)
 
     @override
-    def _create_success_result(self, rch, entity_id) -> EntityMigrationResult:
-        return EntityMigrationResult.for_role_capability(rch, entity_id, "success")
+    def _create_success_result(self, role, entity_id) -> EntityMigrationResult:
+        return EntityMigrationResult.for_role_capability(role, entity_id, "success")
 
     @override
-    def _create_skipped_result(self, rch, entity_id) -> EntityMigrationResult:
-        return EntityMigrationResult.for_role_capability(rch, entity_id, "skipped")
+    def _create_skipped_result(self, role, entity_id) -> EntityMigrationResult:
+        return EntityMigrationResult.for_role_capability(role, entity_id, "skipped", "already exists")
 
     @override
-    def _create_error_result(self, rch, entity_id, error) -> EntityMigrationResult:
-        return EntityMigrationResult.for_role_capability(rch, entity_id, "error", error)
+    def _create_error_result(self, role, entity_id, error) -> EntityMigrationResult:
+        return EntityMigrationResult.for_role_capability(role, entity_id, "error", "Failed to perform request", error)

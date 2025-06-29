@@ -25,18 +25,20 @@ class EurekaClient(metaclass=SingletonMeta):
         return [UserRoles(**ur) for ur in user_roles]
 
     def post_role_capabilities(self, role_id: str, capability_ids: List[str]):
-        body = OrderedDict({"roleId": role_id, "capabilitySetIds": capability_ids})
+        body = OrderedDict({"roleId": role_id, "capabilityIds": capability_ids})
         response = self._client.post_json("/roles/capabilities", request_body=body)
-        return response.get("roleCapabilities", []) if response else []
+        role_capabilities_json = response.get("roleCapabilities", []) if response else []
+        return [RoleCapability(**rc) for rc in role_capabilities_json]
 
     def post_role_capability_sets(self, role_id, capability_set_ids: List[str]):
         body = OrderedDict({"roleId": role_id, "capabilitySetIds": capability_set_ids})
         response = self._client.post_json("/roles/capability-sets", request_body=body)
-        return response.get("roleCapabilitySets", []) if response else []
+        role_capability_sets_json = response.get("roleCapabilitySets", []) if response else []
+        return [RoleCapabilitySet(**rc) for rc in role_capability_sets_json]
 
-    def find_roles_by_query(self, role_names_query) -> List[Role]:
-        self._log.debug("Retrieving roles by query: query=%s", role_names_query)
-        response = self._client.get_json("/roles", role_names_query)
+    def find_roles_by_query(self, cql_query: str) -> List[Role]:
+        self._log.debug("Retrieving roles by query: query=%s", cql_query)
+        response = self._client.get_json("/roles", params={"query": cql_query, "limit": 500})
         return [Role(**role_dict) for role_dict in response.get("roles", [])]
 
     def find_capabilities(self, cql_query: str) -> list[Capability]:

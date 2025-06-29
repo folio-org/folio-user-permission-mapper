@@ -16,7 +16,7 @@ class EntityMigrationResult(BaseModel):
     entityName: str
     entityId: str
     reason: str | None = None
-    error: HttpReqErr | None = []
+    error: HttpReqErr | None = None
 
     @staticmethod
     def for_role(role, status, reason = None, error= None):
@@ -29,31 +29,31 @@ class EntityMigrationResult(BaseModel):
         )
 
     @staticmethod
-    def for_role_capability(rch, capability_id: str, status: str, reason = None, error  = None):
+    def for_role_capability(role: Role, capability_id: str, status: str, reason = None, error  = None):
         return EntityMigrationResult(
             status=status,
             entityName="role-capability",
-            entityId=f"Role: '{rch.roleName}' -> {rch.roleId}\nCapability: {capability_id}",
+            entityId=f"Role: '{role.name}' -> {role.id}\nCapability: {capability_id}",
             reason=reason,
             error=error,
         )
 
     @staticmethod
-    def for_role_capability_set(rch, set_id: str, status: str, reason = None, error  = None):
+    def for_role_capability_set(role, set_id: str, status: str, reason = None, error  = None):
         return EntityMigrationResult(
             status=status,
             entityName="role-capability-set",
-            entityId=f"Role: '{rch.roleName}' -> {rch.roleId}\nCapabilitySet: {set_id}",
+            entityId=f"Role: '{role.name}' -> {role.id}\nCapabilitySet: {set_id}",
             reason=reason,
             error=error,
         )
 
     @staticmethod
-    def for_role_users(ru, user_id: str, status: str, reason = None, error  = None):
+    def for_role_users(role, user_id: str, status: str, reason = None, error  = None):
         return EntityMigrationResult(
             status=status,
             entityName="role-capability-set",
-            entityId=f"Role: '{ru.roleName}' -> {ru.roleId}\nUser: {user_id}",
+            entityId=f"Role: '{role.name}' -> {role.id}\nUser: {user_id}",
             reason=reason,
             error=error,
         )

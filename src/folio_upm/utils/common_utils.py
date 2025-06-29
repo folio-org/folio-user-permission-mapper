@@ -33,6 +33,10 @@ class CqlQueryUtils:
         return CqlQueryUtils.any_match_by_field("name", values)
 
     @staticmethod
+    def any_match_by_permission(values: List[str]) -> str:
+        return CqlQueryUtils.any_match_by_field("permission", values)
+
+    @staticmethod
     def any_match_by_field(field: str, values: list[str]) -> str:
         """
         Generates a query string to match any of the provided IDs for a given field.

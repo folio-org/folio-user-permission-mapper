@@ -59,7 +59,7 @@ class RoleUsersService(metaclass=SingletonMeta):
     @staticmethod
     def __create_unmatched_result(rch, permission_name):
         return EntityMigrationResult(
-            status="not matched",
+            status="not_matched",
             entityName="role-capability(set)",
             entityId=f"Role: {rch.roleName} -> {rch.roleId}\nPS: {permission_name}",
             reason=f"Failed to find capability or capability set by PS name: {permission_name}",
