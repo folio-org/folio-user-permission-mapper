@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Sequence, List
+from typing import Any, List, Sequence
 
 
 class IterableUtils:

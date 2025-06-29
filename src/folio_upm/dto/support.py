@@ -16,11 +16,11 @@ class CapabilityPlaceholder(BaseModel):
     resolvedType: str
     permissionName: str
     permissionType: str
-    displayName: Optional[str]= None
+    displayName: Optional[str] = None
     expandedFrom: Optional[str] = None
     name: Optional[str] = None
     resource: Optional[str] = None
-    action: Optional[str] =  None
+    action: Optional[str] = None
     capabilityType: Optional[str] = None
 
 

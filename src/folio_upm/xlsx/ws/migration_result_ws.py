@@ -4,7 +4,6 @@ from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
 from folio_upm.dto.migration import EntityMigrationResult
-from folio_upm.dto.results import PsStatistics
 from folio_upm.xlsx import constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
@@ -18,7 +17,7 @@ class MigrationResultWorksheet(AbstractWorksheet):
         Column[EntityMigrationResult](w=40, n="Reason", f=lambda x: x.reason),
         Column[EntityMigrationResult](w=25, n="Error Http Status", f=lambda x: x.error and x.error.status),
         Column[EntityMigrationResult](w=100, n="Error Message", f=lambda x: x.error and x.error.message),
-        Column[EntityMigrationResult](w=100, n="Error Response Body", f=lambda x: x.error and x.error.responseBody)
+        Column[EntityMigrationResult](w=150, n="Error Response Body", f=lambda x: x.error and x.error.responseBody),
     ]
 
     def __init__(self, ws: Worksheet, title: str, data: List[EntityMigrationResult]):

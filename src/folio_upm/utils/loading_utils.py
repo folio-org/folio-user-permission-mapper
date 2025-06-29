@@ -1,8 +1,9 @@
-from typing import Any, Callable, Iterable, List, Optional, TypeVar
+from typing import Any, Callable, Iterable, List, Optional
 
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.upm_env import Env
+
 
 class PartitionedDataLoader:
 
@@ -63,7 +64,7 @@ class PagedDataLoader:
                 self._batch_limit,
                 last_offset,
             )
-            page = self._loader_func(self._query, self._batch_limit, last_offset)
+            page = self.load_page(last_offset)
             self._log.debug("Paged data loaded for '%s', records=%s", self._resource, len(page))
             last_load_size = len(page)
             result += page
@@ -73,3 +74,10 @@ class PagedDataLoader:
                 break
 
         return result
+
+    def load_page(self, last_offset: int = 0) -> List[Any]:
+        try:
+            return self._loader_func(self._query, self._batch_limit, last_offset)
+        except Exception as e:
+            self._log.warn("Failed to load page for '%s': %s", self._resource, e)
+            return []

@@ -1,11 +1,11 @@
 import re
-from typing import List, Any
+from typing import Any, List
 
 import requests
 
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.dto.eureka import Role
-from folio_upm.dto.migration import HttpReqErr, EntityMigrationResult
+from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import CqlQueryUtils
@@ -53,14 +53,14 @@ class RoleEntityService(metaclass=SingletonMeta):
         role_name = role.name
         resp = err.response
         response_text = resp.text or ""
-        if resp.status_code == 400 and "Relation already exists for role" in response_text:
-            self._log.info("Handling existing entities in role-%s for role '%s': %s", self._name, role_name, err)
-            return self.__handle_existing_entities_response(role, entity_ids, resp)
         self._log.warn("Failed to create role-%s for role '%s': %s", self._name, role_name, err)
-        return self.__create_error_result(entity_ids, err, resp, role)
+        if resp.status_code == 400 and "Relation already exists for role" in response_text:
+            self._log.info("Handling existing entities in role-%s for role '%s'", self._name, role_name)
+            return self.__handle_existing_entities_response(role, entity_ids, err)
+        return self.__create_error_result(role, entity_ids, err)
 
-    def __handle_existing_entities_response(self, role, entity_ids, resp):
-        response_text = resp.text or ""
+    def __handle_existing_entities_response(self, role, entity_ids, err):
+        response_text = err.response.text or ""
         pattern = r"=\[([a-f0-9\- ,]+)\]"
         match = re.search(pattern, response_text)
         if match:
@@ -71,14 +71,15 @@ class RoleEntityService(metaclass=SingletonMeta):
                 return assigned_ids_result + self.__assign_entity_ids_to_role(role, unassigned_ids)
             return assigned_ids_result
         self._log.warn("Failed to extract existing entity IDs from response: %s", response_text)
-        return self.__create_error_result(entity_ids, resp, resp, role)
+        return self.__create_error_result(role, entity_ids, err)
 
     def __find_unassigned_entities(self, entity_ids: List[str], assigned_entities_resp) -> List[str]:
         requested_ids = OrderedSet[str](entity_ids)
         assigned_ids = OrderedSet[str]([self._get_result_entity_id(e) for e in assigned_entities_resp])
         return requested_ids.remove_all(assigned_ids).to_list()
 
-    def __create_error_result(self, entity_ids, err, resp, role):
+    def __create_error_result(self, role, entity_ids, err):
+        resp = err.response
         error = HttpReqErr(message=str(err), status=resp.status_code, responseBody=resp.text)
         return [self._create_error_result(role, entity_id, error) for entity_id in entity_ids]
 

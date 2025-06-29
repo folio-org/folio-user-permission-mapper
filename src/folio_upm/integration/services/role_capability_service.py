@@ -1,17 +1,10 @@
-from typing import List, Tuple, override
-
-import requests
+from typing import List, override
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import CapabilitySet, Capability, RoleCapability
-from folio_upm.dto.migration import HttpReqErr, EntityMigrationResult
-from folio_upm.dto.support import RoleCapabilitiesHolder
-from folio_upm.integration.clients.eureka_client import EurekaClient
+from folio_upm.dto.eureka import RoleCapability
+from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.integration.services.role_entity_service import RoleEntityService
 from folio_upm.utils import log_factory
-from folio_upm.utils.common_utils import CqlQueryUtils
-from folio_upm.utils.loading_utils import PartitionedDataLoader
-from folio_upm.utils.ordered_set import OrderedSet
 
 
 class RoleCapabilityService(RoleEntityService, metaclass=SingletonMeta):

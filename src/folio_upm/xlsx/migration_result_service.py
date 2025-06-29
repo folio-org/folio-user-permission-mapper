@@ -10,7 +10,7 @@ class MigrationResultService:
     _worksheet_definitions = [
         ("Roles", lambda migration_rs: migration_rs.roles),
         ("Role-Users", lambda migration_rs: migration_rs.roleUsers),
-        ("Role-Capabilities", lambda migration_rs: migration_rs.roleCapabilities)
+        ("Role-Capabilities", lambda migration_rs: migration_rs.roleCapabilities),
     ]
 
     def __init__(self, migration_result: EurekaMigrationResult):

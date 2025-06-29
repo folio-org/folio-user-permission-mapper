@@ -1,5 +1,6 @@
-from functools import lru_cache
-from typing import OrderedDict as OrdDict, Set
+from typing import List
+from typing import OrderedDict as OrdDict
+from typing import Set
 
 import requests
 
@@ -29,6 +30,11 @@ class RoleService(metaclass=SingletonMeta):
             self._log.warn("Failed to find role by name '%s': %s", role_name, e)
             return None
 
+    def find_roles_by_names(self, role_names: List[str]) -> List[Role]:
+        qb = CqlQueryUtils.any_match_by_name
+        loader = self._client.find_roles_by_query
+        return PartitionedDataLoader("roles", role_names, loader, qb).load()
+
     def create_roles(self, analyzed_roles: OrdDict[str, AnalyzedRole]):
         self._log.info("Creating %s role(s)...", len(analyzed_roles))
         existing_role_names = self.__find_existing_roles(analyzed_roles)
@@ -39,11 +45,8 @@ class RoleService(metaclass=SingletonMeta):
 
     def __find_existing_roles(self, analyzed_roles):
         role_names = [ar.role.name for ar in analyzed_roles.values() if ar.role.name]
-        loader_func = self._client.find_roles_by_query
-        data_loader = PartitionedDataLoader("roles", role_names, loader_func, CqlQueryUtils.any_match_by_name)
-        loaded_roles = data_loader.load()
-        existing_role_names = set([role.name for role in loaded_roles])
-        return existing_role_names
+        found_roles = self.find_roles_by_names(role_names)
+        return set([role.name for role in found_roles])
 
     def __verify_and_create_role(self, ar: AnalyzedRole, existing_role_names: Set[str]) -> EntityMigrationResult:
         role = ar.role
@@ -51,13 +54,10 @@ class RoleService(metaclass=SingletonMeta):
         if ar.systemGenerated:
             self._log.info("Role '%s' is system-generated, skipping creation.", role_name)
             return EntityMigrationResult.for_role(role, "skipped", "system generated")
-        if not role_name:
-            self._log.error("Role name cannot be empty, skipping role creation for role: %s", role.id)
-            return EntityMigrationResult.for_role(role, "skipped", "role name is empty")
         if role_name not in existing_role_names:
             return self.__create_role_safe(role)
         else:
-            self._log.info("Role '%s' already exists, skipping creation.", role_name)
+            self._log.warn("Role '%s' already exists, skipping creation.", role_name)
             return EntityMigrationResult.for_role(role, "skipped", "already exists")
 
     def __create_role_safe(self, role):
@@ -66,8 +66,6 @@ class RoleService(metaclass=SingletonMeta):
             self._log.debug("Creating role: name='%s'...", role.name)
             created_role = self._client.post_role(role)
             self._log.info("Role is created: id=%s, name=%s", created_role.id, role_name)
-            if created_role.id != role.id:
-                self._log.warning("Role ID mismatch: expected %s, got %s", role.id, created_role.id)
             return EntityMigrationResult.for_role(created_role, "success", f"Role created: {created_role.id}")
         except requests.HTTPError as e:
             self._log.warn("Failed to create role '%s': %s", role_name, e)

@@ -1,4 +1,3 @@
-import uuid
 from collections import OrderedDict
 from typing import List, Optional
 from typing import OrderedDict as OrdDict
@@ -162,7 +161,6 @@ class RolesProvider:
             else:
                 capabilities_by_name[capability_set.permission] = [capability_set]
         return capabilities_by_name
-
 
     @staticmethod
     def __get_permissions_for_distributed_strategy(capabilities: List[CapabilityPlaceholder]) -> List[str]:

@@ -2,7 +2,7 @@ from typing import Any, Callable, Optional
 
 import requests
 
-from folio_upm.utils import json_utils, log_factory
+from folio_upm.utils import log_factory
 from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env
 

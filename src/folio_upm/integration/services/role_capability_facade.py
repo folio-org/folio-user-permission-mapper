@@ -25,8 +25,8 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
             role_name = rch.roleName
             role_by_name = self._role_service.find_role_by_name(role_name)
             if role_by_name is None:
-                self._log.warning("Role '{}' not found by name.".format(role_name))
-                migration_results.append(self.__create_role_not_found_result(role_name))
+                self._log.warning("Role '%s' not found by name, skipping capability assignment...", role_name)
+                migration_results.append(EntityMigrationResult.role_not_found_result(role_name))
                 continue
             capability_sets, capabilities, issues = self.__find_by_permission_names(rch)
             migration_results += [self.__create_unmatched_result(role_by_name, i) for i in issues]
@@ -55,13 +55,4 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
             entityName="capability or capability-set",
             entityId=f"Role: {role.name} -> {role.id}\nPS: {permission_name}",
             reason=f"Failed to find capability or capability set by PS name: {permission_name}",
-        )
-
-    @staticmethod
-    def __create_role_not_found_result(role_name: str):
-        return EntityMigrationResult(
-            status="not_matched",
-            entityName="role",
-            entityId=f"{role_name}",
-            reason="Failed to find by name",
         )

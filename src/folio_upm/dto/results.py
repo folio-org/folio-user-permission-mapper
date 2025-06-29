@@ -4,8 +4,8 @@ from typing import OrderedDict as OrdDict
 
 from pydantic import BaseModel, field_serializer
 
-from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.eureka import Capability, CapabilitySet, Role, RoleUsers, UserPermission
+from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet
 from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet, RoleCapabilitiesHolder
 from folio_upm.utils.ordered_set import OrderedSet

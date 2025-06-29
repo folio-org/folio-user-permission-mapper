@@ -2,7 +2,7 @@ from collections import OrderedDict
 from typing import List
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import Capability, Role, RoleCapability, RoleCapabilitySet, CapabilitySet, UserRoles
+from folio_upm.dto.eureka import Capability, CapabilitySet, Role, RoleCapability, RoleCapabilitySet, UserRole
 from folio_upm.integration.clients.base.eureka_http_client import EurekaHttpClient
 from folio_upm.utils import log_factory
 
@@ -18,11 +18,11 @@ class EurekaClient(metaclass=SingletonMeta):
         response_json = self._client.post_json("/roles", role.model_dump())
         return Role(**response_json)
 
-    def post_role_users(self, role_id: str, users_ids: list[str]) -> List[UserRoles]:
-        body = OrderedDict({"roleId": role_id, "userIds": users_ids})
+    def post_user_roles(self, user_id: str, role_ids: list[str]) -> List[UserRole]:
+        body = OrderedDict({"userId": user_id, "roleIds": role_ids})
         response = self._client.post_json("/roles/users", request_body=body)
         user_roles = response.get("userRoles", []) if response else []
-        return [UserRoles(**ur) for ur in user_roles]
+        return [UserRole(**ur) for ur in user_roles]
 
     def post_role_capabilities(self, role_id: str, capability_ids: List[str]):
         body = OrderedDict({"roleId": role_id, "capabilityIds": capability_ids})

@@ -1,5 +1,3 @@
-from typing import Optional, List
-
 from pydantic import BaseModel
 
 from folio_upm.dto.eureka import Role
@@ -19,7 +17,7 @@ class EntityMigrationResult(BaseModel):
     error: HttpReqErr | None = None
 
     @staticmethod
-    def for_role(role, status, reason = None, error= None):
+    def for_role(role, status, reason=None, error=None):
         return EntityMigrationResult(
             status=status,
             entityName="role",
@@ -29,7 +27,7 @@ class EntityMigrationResult(BaseModel):
         )
 
     @staticmethod
-    def for_role_capability(role: Role, capability_id: str, status: str, reason = None, error  = None):
+    def for_role_capability(role: Role, capability_id: str, status: str, reason=None, error=None):
         return EntityMigrationResult(
             status=status,
             entityName="role-capability",
@@ -39,7 +37,7 @@ class EntityMigrationResult(BaseModel):
         )
 
     @staticmethod
-    def for_role_capability_set(role, set_id: str, status: str, reason = None, error  = None):
+    def for_role_capability_set(role, set_id: str, status: str, reason=None, error=None):
         return EntityMigrationResult(
             status=status,
             entityName="role-capability-set",
@@ -49,11 +47,20 @@ class EntityMigrationResult(BaseModel):
         )
 
     @staticmethod
-    def for_role_users(role, user_id: str, status: str, reason = None, error  = None):
+    def for_role_users(role, user_id: str, status: str, reason=None, error=None):
         return EntityMigrationResult(
             status=status,
             entityName="role-capability-set",
             entityId=f"Role: '{role.name}' -> {role.id}\nUser: {user_id}",
             reason=reason,
             error=error,
+        )
+
+    @staticmethod
+    def role_not_found_result(role_name: str):
+        return EntityMigrationResult(
+            status="not_matched",
+            entityName="role",
+            entityId=f"{role_name}",
+            reason="Failed to find by name",
         )
