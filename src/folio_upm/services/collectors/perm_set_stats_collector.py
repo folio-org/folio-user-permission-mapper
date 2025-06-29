@@ -61,7 +61,7 @@ class PermSetStatisticsCollector:
         for x in ap.sourcePermSets:
             module_id = ServiceUtils.get_module_id(x.val)
             if module_id:
-                module_ids.append(module_id)
+                module_ids.add(module_id)
         return module_ids.to_list()
 
     @staticmethod

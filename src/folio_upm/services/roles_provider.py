@@ -15,7 +15,7 @@ from folio_upm.dto.support import (
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.system_roles_provider import SystemGeneratedRolesProvider
+from folio_upm.utils.system_roles_provider import SystemRolesProvider
 
 
 class RolesProvider:
@@ -66,12 +66,13 @@ class RolesProvider:
 
         expanded_sub_permissions = self.__expand_sub_permissions(analyzed_ps, [])
 
+        is_system_generated = SystemRolesProvider().has_system_generated_ps(source_ps_name)
         return AnalyzedRole(
-            role=role,
+            role=role if not is_system_generated else SystemRolesProvider().get_eureka_role_name(source_ps_name),
             source=source_ps_name,
             users=self._users_by_ps_names.get(source_ps_name, OrderedSet()),
             permissionSets=expanded_sub_permissions,
-            excluded=SystemGeneratedRolesProvider().has_system_generated_ps(source_ps_name),
+            systemGenerated=is_system_generated,
             originalPermissionsCount=len(analyzed_ps.get_sub_permissions()),
             totalPermissionsCount=len(expanded_sub_permissions),
         )
@@ -124,7 +125,7 @@ class RolesProvider:
             for ps_name in user_perm.permissions:
                 if ps_name not in users_by_ps_name:
                     users_by_ps_name[ps_name] = OrderedSet()
-                users_by_ps_name[ps_name].append(user_id)
+                users_by_ps_name[ps_name].add(user_id)
         return users_by_ps_name
 
     def __expand_sub_permissions(self, ap: AnalyzedPermissionSet, exp_list: List[str]) -> List[ExpandedPermissionSet]:
@@ -161,3 +162,12 @@ class RolesProvider:
             else:
                 capabilities_by_name[capability_set.permission] = [capability_set]
         return capabilities_by_name
+
+
+    @staticmethod
+    def __get_permissions_for_distributed_strategy(capabilities: List[CapabilityPlaceholder]) -> List[str]:
+        return [x.permissionName for x in capabilities]
+
+    @staticmethod
+    def __get_permissions_for_consolidated_strategy(capabilities: List[CapabilityPlaceholder]) -> List[str]:
+        return [x.permissionName for x in capabilities]

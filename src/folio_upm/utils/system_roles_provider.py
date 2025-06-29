@@ -5,7 +5,7 @@ from folio_upm.utils import log_factory
 from folio_upm.utils.upm_env import Env
 
 
-class SystemGeneratedRolesProvider(metaclass=SingletonMeta):
+class SystemRolesProvider(metaclass=SingletonMeta):
 
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
@@ -17,6 +17,9 @@ class SystemGeneratedRolesProvider(metaclass=SingletonMeta):
 
     def get_eureka_role_name(self, role_name: str) -> Optional[str]:
         return self._system_roles_dict.get(role_name)
+
+    def print_system_roles(self):
+        self._log.debug("Defined system-generated roles: %s", self._system_roles_dict)
 
     def __get_system_roles_mappings(self):
         system_generated_roles = Env().get_env("SYSTEM_GENERATED_PERM_MAPPINGS")
@@ -32,5 +35,5 @@ class SystemGeneratedRolesProvider(metaclass=SingletonMeta):
             result_dict[okapi_ps_and_role[0].strip()] = okapi_ps_and_role[1].strip()
 
         for okapi_ps, eureka_role_name in result_dict.items():
-            self._log.info(f"System-generated role mapping: {okapi_ps} -> {eureka_role_name}")
+            self._log.debug(f"System-generated role mapping: {okapi_ps} -> {eureka_role_name}")
         return result_dict

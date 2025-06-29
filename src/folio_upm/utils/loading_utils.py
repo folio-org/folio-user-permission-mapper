@@ -1,9 +1,8 @@
-from typing import Any, Callable, Iterable, List, Optional
+from typing import Any, Callable, Iterable, List, Optional, TypeVar
 
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.upm_env import Env
-
 
 class PartitionedDataLoader:
 

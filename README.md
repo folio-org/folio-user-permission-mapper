@@ -184,7 +184,7 @@ The command will do the following actions:
 
 #### Output
 
-- `<tenant_id>/<tenant_id>-analysis-result.xlsx`
+- `<tenant_id>/<tenant_id>-analysis-result-<generation_timestamp>.xlsx`
 - `<tenant_id>/<tenant_id>-analysis-result.json.gz`
 
 ### Environment Variables
@@ -208,7 +208,7 @@ The command will do the following actions:
 
 The command will do the following actions:
 
-- Load `okapi-permissions.gson.gz` and _(optionally)_ `eureka-capabilities` from storage.
+- Load `<tenant>-analysis-result.json.gz` and from storage.
 - Create roles (values specified in `SYSTEM_GENERATED_PERM_MAPPINGS` will be skipped)</br>
   _If a role exists, it will be skipped (skipped operations will be visible in error report)._
 - Assign capabilities and capability-sets to a role</br>

@@ -3,7 +3,7 @@ from typing import List, Optional, override
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
-from folio_upm.dto.errors import EntityMigrationResult
+from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.results import PsStatistics
 from folio_upm.xlsx import constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column

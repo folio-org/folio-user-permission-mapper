@@ -3,7 +3,7 @@ from typing import OrderedDict as OrdDict, Set
 import requests
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.errors import EntityMigrationResult, HttpReqErr
+from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
 from folio_upm.dto.results import AnalyzedRole
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory

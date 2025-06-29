@@ -53,7 +53,7 @@ class PermissionAnalyzer:
             self._analyzed_permissions += 1
             if ServiceUtils.is_system_permission(ps.permissionName):
                 self._system_perms_count[src_type] += 1
-                self._system_permission_names.append(ps.permissionName)
+                self._system_permission_names.add(ps.permissionName)
             else:
                 self.__process_permission(ps, src_type)
 

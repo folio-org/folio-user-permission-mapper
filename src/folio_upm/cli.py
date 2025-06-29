@@ -11,6 +11,8 @@ from folio_upm.services.loaders.eureka_result_loader import EurekaResultLoader
 from folio_upm.services.loaders.permission_loader import PermissionLoader
 from folio_upm.storage.tenant_storage_service import TenantStorageService
 from folio_upm.utils import log_factory
+from folio_upm.utils.system_roles_provider import SystemRolesProvider
+from folio_upm.utils.upm_env import Env
 from folio_upm.xlsx.migration_result_service import MigrationResultService
 from folio_upm.xlsx.permission_result_service import PermissionResultService
 
@@ -47,18 +49,25 @@ def collect_capabilities():
 
 @cli.command("generate-report")
 def generate_report():
+    migration_strategy = Env().get_migration_strategy()
+    _log.info("Generating report for strategy: %s ...", migration_strategy)
+    SystemRolesProvider().print_system_roles()
+
     storage_service = TenantStorageService()
     load_result = storage_service.require_object(okapi_permissions_fn, json_gz_ext)
     eureka_load_result = EurekaResultLoader().get_load_result()
     analysis_result = LoadResultAnalyzer(load_result, eureka_load_result).get_results()
     workbook = PermissionResultService(analysis_result).generate_report()
 
-    storage_service.save_object(mixed_analysis_result_fn, xlsx_ext, workbook, include_ts=True)
-    storage_service.save_object(mixed_analysis_result_fn, json_gz_ext, analysis_result.model_dump())
+    result_fn = f"{mixed_analysis_result_fn}-{migration_strategy}"
+    storage_service.save_object(result_fn, xlsx_ext, workbook, include_ts=True)
+    storage_service.save_object(result_fn, json_gz_ext, analysis_result.model_dump())
+    _log.info("Report is successfully generated.", Env().get_migration_strategy())
 
 
 @cli.command("run-eureka-migration")
 def run_eureka_migration():
+    migration_strategy = Env().get_migration_strategy()
     storage_service = TenantStorageService()
     analysis_result_dict = storage_service.get_object(mixed_analysis_result_fn, json_gz_ext)
     analysis_result = AnalysisResult(**analysis_result_dict)
