@@ -72,4 +72,6 @@ class RoleService(metaclass=SingletonMeta):
             resp = e.response
             error = HttpReqErr(message=str(e), status=resp.status_code, responseBody=resp.text)
             status = "skipped" if resp.status_code == 409 else "error"
+            if status == "skipped":
+                self._log.debug("Role '%s' already exists in 'mod-roles-keycloak'.", role_name)
             return EntityMigrationResult.for_role(role, status, "Failed to perform request", error)
