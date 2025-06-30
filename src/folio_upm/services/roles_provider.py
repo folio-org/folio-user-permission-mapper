@@ -54,10 +54,10 @@ class RolesProvider:
         result = OrderedDict[str, AnalyzedRole]()
         for analyzed_ps in self._ps_analysis_result.mutable.values():
             ar = self.__create_role(analyzed_ps)
-            result[ar.role.id] = ar
+            result[ar.role.name] = ar
         return result
 
-    def __create_role(self, analyzed_ps: AnalyzedPermissionSet) -> AnalyzedRole:
+    def __create_role(self, analyzed_ps: AnalyzedPermissionSet) -> AnalyzedRole | None:
         name = analyzed_ps.get_first_value(lambda x: x.displayName)
         description = analyzed_ps.get_first_value(lambda x: x.description)
         role = Role(name=name and name.strip(), description=description)
@@ -66,8 +66,12 @@ class RolesProvider:
         expanded_sub_permissions = self.__expand_sub_permissions(analyzed_ps, [])
 
         is_system_generated = SystemRolesProvider().has_system_generated_ps(source_ps_name)
+        if is_system_generated:
+            role_name = SystemRolesProvider().get_eureka_role_name(source_ps_name)
+            role = Role(name=role_name, description="System generated role")
+
         return AnalyzedRole(
-            role=role if not is_system_generated else SystemRolesProvider().get_eureka_role_name(source_ps_name),
+            role=role,
             source=source_ps_name,
             users=self._users_by_ps_names.get(source_ps_name, OrderedSet()),
             permissionSets=expanded_sub_permissions,
@@ -77,17 +81,13 @@ class RolesProvider:
         )
 
     def __collect_role_users(self) -> List[RoleUsers]:
-        return [
-            RoleUsers(roleId=role.role.id, userIds=list(role.users), roleName=role.role.name)
-            for role in self._roles.values()
-        ]
+        return [RoleUsers(userIds=list(role.users), roleName=role.role.name) for role in self._roles.values()]
 
     def __create_role_capabilities(self) -> List[RoleCapabilitiesHolder]:
         return [self.__create_role_capability_holder(role) for role in self._roles.values()]
 
     def __create_role_capability_holder(self, role: AnalyzedRole) -> RoleCapabilitiesHolder:
         return RoleCapabilitiesHolder(
-            roleId=role.role.id,
             roleName=role.role.name,
             capabilities=[self.__create_capability_placeholder(ps) for ps in role.permissionSets],
         )

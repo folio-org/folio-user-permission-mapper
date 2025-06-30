@@ -1,4 +1,4 @@
-from typing import List, Optional, override
+from typing import List, override
 
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
@@ -8,8 +8,7 @@ from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
 class UserRoleRow(BaseModel):
-    name: Optional[str]
-    id: str
+    name: str
     userId: str
 
 
@@ -27,7 +26,7 @@ class RoleUsersWorksheet(AbstractWorksheet):
     @override
     def _get_iterable_data(self):
         return [
-            UserRoleRow(userId=user_id, id=role_users.roleId, name=role_users.roleName)
+            UserRoleRow(userId=user_id, name=role_users.roleName)
             for role_users in self._data
             for user_id in role_users.userIds
         ]

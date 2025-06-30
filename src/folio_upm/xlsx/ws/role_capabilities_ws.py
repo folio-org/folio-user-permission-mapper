@@ -12,7 +12,6 @@ from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
 class RoleCapabilityRow(BaseModel):
-    roleId: str
     roleName: str
     source: str
     excluded: bool
@@ -53,7 +52,6 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
     def _get_iterable_data(self):
         return [
             RoleCapabilityRow(
-                roleId=role_capability.roleId,
                 roleName=role_capability.roleName,
                 resolvedType=capability.resolvedType,
                 source=capability.permissionName,

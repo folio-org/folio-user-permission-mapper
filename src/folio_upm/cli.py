@@ -62,7 +62,7 @@ def generate_report():
     result_fn = f"{mixed_analysis_result_fn}"
     storage_service.save_object(result_fn, xlsx_ext, workbook, include_ts=True)
     storage_service.save_object(result_fn, json_gz_ext, analysis_result.model_dump())
-    _log.info("Report is successfully generated.", Env().get_migration_strategy())
+    _log.info("Report is successfully generated for strategy: %s", migration_strategy)
 
 
 @cli.command("run-eureka-migration")
