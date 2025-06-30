@@ -2,7 +2,7 @@ from collections import OrderedDict
 from typing import List
 from typing import OrderedDict as OrdDict
 
-from folio_upm.dto.eureka import RoleUsers, UserRoles
+from folio_upm.dto.eureka import UserRoles
 from folio_upm.dto.results import AnalyzedRole
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
