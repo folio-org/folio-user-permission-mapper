@@ -14,13 +14,17 @@ class Endpoint(BaseModel):
     method: str
 
 
-class UserRoles(BaseModel):
+class UserRole(BaseModel):
     userId: str
     roleId: str
 
 
+class UserRoles(BaseModel):
+    userId: str
+    roles: List[str] | None = []
+
+
 class RoleUsers(BaseModel):
-    roleId: str
     roleName: Optional[str]
     userIds: List[str]
 

@@ -47,9 +47,30 @@ class Env(metaclass=SingletonMeta):
         str_var = self.get_env(env_variable_name, str(default_value))
         return ServiceUtils.parse_bool(str_var, default_value)
 
+    def get_migration_strategy(self):
+        resolved_strategy = self.get_env("EUREKA_ROLE_LOAD_STRATEGY", default_value="distributed")
+        allowed_values = {"distributed", "local"}
+        if resolved_strategy not in allowed_values:
+            raise ValueError(f"Invalid role migration strategy provided. Allowed values are: {allowed_values}.")
+        return resolved_strategy
+
+    def get_enabled_storages(self):
+        storages = self.get_env("ENABLED_STORAGES", default_value="local")
+        parsed_storages = [x.strip() for x in storages.split(",")]
+        allowed_values = {"s3", "local"}
+        if not set(parsed_storages) <= allowed_values:
+            raise ValueError(f"Invalid storages: '{parsed_storages}'. Allowed values are: {allowed_values}'.")
+        return parsed_storages
+
     @lru_cache(maxsize=100)
     def get_env(self, env_variable_name, default_value: str | None = None, log_result=True) -> Optional[str]:
-        env_variable_value = os.getenv(env_variable_name, default_value)
+        env_variable_value = os.getenv(env_variable_name)
+        if env_variable_value is None:
+            self._log.debug(f"{env_variable_name} is not set, using default value: {default_value}")
+            return default_value
+        elif env_variable_value.strip() == "":
+            self._log.debug(f"{env_variable_name} is set to an empty string, using default value: {default_value}")
+            return default_value
         if log_result:
             self._log.info(f"Resolved value for {env_variable_name}: {env_variable_value}")
         return env_variable_value

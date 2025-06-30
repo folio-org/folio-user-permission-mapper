@@ -39,7 +39,7 @@ class ParentPermSetCollector:
                 continue
             for parent_ps in source_perm_set.val.childOf:
                 if ServiceUtils.is_system_permission(parent_ps):
-                    self._skipped_service_permissions.append(parent_ps)
+                    self._skipped_service_permissions.add(parent_ps)
                     continue
                 parent_ps_type = self._ps_analysis_result.identify_permission_type(parent_ps)
                 analyzed_ps = self._ps_analysis_result[parent_ps_type].get(parent_ps, None)
@@ -54,7 +54,7 @@ class ParentPermSetCollector:
                         parentPsSources=OrderedSet(source_perm_set.src),
                     )
                 else:
-                    parent_ps_dict[parent_ps].parentPsTypes.append(parent_ps_type)
-                    parent_ps_dict[parent_ps].parentPsSources.append(source_perm_set.src)
+                    parent_ps_dict[parent_ps].parentPsTypes.add(parent_ps_type)
+                    parent_ps_dict[parent_ps].parentPsSources.add(source_perm_set.src)
 
         return list(parent_ps_dict.values())

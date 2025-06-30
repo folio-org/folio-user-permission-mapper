@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{ include = "folio_upm", from = "src" }]
 
 [tool.poetry.scripts]
-folio-permission-mapper = "folio_upm.cli:cli"
+folio-permission-migration-cli = "folio_upm.cli:cli"
 
 [tool.poetry.dependencies]
 python = "^3.12"

@@ -25,10 +25,10 @@ class PartitionedDataLoader:
     def load(self) -> List[Any]:
         result = []
 
-        self._log.info("Loading partitioned data for '%s'...", self._resource)
+        self._log.info("Loading partitioned data for '%s'", self._resource)
         for partition in self._partitioned_data:
             query = self._query_builder(partition)
-            self._log.debug("Loading partitioned data ('%s') for query: %s..", self._resource, query)
+            self._log.debug("Loading partitioned data ('%s') for query: '%s'", self._resource, query)
             loaded_data = self._data_loader(query)
             self._log.debug("Partitioned data loaded '%s': records=%s", self._resource, len(loaded_data))
             result += loaded_data
@@ -64,7 +64,7 @@ class PagedDataLoader:
                 self._batch_limit,
                 last_offset,
             )
-            page = self._loader_func(self._query, self._batch_limit, last_offset)
+            page = self.load_page(last_offset)
             self._log.debug("Paged data loaded for '%s', records=%s", self._resource, len(page))
             last_load_size = len(page)
             result += page
@@ -74,3 +74,10 @@ class PagedDataLoader:
                 break
 
         return result
+
+    def load_page(self, last_offset: int = 0) -> List[Any]:
+        try:
+            return self._loader_func(self._query, self._batch_limit, last_offset)
+        except Exception as e:
+            self._log.warn("Failed to load page for '%s': %s", self._resource, e)
+            return []

@@ -1,30 +1,9 @@
-from collections import OrderedDict
-from typing import Any, Optional, Sequence
+from typing import Optional
 
 from folio_upm.dto.okapi import PermissionSet
 
 
 class ServiceUtils:
-
-    @staticmethod
-    def first(value: Sequence[Any | None]):
-        if value is not None and len(value) > 0:
-            return value[0]
-        return None
-
-    @staticmethod
-    def last(value: Sequence[Any | None]):
-        if value is not None and len(value) > 0:
-            return value[-1]
-        return None
-
-    @staticmethod
-    def is_system_permission(permission: str) -> bool:
-        return permission.startswith("SYS#")
-
-    @staticmethod
-    def unique_values(iterable):
-        return list(OrderedDict.fromkeys(iterable).keys())
 
     @staticmethod
     def parse_bool(value: str, default_val: bool) -> bool:
@@ -36,6 +15,10 @@ class ServiceUtils:
         elif value in ("false", "no", "0"):
             return False
         return default_val
+
+    @staticmethod
+    def is_system_permission(permission: str) -> bool:
+        return permission.startswith("SYS#")
 
     @staticmethod
     def get_module_id(permission_set: PermissionSet) -> Optional[str]:

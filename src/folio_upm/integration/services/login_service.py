@@ -18,8 +18,8 @@ class LoginService(metaclass=SingletonMeta):
 
     @cached(cache=TTLCache(maxsize=10, ttl=os.getenv("ACCESS_TOKEN_TTL", 60)))
     def get_okapi_token(self):
-        username = os.getenv("ADMIN_USERNAME")
-        password = os.getenv("ADMIN_PASSWORD")
+        username = os.getenv("OKAPI_ADMIN_USERNAME")
+        password = os.getenv("OKAPI_ADMIN_PASSWORD")
         return self._login_client.login_as_admin(Env().get_okapi_url(), username, password)
 
     @cached(cache=TTLCache(maxsize=10, ttl=os.getenv("ACCESS_TOKEN_TTL", 600)))

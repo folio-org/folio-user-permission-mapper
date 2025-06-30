@@ -6,9 +6,9 @@ from folio_upm.utils.upm_env import Env
 
 class EurekaResultLoader:
 
-    def __init__(self, storages):
+    def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
-        self._tenant_storage_service = TenantStorageService(storages)
+        self._tenant_storage_service = TenantStorageService()
         self._eureka_load_result = self.__load_eureka_capabilities()
 
     def get_load_result(self) -> EurekaLoadResult:
@@ -20,7 +20,7 @@ class EurekaResultLoader:
             self._log.error("Tenant-related eureka capabilities found in storage.")
             return EurekaLoadResult(**eureka_load_result_dict)
 
-        ref_capabilities_file_path = Env().get_env("REF_CAPABILITIES_FILE_PATH")
+        ref_capabilities_file_path = Env().get_env("REF_CAPABILITIES_FILE_KEY")
         if not ref_capabilities_file_path:
             self._log.info("Reference capabilities file path is not set, returning empty value...")
             return EurekaLoadResult()

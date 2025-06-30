@@ -30,7 +30,6 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
 
     _title = "Role-Capabilities"
     _columns = [
-        Column[RoleCapabilityRow](w=40, n="Role Id", f=lambda x: x.roleId),
         Column[RoleCapabilityRow](w=60, n="Role Name", f=lambda x: x.roleName),
         Column[RoleCapabilityRow](w=80, n="PS Name", f=lambda x: x.source),
         Column[RoleCapabilityRow](w=80, n="PS Display Name", f=lambda x: x.sourceDisplayName),

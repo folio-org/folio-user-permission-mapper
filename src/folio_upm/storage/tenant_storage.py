@@ -11,13 +11,13 @@ class TenantStorage:
     _json_ext = "json"
     _json_gz_ext = "json.gz"
 
-    def __init__(self, override_reports: bool = False):
+    def __init__(self, override_reports: bool = True):
         self._tenant_id = Env().get_tenant_id()
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._override_reports = override_reports
 
-    def save_object(self, object_name: str, object_ext: str, object_data: Any = None):
-        file_key = self._get_file_key(object_name, object_ext)
+    def save_object(self, object_name: str, object_ext: str, object_data: Any = None, include_ts: bool = False):
+        file_key = self._get_file_key(object_name, object_ext, include_ts)
         if object_ext == "json.gz":
             self._save_json_gz(file_key, object_data)
         elif object_ext == "json":
@@ -28,13 +28,11 @@ class TenantStorage:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
 
     def get_object(self, object_name: str, object_ext: str):
-        file_key = self._get_file_key(object_name, object_ext)
+        file_key = self._get_file_key(object_name, object_ext, include_ts=False)
         if object_ext == "json.gz":
             return self._get_json_gz(file_key)
         elif object_ext == "json":
             return self._get_json(file_key)
-        elif object_ext == "xlsx":
-            return self._get_xlsx(file_key)
         else:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
             return None
@@ -44,8 +42,6 @@ class TenantStorage:
             return self._get_json_gz(ref_key)
         elif ref_key.endswith("json"):
             return self._get_json(ref_key)
-        elif ref_key.endswith("xlsx"):
-            return self._get_xlsx(ref_key)
         else:
             self._log.error("Unsupported object type: %s, file=%s", ref_key, ref_key)
         return None
@@ -68,9 +64,9 @@ class TenantStorage:
     def _save_xlsx(self, object_name: str, object_data: Any):
         pass
 
-    def _get_file_key(self, file_name, extension, include_ts=True) -> str:
+    def _get_file_key(self, file_name, extension, include_ts: bool = False) -> str:
         file_name = f"{self._tenant_id}-{file_name}"
-        if include_ts and self._override_reports:
+        if include_ts:
             now = datetime.now(tz=UTC)
             file_name += f"-{now.strftime("%Y%m%d%H%M%S") + f"{now.microsecond // 1000:03d}"}"
         return f"{self._tenant_id}/{file_name}.{extension}"

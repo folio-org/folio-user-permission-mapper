@@ -18,17 +18,14 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("LocalTenantStorage initialized.")
         self._out_folder = ".temp"
-        self._skip_json_gz = True
 
     @override
-    def _get_json_gz(self, json_name):
-        self._log.debug("LocalTenantStorage._get_json_gz is not available.")
-        return None
+    def _get_json_gz(self, file_key):
+        json_bytes_buffer = self.__read_binary_data(file_key)
+        return json_bytes_buffer and JsonUtils.from_json_gz(json_bytes_buffer)
 
     @override
     def _save_json_gz(self, file_key, object_data: dict):
-        if self._skip_json_gz:
-            return
         data_bytes = JsonUtils.to_json_gz(object_data)
         self.__save_file_with_latest_included(file_key, data_bytes)
 
@@ -57,6 +54,18 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
             binary_data.seek(0)
             f.write(binary_data.getbuffer())
             self._log.debug("Data saved to file '%s'", file)
+
+    def __read_binary_data(self, file_key) -> BytesIO | None:
+        file = f"{self._out_folder}/{file_key}"
+        if not os.path.exists(file):
+            self._log.warn("File '%s' not found", file)
+            return None
+
+        with open(file, "rb") as f:
+            file_bytes_buffer = BytesIO(f.read())
+            file_bytes_buffer.seek(0)
+            self._log.debug("Returning file: '%s'", file)
+            return file_bytes_buffer
 
     def __create_temp_directory(self):
         directory = f"{self._out_folder}/{self._tenant_id}"

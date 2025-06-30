@@ -1,4 +1,3 @@
-import uuid
 from collections import OrderedDict
 from typing import List, Optional
 from typing import OrderedDict as OrdDict
@@ -13,9 +12,9 @@ from folio_upm.dto.support import (
     RoleCapabilitiesHolder,
 )
 from folio_upm.utils import log_factory
+from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.service_utils import ServiceUtils
-from folio_upm.utils.system_roles_provider import SystemGeneratedRolesProvider
+from folio_upm.utils.system_roles_provider import SystemRolesProvider
 
 
 class RolesProvider:
@@ -61,17 +60,18 @@ class RolesProvider:
     def __create_role(self, analyzed_ps: AnalyzedPermissionSet) -> AnalyzedRole:
         name = analyzed_ps.get_first_value(lambda x: x.displayName)
         description = analyzed_ps.get_first_value(lambda x: x.description)
-        role = Role(id=str(uuid.uuid4()), name=name, description=description)
+        role = Role(name=name and name.strip(), description=description)
         source_ps_name = analyzed_ps.permissionName
 
         expanded_sub_permissions = self.__expand_sub_permissions(analyzed_ps, [])
 
+        is_system_generated = SystemRolesProvider().has_system_generated_ps(source_ps_name)
         return AnalyzedRole(
-            role=role,
+            role=role if not is_system_generated else SystemRolesProvider().get_eureka_role_name(source_ps_name),
             source=source_ps_name,
             users=self._users_by_ps_names.get(source_ps_name, OrderedSet()),
             permissionSets=expanded_sub_permissions,
-            excluded=SystemGeneratedRolesProvider().has_system_generated_ps(source_ps_name),
+            systemGenerated=is_system_generated,
             originalPermissionsCount=len(analyzed_ps.get_sub_permissions()),
             totalPermissionsCount=len(expanded_sub_permissions),
         )
@@ -112,9 +112,9 @@ class RolesProvider:
 
     def __find_capability_or_capability_set(self, ps_name: str) -> Tuple[Optional[Capability | CapabilitySet], str]:
         if ps_name in self._capability_sets_by_name:
-            return ServiceUtils.first(self._capability_sets_by_name.get(ps_name, [])), "capability-set"
+            return IterableUtils.first(self._capability_sets_by_name.get(ps_name, [])), "capability-set"
         if ps_name in self._capabilities_by_name:
-            return ServiceUtils.first(self._capabilities_by_name.get(ps_name, [])), "capability"
+            return IterableUtils.first(self._capabilities_by_name.get(ps_name, [])), "capability"
         return None, "unknown"
 
     def __collect_users_by_ps_name(self) -> dict[str, OrderedSet[str]]:
@@ -124,7 +124,7 @@ class RolesProvider:
             for ps_name in user_perm.permissions:
                 if ps_name not in users_by_ps_name:
                     users_by_ps_name[ps_name] = OrderedSet()
-                users_by_ps_name[ps_name].append(user_id)
+                users_by_ps_name[ps_name].add(user_id)
         return users_by_ps_name
 
     def __expand_sub_permissions(self, ap: AnalyzedPermissionSet, exp_list: List[str]) -> List[ExpandedPermissionSet]:
@@ -133,7 +133,7 @@ class RolesProvider:
             if permission_name in exp_list:
                 continue
             ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
-            expanded_from = ServiceUtils.last(exp_list)
+            expanded_from = IterableUtils.last(exp_list)
             result.append(ExpandedPermissionSet(permissionName=permission_name, expandedFrom=expanded_from))
             if ps_type == "mutable":
                 found_child_ap = self._ps_analysis_result[ps_type].get(permission_name, None)
@@ -161,3 +161,11 @@ class RolesProvider:
             else:
                 capabilities_by_name[capability_set.permission] = [capability_set]
         return capabilities_by_name
+
+    @staticmethod
+    def __get_permissions_for_distributed_strategy(capabilities: List[CapabilityPlaceholder]) -> List[str]:
+        return [x.permissionName for x in capabilities]
+
+    @staticmethod
+    def __get_permissions_for_consolidated_strategy(capabilities: List[CapabilityPlaceholder]) -> List[str]:
+        return [x.permissionName for x in capabilities]

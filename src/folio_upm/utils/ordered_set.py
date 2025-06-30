@@ -22,29 +22,36 @@ class OrderedSet(Generic[T]):
 
         if self.__is_iterable(value):
             for item in value:
-                self.append(item)
+                self.add(item)
         else:
-            self.append(value)
+            self.add(value)
 
-    def append(self, item: T | Iterable[T]) -> None:
-        """Add an item to the set."""
-        if self.__is_iterable(item):
-            for sub_item in item:
-                if sub_item not in self._data:
-                    self._data[sub_item] = None
-        else:
-            self._data[item] = None
-
-    def __iadd__(self, other: Iterable[T]) -> "OrderedSet[T]":
-        if not self.__is_iterable(other):
-            raise TypeError(f"Expected an iterable, got {type(other).__name__}")
-        for item in other:
-            self.append(item)
+    def add(self, item: T) -> "OrderedSet[T]":
+        self.__validate_item(item)
+        self._data[item] = None
         return self
 
-    def remove(self, item: T) -> None:
-        """Remove an item from the set if it exists."""
+    def add_all(self, items: Iterable[T]) -> "OrderedSet[T]":
+        self.__validate_iterable_items(items)
+        for sub_item in items:
+            if sub_item not in self._data:
+                self.add(sub_item)
+        return self
+
+    def remove(self, item: T | None) -> "OrderedSet[T]":
+        self.__validate_item(item, check_none=False)
         self._data.pop(item, None)
+        return self
+
+    def remove_all(self, items: Iterable[T | None]) -> "OrderedSet[T]":
+        self.__validate_iterable_items(items)
+        for item in items:
+            self.remove(item)
+        return self
+
+    def __iadd__(self, other: Iterable[T]) -> "OrderedSet[T]":
+        self.add_all(other)
+        return self
 
     def __contains__(self, item: T) -> bool:
         """Check if an item is in the set."""
@@ -74,7 +81,7 @@ class OrderedSet(Generic[T]):
         """Create an OrderedSet from a list."""
         ordered_set = cls()
         for item in items:
-            ordered_set.append(item)
+            ordered_set.add(item)
         return ordered_set
 
     @classmethod
@@ -93,5 +100,17 @@ class OrderedSet(Generic[T]):
         return cls(value)
 
     @staticmethod
+    def __validate_iterable_items(items: Iterable[T]) -> None:
+        if not OrderedSet.__is_iterable(items):
+            raise TypeError(f"Expected an iterable, got {type(items).__name__}")
+
+    @staticmethod
     def __is_iterable(item):
         return isinstance(item, Iterable) and not isinstance(item, str)
+
+    @staticmethod
+    def __validate_item(item: T, check_none: True = True) -> None:
+        if check_none and item is None:
+            raise ValueError("None items are not allowed in OrderedSet")
+        if not hasattr(item, "__hash__") or item.__hash__ is None:
+            raise TypeError(f"Item {item} is not hashable and cannot be added to OrderedSet")

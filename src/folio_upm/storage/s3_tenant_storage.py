@@ -14,7 +14,7 @@ from folio_upm.utils.xlsx_utils import XlsxUtils
 class S3TenantStorage(TenantStorage, metaclass=SingletonMeta):
 
     def __init__(self):
-        super().__init__(False)
+        super().__init__(True)
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("S3TenantStorage initialized.")
         self._storage = S3Storage()

@@ -16,7 +16,6 @@ class UserRoleRow(BaseModel):
 class RoleUsersWorksheet(AbstractWorksheet):
     _title = "Role-Users"
     _columns = [
-        Column(w=40, n="Role Id", f=lambda x: x.id),
         Column(w=80, n="Role Name", f=lambda x: x.name),
         Column(w=40, n="User Id", f=lambda x: x.userId),
     ]
