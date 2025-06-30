@@ -1,7 +1,7 @@
 from collections import OrderedDict
-from typing import Tuple, Optional
+from typing import Tuple
 
-from folio_upm.dto.eureka import CapabilitySet, Capability
+from folio_upm.dto.eureka import Capability, CapabilitySet
 from folio_upm.dto.results import EurekaLoadResult
 from folio_upm.utils.common_utils import IterableUtils
 

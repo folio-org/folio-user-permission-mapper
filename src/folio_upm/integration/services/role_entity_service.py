@@ -53,7 +53,8 @@ class RoleEntityService(metaclass=SingletonMeta):
         role_name = role.name
         resp = err.response
         response_text = resp.text or ""
-        self._log.warn("Failed to create role-%s for role '%s': %s", self._name, role_name, err)
+        msg_template = "Failed to create role-%s for role '%s': %s, responseBody: %s"
+        self._log.warn(msg_template, self._name, role_name, err, err.response.text)
         if resp.status_code == 400 and "Relation already exists for role" in response_text:
             self._log.info("Handling existing entities in role-%s for role '%s'", self._name, role_name)
             return self.__handle_existing_entities_response(role, entity_ids, err)

@@ -5,7 +5,7 @@ from typing import List
 import requests
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import Role, RoleUsers, UserRoles
+from folio_upm.dto.eureka import Role, UserRoles
 from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.integration.services.role_service import RoleService
@@ -63,7 +63,8 @@ class RoleUsersService(metaclass=SingletonMeta):
 
     def __handle_error_response(self, user_id, role_ids, roles_by_id: dict[str, Role], err):
         resp = err.response
-        self._log.warn("Failed to create user-roles for user '%s': %s", user_id, err)
+        msg_template = "Failed to create user-roles for user '%s': %s, responseBody: %s"
+        self._log.warn(msg_template, user_id, err, err.response.text)
         response_text = resp.text or ""
         if resp.status_code == 400 and "Relations between user and roles already exists" in response_text:
             self._log.info("Handling existing user-role relations for user '%s'", user_id)

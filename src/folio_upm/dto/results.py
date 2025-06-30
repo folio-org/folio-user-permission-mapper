@@ -4,7 +4,7 @@ from typing import OrderedDict as OrdDict
 
 from pydantic import BaseModel, field_serializer
 
-from folio_upm.dto.eureka import Capability, CapabilitySet, Role, RoleUsers, UserPermission, UserRoles
+from folio_upm.dto.eureka import Capability, CapabilitySet, Role, UserPermission, UserRoles
 from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet
 from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet, RoleCapabilitiesHolder
