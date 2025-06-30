@@ -59,7 +59,7 @@ def generate_report():
     analysis_result = LoadResultAnalyzer(load_result, eureka_load_result).get_results()
     workbook = PermissionResultService(analysis_result).generate_report()
 
-    result_fn = f"{mixed_analysis_result_fn}"
+    result_fn = f"{mixed_analysis_result_fn}-{migration_strategy}"
     storage_service.save_object(result_fn, xlsx_ext, workbook, include_ts=True)
     storage_service.save_object(result_fn, json_gz_ext, analysis_result.model_dump())
     _log.info("Report is successfully generated for strategy: %s", migration_strategy)
@@ -69,8 +69,9 @@ def generate_report():
 def run_eureka_migration():
     migration_strategy = Env().get_migration_strategy()
     _log.info("Running eureka migration for strategy: %s ...", migration_strategy)
+    result_fn = f"{mixed_analysis_result_fn}-{migration_strategy}"
     storage_service = TenantStorageService()
-    analysis_result_dict = storage_service.get_object(mixed_analysis_result_fn, json_gz_ext)
+    analysis_result_dict = storage_service.get_object(result_fn, json_gz_ext)
     analysis_result = AnalysisResult(**analysis_result_dict)
     migration_result = EurekaMigrationService().migrate_to_eureka(analysis_result)
     migration_result_report = MigrationResultService(migration_result).generate_report()
@@ -95,3 +96,4 @@ if __name__ == "__main__":
         cli()
     except Exception as e:
         _log.error(e, exc_info=True)
+        _log.error("Command execution finished with error: %s", e)

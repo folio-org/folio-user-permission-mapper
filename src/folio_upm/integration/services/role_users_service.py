@@ -21,8 +21,7 @@ class RoleUsersService(metaclass=SingletonMeta):
         self._client = EurekaClient()
         self._roles_service = RoleService()
 
-    def assign_users(self, role_users: List[RoleUsers]) -> List[EntityMigrationResult]:
-        user_roles = self.__collect_roles_by_user(role_users)
+    def assign_users(self, user_roles: List[UserRoles]) -> List[EntityMigrationResult]:
         migration_result = []
         for ur in user_roles:
             migration_result += self.__assign(ur)
@@ -84,17 +83,6 @@ class RoleUsersService(metaclass=SingletonMeta):
             return assigned_ids_result
         self._log.warn("Failed to extract existing entity IDs from response: %s", response_text)
         return self.__create_err_result(user_id, role_ids, roles_by_id, err)
-
-    @staticmethod
-    def __collect_roles_by_user(role_users: List[RoleUsers]):
-        user_roles = OrderedDict()
-        for ru in role_users:
-            for user_id in ru.userIds:
-                if user_id not in user_roles:
-                    user_roles[user_id] = OrderedSet()
-                user_roles[user_id].add(ru.roleName)
-
-        return [UserRoles(userId=user_id, roles=role_names.to_list()) for user_id, role_names in user_roles.items()]
 
     @staticmethod
     def __find_unassigned_role_ids(expected_role_ids, user_roles) -> List[str]:

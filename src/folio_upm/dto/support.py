@@ -49,6 +49,13 @@ class AnalyzedPermissionSet(BaseModel):
         extracted_values = [value_extractor(i.val) for i in self.sourcePermSets]
         return extracted_values[0] if len(extracted_values) > 1 else None
 
+    def get_parent_permission_names(self) -> OrderedSet[str]:
+        parent_permissions = OrderedSet[str]()
+        for source_perm_set in self.sourcePermSets:
+            if source_perm_set.val.childOf:
+                parent_permissions.add_all(source_perm_set.val.childOf)
+        return parent_permissions
+
     def get_sub_permissions(self, include_flat: bool = False) -> OrderedSet[str]:
         sub_permissions = OrderedSet()
         for source_perm_set in self.sourcePermSets:

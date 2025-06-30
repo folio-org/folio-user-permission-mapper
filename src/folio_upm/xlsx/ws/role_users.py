@@ -26,7 +26,7 @@ class RoleUsersWorksheet(AbstractWorksheet):
     @override
     def _get_iterable_data(self):
         return [
-            UserRoleRow(userId=user_id, name=role_users.roleName)
-            for role_users in self._data
-            for user_id in role_users.userIds
+            UserRoleRow(userId=user_roles.userId, name=role_name)
+            for user_roles in self._data
+            for role_name in user_roles.roles
         ]

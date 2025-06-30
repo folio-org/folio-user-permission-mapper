@@ -49,7 +49,7 @@ class Env(metaclass=SingletonMeta):
 
     def get_migration_strategy(self):
         resolved_strategy = self.get_env("EUREKA_ROLE_LOAD_STRATEGY", default_value="distributed")
-        allowed_values = {"distributed", "local"}
+        allowed_values = {"distributed", "consolidated"}
         if resolved_strategy not in allowed_values:
             raise ValueError(f"Invalid role migration strategy provided. Allowed values are: {allowed_values}.")
         return resolved_strategy

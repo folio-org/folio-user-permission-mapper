@@ -17,7 +17,7 @@ class EurekaResultLoader:
     def __load_eureka_capabilities(self) -> EurekaLoadResult:
         eureka_load_result_dict = self._tenant_storage_service.get_object("eureka-capabilities", "json.gz")
         if eureka_load_result_dict is not None:
-            self._log.error("Tenant-related eureka capabilities found in storage.")
+            self._log.info("Tenant-related eureka capabilities found in storage.")
             return EurekaLoadResult(**eureka_load_result_dict)
 
         ref_capabilities_file_path = Env().get_env("REF_CAPABILITIES_FILE_KEY")

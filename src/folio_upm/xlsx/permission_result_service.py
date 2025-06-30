@@ -41,5 +41,5 @@ class PermissionResultService:
             self._log.debug("Processing worksheet in '%s'", ws_class.__name__)
             ws_generator = ws_class(wb.create_sheet(), data_extractor(self._analysis_result))
             ws_generator.fill()
-
+        self._log.info("XLSX report generated successfully.")
         return wb

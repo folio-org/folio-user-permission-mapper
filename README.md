@@ -72,12 +72,12 @@ The CLI tool provides a single command to collect and process permissions. Run t
 to execute the tool:
 
 ```bash
-poetry run folio-permission-mapper <command>
+poetry run folio-permission-migration-cli <command>
 ```
 
 > **_NOTE:_** If it's installed via wheel file:
 > ```bash
-> folio-permission-mapper <command>
+> folio-permission-migration-cli <command>
 > ```
 
 ---
