@@ -3,6 +3,7 @@ from typing import List, Optional
 from typing import OrderedDict as OrdDict
 
 from folio_upm.dto.eureka import Role, UserRoles
+from folio_upm.dto.permission_type import MUTABLE
 from folio_upm.dto.results import AnalyzedRole, EurekaLoadResult, LoadResult, PermissionAnalysisResult
 from folio_upm.dto.support import (
     AnalyzedPermissionSet,
@@ -147,7 +148,7 @@ class RolesProvider:
         if strategy == "consolidated":
             ps_name = expanded_ps.permissionName
             permission_type = self._ps_analysis_result.identify_permission_type(ps_name)
-            if permission_type != "mutable":
+            if permission_type != MUTABLE:
                 return self.__create_capability_placeholder(expanded_ps, permission_type)
             else:
                 return None
@@ -155,7 +156,7 @@ class RolesProvider:
             if expanded_ps.expandedFrom is None:
                 ps_name = expanded_ps.permissionName
                 permission_type = self._ps_analysis_result.identify_permission_type(ps_name)
-                if permission_type != "mutable":
+                if permission_type != MUTABLE:
                     return self.__create_capability_placeholder(expanded_ps, permission_type)
             else:
                 return None
@@ -168,7 +169,7 @@ class RolesProvider:
         return CapabilityPlaceholder(
             resolvedType=resolved_type,
             permissionName=permission_name,
-            permissionType=permission_type,
+            permissionType=permission_type.get_name(),
             expandedFrom=expanded_ps.expandedFrom,
             displayName=analyzed_ps and analyzed_ps.get_uq_display_names_str(),
             name=capability_or_set and capability_or_set.name,

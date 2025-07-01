@@ -5,7 +5,7 @@ from folio_upm.utils import log_factory
 from folio_upm.xlsx.ws.ps_nesting_ws import PermissionNestingWorksheet
 from folio_upm.xlsx.ws.ps_stats_ws import PermissionStatsWorksheet
 from folio_upm.xlsx.ws.role_capabilities_ws import RolesCapabilitiesWorksheet
-from folio_upm.xlsx.ws.role_users import RoleUsersWorksheet
+from folio_upm.xlsx.ws.user_roles import UserRolesWorksheet
 from folio_upm.xlsx.ws.roles_ws import RolesWorksheet
 from folio_upm.xlsx.ws.user_ps import UserPermissionSetsWorksheet
 from folio_upm.xlsx.ws.user_stats_ws import UserStatsWorksheet
@@ -14,13 +14,13 @@ from folio_upm.xlsx.ws.user_stats_ws import UserStatsWorksheet
 class PermissionResultService:
 
     _worksheet_definitions = [
-        (UserStatsWorksheet, lambda ar: ar.userStatistics),
-        (PermissionStatsWorksheet, lambda ar: ar.psStatistics),
         (PermissionNestingWorksheet, lambda ar: ar.permSetNesting),
         (UserPermissionSetsWorksheet, lambda ar: ar.userPermissionSets),
         (RolesWorksheet, lambda ar: ar.roles),
-        (RoleUsersWorksheet, lambda ar: ar.roleUsers),
+        (UserRolesWorksheet, lambda ar: ar.roleUsers),
         (RolesCapabilitiesWorksheet, lambda ar: ar.roleCapabilities),
+        (UserStatsWorksheet, lambda ar: ar.userStatistics),
+        (PermissionStatsWorksheet, lambda ar: ar.psStatistics),
     ]
 
     def __init__(self, analysis_result: AnalysisResult):

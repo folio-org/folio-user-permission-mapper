@@ -10,14 +10,14 @@ from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 class UserStatsWorksheet(AbstractWorksheet):
 
-    _title = "User Stats"
+    _title = "UserStats-Okapi"
     _columns = [
         Column(w=40, n="User Id", f=lambda x: x.userId),
-        Column(w=21, n="# of Mutable", f=lambda x: x.mutablePermissionSetsCount),
-        Column(w=21, n="# of Invalid", f=lambda x: x.invalidPermissionSetsCount),
-        Column(w=21, n="# of System", f=lambda x: x.okapiPermissionSetsCount),
-        Column(w=21, n="# of Deprecated", f=lambda x: x.deprecatedPermissionSetsCount),
-        Column(w=21, n="# of Total", f=lambda x: x.allPermissionSetsCount),
+        Column(w=25, n="# User-Created", f=lambda x: x.mutablePermissionSetsCount),
+        Column(w=25, n="# Invalid", f=lambda x: x.invalidPermissionSetsCount),
+        Column(w=25, n="# System-Created", f=lambda x: x.okapiPermissionSetsCount),
+        Column(w=25, n="# Deprecated", f=lambda x: x.deprecatedPermissionSetsCount),
+        Column(w=25, n="# Total", f=lambda x: x.allPermissionSetsCount),
     ]
 
     def __init__(self, ws: Worksheet, data: List[UserStatistics]):

@@ -16,7 +16,7 @@ class RolesWorksheet(AbstractWorksheet):
     _columns = [
         Column[AnalyzedRole](w=60, n="Name", f=lambda x: x.role.name),
         Column[AnalyzedRole](w=50, n="Source PS", f=lambda x: x.source),
-        Column[AnalyzedRole](w=14, n="System", f=lambda x: x.systemGenerated),
+        Column[AnalyzedRole](w=14, n="System", f=lambda x: "y" if x.systemGenerated else "n"),
         Column[AnalyzedRole](w=60, n="Description", f=lambda x: x.role.description),
         Column[AnalyzedRole](w=22, n="# of Users", f=lambda x: x.get_assigned_users_count()),
         Column[AnalyzedRole](w=22, n="# of PS", f=lambda x: x.originalPermissionsCount),

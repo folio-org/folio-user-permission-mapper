@@ -6,6 +6,7 @@ from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
+from folio_upm.dto.permission_type import INVALID, MUTABLE, DEPRECATED, QUESTIONABLE, UNPROCESSED
 from folio_upm.dto.support import RoleCapabilitiesHolder
 from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
@@ -44,9 +45,8 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
     def __init__(self, ws: Worksheet, data: OrdDict[str, RoleCapabilitiesHolder]):
         super().__init__(ws, self._title, data, self._columns)
 
-        self._red_types = ["invalid", "mutable"]
-        self._yellow_types = ["deprecated", "questionable", "unprocessed"]
-        self._yellow_res_types = ["deprecated", "questionable", "unprocessed"]
+        self._red_types = [INVALID, MUTABLE]
+        self._yellow_types = [DEPRECATED, QUESTIONABLE, UNPROCESSED]
 
     @override
     def _get_iterable_data(self):

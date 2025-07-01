@@ -15,7 +15,7 @@ class UserPermsHolder(BaseModel):
 class CapabilityPlaceholder(BaseModel):
     resolvedType: str
     permissionName: str
-    permissionType: str
+    permissionType: Optional[str]
     displayName: Optional[str] = None
     expandedFrom: Optional[str] = None
     name: Optional[str] = None

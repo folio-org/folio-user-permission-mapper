@@ -12,11 +12,11 @@ class UserRoleRow(BaseModel):
     userId: str
 
 
-class RoleUsersWorksheet(AbstractWorksheet):
+class UserRolesWorksheet(AbstractWorksheet):
     _title = "Role-Users"
     _columns = [
-        Column(w=80, n="Role Name", f=lambda x: x.name),
         Column(w=40, n="User Id", f=lambda x: x.userId),
+        Column(w=80, n="Role Name", f=lambda x: x.name),
     ]
 
     def __init__(self, ws: Worksheet, data: List[RoleUsers]):

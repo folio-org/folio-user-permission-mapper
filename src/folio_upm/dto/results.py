@@ -2,11 +2,12 @@ from collections import OrderedDict
 from typing import List, Optional
 from typing import OrderedDict as OrdDict
 
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, field_validator
 
 from folio_upm.dto.eureka import Capability, CapabilitySet, Role, UserPermission, UserRoles
 from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet
+from folio_upm.dto.permission_type import PermissionType, SUPPORTED_PS_TYPES
 from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet, RoleCapabilitiesHolder
 from folio_upm.utils.ordered_set import OrderedSet
 
@@ -31,28 +32,29 @@ class PermissionAnalysisResult(BaseModel):
     questionable: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
     unprocessed: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
     systemPermissionNames: OrderedSet[str] = []
-    _all_types: List[str] = ["mutable", "invalid", "deprecated", "questionable", "unprocessed", "okapi"]
 
-    def __getitem__(self, key: str) -> Optional[OrdDict[str, "AnalyzedPermissionSet"]]:
-        if key not in self._all_types:
+    def __getitem__(self, ps_type: PermissionType) -> Optional[OrdDict[str, "AnalyzedPermissionSet"]]:
+        if ps_type not in SUPPORTED_PS_TYPES:
             return OrderedDict()
-        return getattr(self, key)
+        return getattr(self, ps_type.get_name())
 
-    def identify_permission_type(self, ps_name: str) -> Optional[str]:
-        for ps_type in self._all_types:
-            if ps_name in getattr(self, ps_type):
-                return ps_type
-        return "unknown"
+    def identify_permission_type(self, ps_name: str) -> PermissionType:
+        for ps_type in SUPPORTED_PS_TYPES:
+            key = ps_type.get_name()
+            if ps_name in getattr(self, key):
+                return PermissionType.from_string(key)
+        return PermissionType.UNKNOWN
 
-    def get_types(self):
-        return self._all_types
+    @staticmethod
+    def get_supported_types() -> List[PermissionType]:
+        return SUPPORTED_PS_TYPES
 
 
 class UserStatistics(BaseModel):
     userId: str
     mutablePermissionSetsCount: int
-    invalidPermissionSetsCount: int
     okapiPermissionSetsCount: int
+    invalidPermissionSetsCount: int
     deprecatedPermissionSetsCount: int
     allPermissionSetsCount: int
 
@@ -80,7 +82,7 @@ class AnalyzedRole(BaseModel):
 class PsStatistics(BaseModel):
     name: str
     displayNames: List[str]
-    type: str
+    permissionType: str = None
     uniqueSources: List[str]
     refCount: int
     note: Optional[str]
@@ -105,10 +107,13 @@ class PsStatistics(BaseModel):
     def get_uq_display_names_str(self) -> str:
         return "\n".join(sorted(self.displayNames))
 
+    def get_permission_type_name(self) -> str:
+        return PermissionType.from_string(self.permissionType).get_visible_name()
+
 
 class AnalyzedParentPermSets(BaseModel):
     permissionName: str
-    permissionType: str
+    permissionType: str = None
     displayName: Optional[str] = None
     parentPermissionName: str
     parentDisplayName: Optional[str] = None
@@ -116,10 +121,15 @@ class AnalyzedParentPermSets(BaseModel):
     parentPsSources: OrderedSet[str]
 
     def get_parent_types_str(self):
-        return ", ".join(sorted(self.parentPsTypes)) or "not found"
+        sorted_types = sorted(self.parentPsTypes)
+        visible_parent_types = [PermissionType.from_string(p).get_visible_name() for p in sorted_types]
+        return ", ".join(visible_parent_types) or "not found"
 
     def get_parent_sources_str(self):
         return ", ".join(sorted(self.parentPsSources))
+
+    def get_permission_type_name(self) -> str:
+        return PermissionType.from_string(self.permissionType).get_visible_name()
 
     @field_serializer("parentPsTypes", "parentPsSources")
     def serialize_ordered_set(self, value: OrderedSet[str]) -> List[str]:
@@ -128,8 +138,12 @@ class AnalyzedParentPermSets(BaseModel):
 
 class AnalyzedUserPermissionSet(BaseModel):
     userId: str
-    psName: str
-    psType: Optional[str]
+    permissionName: str
+    displayName: Optional[str] = None
+    permissionType: Optional[str] = None
+
+    def get_permission_type_name(self) -> str:
+        return PermissionType.from_string(self.permissionType).get_visible_name()
 
 
 class AnalyzedRoleCapabilities(BaseModel):

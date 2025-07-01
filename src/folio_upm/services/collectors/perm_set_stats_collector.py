@@ -3,6 +3,7 @@ from typing import List, Set
 
 from blib2to3.pytree import Optional
 
+from folio_upm.dto.permission_type import PermissionType
 from folio_upm.dto.results import EurekaLoadResult, PermissionAnalysisResult, PsStatistics
 from folio_upm.dto.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
 from folio_upm.dto.support import AnalyzedPermissionSet
@@ -40,17 +41,16 @@ class PermSetStatisticsCollector:
 
     def __collect_data(self):
         result = []
-        for ps_type in self._ps_analysis_result.get_types():
+        for ps_type in self._ps_analysis_result.get_supported_types():
             for ap in self._ps_analysis_result[ps_type].values():
                 result.append(self.__get_stats_for_analyzed_ps(ap, ps_type))
         return result
 
-    def __get_stats_for_analyzed_ps(self, ap: AnalyzedPermissionSet, ps_type: str) -> PsStatistics:
+    def __get_stats_for_analyzed_ps(self, ap: AnalyzedPermissionSet, ps_type: PermissionType) -> PsStatistics:
         return PsStatistics(
             name=ap.permissionName,
-            hasCapability=self.__check_capability(ap.permissionName),
             displayNames=list(OrderedSet[str]([x.val.displayName for x in ap.sourcePermSets if x.val.displayName])),
-            type=ps_type,
+            permissionType=ps_type.get_name(),
             note=ap.note,
             reasons=ap.reasons,
             uniqueSources=list(OrderedSet[str]([x.src for x in ap.sourcePermSets])),
