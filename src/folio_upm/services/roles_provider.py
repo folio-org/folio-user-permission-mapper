@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import List
+from typing import List, Optional
 from typing import OrderedDict as OrdDict
 
 from folio_upm.dto.eureka import Role, UserRoles
@@ -26,13 +26,12 @@ class RolesProvider:
         self,
         load_result: LoadResult,
         ps_analysis_result: PermissionAnalysisResult,
-        eureka_load_result: EurekaLoadResult = None,
+        eureka_load_result: Optional[EurekaLoadResult],
     ):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._load_result = load_result
-        self._eureka_load_result = eureka_load_result
         self._ps_analysis_result = ps_analysis_result
-        self._capability_service = CapabilityService(self._eureka_load_result)
+        self._capability_service = CapabilityService(eureka_load_result)
         self._users_by_ps_names = self.__collect_users_by_ps_name()
         self.__init_roles_and_relations()
 

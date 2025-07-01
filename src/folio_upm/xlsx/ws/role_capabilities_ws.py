@@ -7,7 +7,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
 from folio_upm.dto.support import RoleCapabilitiesHolder
-from folio_upm.xlsx import constants
+from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
@@ -71,7 +71,7 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
     @override
     def _get_row_fill_color(self, value: RoleCapabilityRow) -> Optional[PatternFill]:
         if value.sourceType in self._red_types or value.sourceType is None:
-            return constants.light_red_fill
-        if value.excluded or (value.sourceType in self._yellow_types) or value.resolvedType == "unknown":
-            return constants.light_yellow_fill
-        return constants.almost_white_fill
+            return ws_constants.light_red_fill
+        if value.excluded or (value.sourceType in self._yellow_types) or value.resolvedType == "not_found":
+            return ws_constants.light_yellow_fill
+        return ws_constants.almost_white_fill

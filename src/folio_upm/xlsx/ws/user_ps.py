@@ -4,7 +4,7 @@ from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
 from folio_upm.dto.results import AnalyzedUserPermissionSet
-from folio_upm.xlsx import constants
+from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
@@ -28,9 +28,9 @@ class UserPermissionSetsWorksheet(AbstractWorksheet):
     def _get_row_fill_color(self, value: AnalyzedUserPermissionSet) -> Optional[PatternFill]:
         ps_type = value.psType
         if ps_type == "invalid":
-            return constants.light_red_fill
+            return ws_constants.light_red_fill
         if ps_type == "mutable":
-            return constants.light_green_fill
+            return ws_constants.light_green_fill
         if ps_type in self._yellow_types:
-            return constants.light_yellow_fill
-        return constants.almost_white_fill
+            return ws_constants.light_yellow_fill
+        return ws_constants.almost_white_fill

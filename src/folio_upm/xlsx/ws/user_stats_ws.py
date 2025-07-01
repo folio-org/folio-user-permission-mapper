@@ -4,7 +4,7 @@ from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
 from folio_upm.dto.results import UserStatistics
-from folio_upm.xlsx import constants
+from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
@@ -27,12 +27,12 @@ class UserStatsWorksheet(AbstractWorksheet):
     @override
     def _get_row_fill_color(self, user_stats: UserStatistics) -> Optional[PatternFill]:
         if user_stats.invalidPermissionSetsCount > 0:
-            return constants.light_red_fill
+            return ws_constants.light_red_fill
         if user_stats.deprecatedPermissionSetsCount > 0:
-            return constants.light_yellow_fill
+            return ws_constants.light_yellow_fill
         if user_stats.mutablePermissionSetsCount > 0:
-            return constants.light_green_fill
-        return constants.almost_white_fill
+            return ws_constants.light_green_fill
+        return ws_constants.almost_white_fill
 
     def _get_iterable_data(self) -> List[UserStatistics]:
         return sorted(self._data, key=self.__get_sort_order)

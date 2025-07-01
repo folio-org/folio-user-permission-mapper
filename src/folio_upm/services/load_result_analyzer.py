@@ -1,6 +1,6 @@
 from typing import Optional
 
-from folio_upm.dto.results import AnalysisResult, LoadResult
+from folio_upm.dto.results import AnalysisResult, LoadResult, EurekaLoadResult
 from folio_upm.services.collectors.parent_perm_set_collector import ParentPermSetCollector
 from folio_upm.services.collectors.perm_set_stats_collector import PermSetStatisticsCollector
 from folio_upm.services.collectors.user_perm_set_collector import UserPermSetCollector
@@ -12,7 +12,7 @@ from folio_upm.utils import log_factory
 
 class LoadResultAnalyzer:
 
-    def __init__(self, analysis_json: dict, eureka_load_result=Optional[dict]):
+    def __init__(self, analysis_json: dict, eureka_load_result=Optional[EurekaLoadResult]):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("LoadResultAnalyzer initialized.")
         self._analysis_json = analysis_json
@@ -31,7 +31,7 @@ class LoadResultAnalyzer:
 
         return AnalysisResult(
             userStatistics=UserStatsCollector(load_result, ps_result).get(),
-            psStatistics=PermSetStatisticsCollector(ps_result).get(),
+            psStatistics=PermSetStatisticsCollector(ps_result, self._eureka_lr).get(),
             userPermissionSets=UserPermSetCollector(load_result, ps_result).get(),
             permSetNesting=ParentPermSetCollector(load_result, ps_result).get(),
             roles=roles_provider.get_roles(),

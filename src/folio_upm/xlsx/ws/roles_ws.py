@@ -6,7 +6,7 @@ from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
 from folio_upm.dto.results import AnalyzedRole
-from folio_upm.xlsx import constants
+from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
@@ -34,5 +34,5 @@ class RolesWorksheet(AbstractWorksheet):
     @override
     def _get_row_fill_color(self, value: AnalyzedRole) -> Optional[PatternFill]:
         if value.systemGenerated:
-            return constants.light_yellow_fill
-        return constants.almost_white_fill
+            return ws_constants.light_yellow_fill
+        return ws_constants.almost_white_fill

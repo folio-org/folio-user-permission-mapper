@@ -248,7 +248,6 @@ The command will do the following actions:
 | SYSTEM_GENERATED_PERM_MAPPINGS |                       | false    | Comma-separated list of system-generated permission mappings that will be applied differently (see: command description) (e.g., `folio_admin:AdminRole`) |
 | CAPABILITY_IDS_PARTITION_SIZE  | 50                    | false    | The max number of permission names provided for capability/capability-set querying                                                                       |
 
-
 ---
 
 ### `download-json`
@@ -289,11 +288,12 @@ You can use a `.env` file to manage these variables.
 
 ### General environment variables
 
-| Env Variable     | Default Value | Required | Description                                                            |
-|:-----------------|:--------------|:---------|:-----------------------------------------------------------------------|
-| DOTENV           | .env          | false    | Custom `.env` file location _(preferable to pass it as variable)_      |
-| LOG_LEVEL        | INFO          | false    | Log level (one of: INFO, DEBUG, WARN, ERROR, CRITICAL)                 |
-| ENABLED_STORAGES |               | false    | Enabled storage for data loading and report output (one of: local, s3) |
+| Env Variable           | Default Value | Required | Description                                                            |
+|:-----------------------|:--------------|:---------|:-----------------------------------------------------------------------|
+| DOTENV                 | .env          | false    | Custom `.env` file location _(preferable to pass it as variable)_      |
+| LOG_LEVEL              | INFO          | false    | Log level (one of: INFO, DEBUG, WARN, ERROR, CRITICAL)                 |
+| ENABLED_STORAGES       |               | false    | Enabled storage for data loading and report output (one of: local, s3) |
+| ENABLE_REPORT_COLORING |               | false    | Boolean value, defines if row colors will be applied for xlsx reports  |
 
 ### Development
 

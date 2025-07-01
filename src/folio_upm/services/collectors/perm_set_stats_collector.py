@@ -1,9 +1,12 @@
 from functools import reduce
 from typing import List, Set
 
-from folio_upm.dto.results import PermissionAnalysisResult, PsStatistics
+from blib2to3.pytree import Optional
+
+from folio_upm.dto.results import PermissionAnalysisResult, PsStatistics, EurekaLoadResult
 from folio_upm.dto.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
 from folio_upm.dto.support import AnalyzedPermissionSet
+from folio_upm.services.capability_service import CapabilityService
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.service_utils import ServiceUtils
 
@@ -26,8 +29,10 @@ class PermSetStatisticsCollector:
         - parentPermsCount: Number of unique parent permissions (permissions this set is a child of)
     """
 
-    def __init__(self, ps_analysis_result: PermissionAnalysisResult):
+    def __init__(self, ps_analysis_result: PermissionAnalysisResult, eureka_load_result=Optional[EurekaLoadResult]):
+        self._eureka_load_result = eureka_load_result
         self._ps_analysis_result = ps_analysis_result
+        self._capability_service = CapabilityService(eureka_load_result)
         self._ps_statistics = self.__collect_data()
 
     def get(self):
@@ -43,6 +48,7 @@ class PermSetStatisticsCollector:
     def __get_stats_for_analyzed_ps(self, ap: AnalyzedPermissionSet, ps_type: str) -> PsStatistics:
         return PsStatistics(
             name=ap.permissionName,
+            hasCapability=self.__check_capability(ap.permissionName),
             displayNames=list(OrderedSet[str]([x.val.displayName for x in ap.sourcePermSets if x.val.displayName])),
             type=ps_type,
             note=ap.note,
@@ -77,3 +83,10 @@ class PermSetStatisticsCollector:
     def __get_parent_perms_count(ap: AnalyzedPermissionSet) -> int:
         unique_parent_perms = reduce(lambda x, y: x | y, [set(sp.val.childOf) for sp in ap.sourcePermSets])
         return len(unique_parent_perms)
+
+    def __check_capability(self, ps_name) -> bool | None:
+        if self._eureka_load_result is None:
+            return None
+        capability_or_set_type = self._capability_service.find_by_ps_name(ps_name)
+        return capability_or_set_type[0] is not None
+

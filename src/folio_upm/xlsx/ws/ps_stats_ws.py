@@ -4,7 +4,8 @@ from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
 from folio_upm.dto.results import PsStatistics
-from folio_upm.xlsx import constants
+from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
@@ -35,9 +36,9 @@ class PermissionStatsWorksheet(AbstractWorksheet):
     def _get_row_fill_color(self, ps_stats: PsStatistics) -> Optional[PatternFill]:
         ps_type = ps_stats.type
         if ps_stats.refCount > ps_stats.get_uq_sources_num() or ps_type == "invalid":
-            return constants.light_red_fill
+            return ws_constants.light_red_fill
         if ps_type == "mutable":
-            return constants.light_green_fill
+            return ws_constants.light_green_fill
         if ps_type in self._yellow_types:
-            return constants.light_yellow_fill
-        return constants.almost_white_fill
+            return ws_constants.light_yellow_fill
+        return ws_constants.almost_white_fill
