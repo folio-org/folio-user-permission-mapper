@@ -64,7 +64,8 @@ class RolesProvider:
         description = analyzed_ps.get_first_value(lambda x: x.description)
         if description is not None:
             if len(description) >= 255:
-                self._log.warning("Role description too long (max limit 255), shortening it: '%s'", description)
+                desc_for_log = description.replace("\n", "\\n")
+                self._log.warning("Role description too long (max limit 255), shortening it: '%s'", desc_for_log)
                 description = description and description[:245] + "..."
         else:
             description = ""
