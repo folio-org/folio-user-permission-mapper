@@ -3,7 +3,7 @@ from typing import List, Set
 
 from blib2to3.pytree import Optional
 
-from folio_upm.dto.results import PermissionAnalysisResult, PsStatistics, EurekaLoadResult
+from folio_upm.dto.results import EurekaLoadResult, PermissionAnalysisResult, PsStatistics
 from folio_upm.dto.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
 from folio_upm.dto.support import AnalyzedPermissionSet
 from folio_upm.services.capability_service import CapabilityService
@@ -89,4 +89,3 @@ class PermSetStatisticsCollector:
             return None
         capability_or_set_type = self._capability_service.find_by_ps_name(ps_name)
         return capability_or_set_type[0] is not None
-

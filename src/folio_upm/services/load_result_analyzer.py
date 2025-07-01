@@ -1,6 +1,6 @@
 from typing import Optional
 
-from folio_upm.dto.results import AnalysisResult, LoadResult, EurekaLoadResult
+from folio_upm.dto.results import AnalysisResult, EurekaLoadResult, LoadResult
 from folio_upm.services.collectors.parent_perm_set_collector import ParentPermSetCollector
 from folio_upm.services.collectors.perm_set_stats_collector import PermSetStatisticsCollector
 from folio_upm.services.collectors.user_perm_set_collector import UserPermSetCollector
