@@ -66,7 +66,7 @@ class RoleService(metaclass=SingletonMeta):
             self._log.debug("Creating role: name='%s'...", role.name)
             role_to_create = Role(name=role_name, description=role.description or "")
             created_role = self._client.post_role(role_to_create)
-            self._log.info("Role is created: id=%s, name=%s", created_role.id, role_name)
+            self._log.info("Role is created: id=%s, name='%s'", created_role.id, role_name)
             return EntityMigrationResult.for_role(created_role, "success", f"Role created: {created_role.id}")
         except requests.HTTPError as e:
             self._log.warn("Failed to create role '%s': %s, responseBody: %s", role_name, e, e.response.text)

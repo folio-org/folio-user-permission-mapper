@@ -62,6 +62,13 @@ class RolesProvider:
     def __create_role(self, analyzed_ps: AnalyzedPermissionSet) -> AnalyzedRole | None:
         name = analyzed_ps.get_first_value(lambda x: x.displayName)
         description = analyzed_ps.get_first_value(lambda x: x.description)
+        if description is not None:
+            if len(description) >= 255:
+                self._log.warning("Role description too long (max limit 255), shortening it: '%s'", description)
+                description = description and description[:245] + "..."
+        else:
+            description = ""
+
         role = Role(name=name and name.strip(), description=description)
         source_ps_name = analyzed_ps.permissionName
 
