@@ -3,6 +3,7 @@ from typing import Callable, List, Optional, Tuple
 from pydantic import BaseModel
 
 from folio_upm.dto.okapi import PermissionSet
+from folio_upm.dto.permission_type import PermissionType
 from folio_upm.dto.source_type import SourceType
 from folio_upm.utils.ordered_set import OrderedSet
 
@@ -22,6 +23,9 @@ class CapabilityPlaceholder(BaseModel):
     resource: Optional[str] = None
     action: Optional[str] = None
     capabilityType: Optional[str] = None
+
+    def get_permission_type_name(self) -> str:
+        return PermissionType.from_string(self.permissionType).get_visible_name()
 
 
 class RoleCapabilitiesHolder(BaseModel):
