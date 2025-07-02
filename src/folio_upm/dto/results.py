@@ -65,10 +65,10 @@ class AnalyzedRole(BaseModel):
     source: str
     users: OrderedSet[str]
     usersCount: int = 0
-    systemGenerated: bool
+    systemGenerated: bool = False
     capabilitiesCount: int = 0
-    originalPermissionsCount: int
-    expandedPermissionsCount: int
+    originalPermissionsCount: int = 0
+    expandedPermissionsCount: int = 0
 
     def get_total_permissions_count(self) -> int:
         return len(self.permissionSets)

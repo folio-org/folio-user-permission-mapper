@@ -8,7 +8,7 @@ from folio_upm.dto.eureka import Role
 from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory
-from folio_upm.utils.common_utils import CqlQueryUtils
+from folio_upm.utils.cql_query_utils import CqlQueryUtils
 from folio_upm.utils.loading_utils import PartitionedDataLoader
 from folio_upm.utils.ordered_set import OrderedSet
 
