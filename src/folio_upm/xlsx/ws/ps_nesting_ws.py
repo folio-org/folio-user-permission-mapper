@@ -3,7 +3,7 @@ from typing import List, Optional, override
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
-from folio_upm.dto.permission_type import INVALID
+from folio_upm.dto.permission_type import INVALID, MUTABLE
 from folio_upm.dto.results import AnalyzedParentPermSets
 from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
@@ -31,6 +31,6 @@ class PermissionNestingWorksheet(AbstractWorksheet):
             return ws_constants.light_red_fill
         if True in [x in value.parentPsTypes for x in self._yellow_types]:
             return ws_constants.light_yellow_fill
-        if "mutable" in value.parentPsTypes:
+        if MUTABLE.get_name() in value.parentPsTypes:
             return ws_constants.light_green_fill
         return ws_constants.almost_white_fill

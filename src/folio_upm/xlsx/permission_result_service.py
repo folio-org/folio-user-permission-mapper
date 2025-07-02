@@ -5,9 +5,9 @@ from folio_upm.utils import log_factory
 from folio_upm.xlsx.ws.ps_nesting_ws import PermissionNestingWorksheet
 from folio_upm.xlsx.ws.ps_stats_ws import PermissionStatsWorksheet
 from folio_upm.xlsx.ws.role_capabilities_ws import RolesCapabilitiesWorksheet
-from folio_upm.xlsx.ws.user_roles import UserRolesWorksheet
 from folio_upm.xlsx.ws.roles_ws import RolesWorksheet
 from folio_upm.xlsx.ws.user_ps import UserPermissionSetsWorksheet
+from folio_upm.xlsx.ws.user_roles import UserRolesWorksheet
 from folio_upm.xlsx.ws.user_stats_ws import UserStatsWorksheet
 
 

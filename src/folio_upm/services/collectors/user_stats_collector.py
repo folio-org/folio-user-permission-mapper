@@ -1,4 +1,4 @@
-from folio_upm.dto.permission_type import MUTABLE, INVALID, OKAPI, DEPRECATED
+from folio_upm.dto.permission_type import DEPRECATED, INVALID, MUTABLE, OKAPI
 from folio_upm.dto.results import LoadResult, PermissionAnalysisResult, UserStatistics
 
 

@@ -3,7 +3,7 @@ from typing import List, Optional, override
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
-from folio_upm.dto.permission_type import MUTABLE, INVALID, QUESTIONABLE, UNPROCESSED, DEPRECATED
+from folio_upm.dto.permission_type import DEPRECATED, INVALID, MUTABLE, QUESTIONABLE, UNPROCESSED, PermissionType
 from folio_upm.dto.results import PsStatistics
 from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
@@ -21,10 +21,10 @@ class PermissionStatsWorksheet(AbstractWorksheet):
         Column[PsStatistics](w=16, n="# Sub PS", f=lambda x: x.subPermsCount),
         Column[PsStatistics](w=23, n="# Flat Sub PS", f=lambda x: x.flatPermCount),
         Column[PsStatistics](w=60, n="Modules", f=lambda x: x.get_uq_modules_str()),
-        # Column[PsStatistics](w=20, n="Found In", f=lambda x: x.get_uq_sources_str()),
-        # Column[PsStatistics](w=25, n="# Definitions", f=lambda x: x.refCount),
-        # Column[PsStatistics](w=30, n="Note", f=lambda x: x.note),
-        # Column[PsStatistics](w=35, n="Invalidity Reason", f=lambda x: x.get_reasons_str()),
+        Column[PsStatistics](w=20, n="Found In", f=lambda x: x.get_uq_sources_str()),
+        Column[PsStatistics](w=25, n="# Definitions", f=lambda x: x.refCount),
+        Column[PsStatistics](w=30, n="Note", f=lambda x: x.note),
+        Column[PsStatistics](w=35, n="Invalidity Reason", f=lambda x: x.get_reasons_str()),
     ]
 
     def __init__(self, ws: Worksheet, data: List[PsStatistics]):
@@ -34,7 +34,7 @@ class PermissionStatsWorksheet(AbstractWorksheet):
 
     @override
     def _get_row_fill_color(self, ps_stats: PsStatistics) -> Optional[PatternFill]:
-        ps_type = ps_stats.type
+        ps_type = PermissionType.from_string(ps_stats.permissionType)
         if ps_stats.refCount > ps_stats.get_uq_sources_num() or ps_type == INVALID:
             return ws_constants.light_red_fill
         if ps_type == MUTABLE:

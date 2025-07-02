@@ -28,7 +28,7 @@ class UserPermissionSetsWorksheet(AbstractWorksheet):
 
     @override
     def _get_row_fill_color(self, value: AnalyzedUserPermissionSet) -> Optional[PatternFill]:
-        ps_type = value.psType
+        ps_type = PermissionType.from_string(value.permissionType)
         if ps_type == INVALID:
             return ws_constants.light_red_fill
         if ps_type == MUTABLE:
@@ -36,4 +36,3 @@ class UserPermissionSetsWorksheet(AbstractWorksheet):
         if ps_type in self._yellow_types:
             return ws_constants.light_yellow_fill
         return ws_constants.almost_white_fill
-

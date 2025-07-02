@@ -36,11 +36,13 @@ OKAPI = PermissionType.OKAPI
 UNKNOWN = PermissionType.UNKNOWN
 
 
-SUPPORTED_PS_TYPES = list[PermissionType]([
-    PermissionType.MUTABLE,
-    PermissionType.INVALID,
-    PermissionType.DEPRECATED,
-    PermissionType.QUESTIONABLE,
-    PermissionType.UNPROCESSED,
-    PermissionType.OKAPI,
-])
+SUPPORTED_PS_TYPES = list[PermissionType](
+    [
+        PermissionType.MUTABLE,
+        PermissionType.INVALID,
+        PermissionType.DEPRECATED,
+        PermissionType.QUESTIONABLE,
+        PermissionType.UNPROCESSED,
+        PermissionType.OKAPI,
+    ]
+)

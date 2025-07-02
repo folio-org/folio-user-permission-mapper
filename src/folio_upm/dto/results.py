@@ -2,12 +2,12 @@ from collections import OrderedDict
 from typing import List, Optional
 from typing import OrderedDict as OrdDict
 
-from pydantic import BaseModel, field_serializer, field_validator
+from pydantic import BaseModel, field_serializer
 
 from folio_upm.dto.eureka import Capability, CapabilitySet, Role, UserPermission, UserRoles
 from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet
-from folio_upm.dto.permission_type import PermissionType, SUPPORTED_PS_TYPES
+from folio_upm.dto.permission_type import SUPPORTED_PS_TYPES, PermissionType
 from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet, RoleCapabilitiesHolder
 from folio_upm.utils.ordered_set import OrderedSet
 
@@ -61,15 +61,14 @@ class UserStatistics(BaseModel):
 
 class AnalyzedRole(BaseModel):
     role: Role
-    users: OrderedSet[str]
     permissionSets: List[ExpandedPermissionSet]
     source: str
+    users: OrderedSet[str]
+    usersCount: int = 0
     systemGenerated: bool
+    capabilitiesCount: int = 0
     originalPermissionsCount: int
-    totalPermissionsCount: int
-
-    def get_assigned_users_count(self) -> int:
-        return len(self.users)
+    expandedPermissionsCount: int
 
     def get_total_permissions_count(self) -> int:
         return len(self.permissionSets)

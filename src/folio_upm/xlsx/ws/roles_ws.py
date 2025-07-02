@@ -16,12 +16,12 @@ class RolesWorksheet(AbstractWorksheet):
     _columns = [
         Column[AnalyzedRole](w=60, n="Name", f=lambda x: x.role.name),
         Column[AnalyzedRole](w=50, n="Source PS", f=lambda x: x.source),
-        Column[AnalyzedRole](w=14, n="System", f=lambda x: "y" if x.systemGenerated else "n"),
+        Column[AnalyzedRole](w=14, n="System", f=lambda x: str(x.systemGenerated).lower()),
         Column[AnalyzedRole](w=60, n="Description", f=lambda x: x.role.description),
-        Column[AnalyzedRole](w=22, n="# of Users", f=lambda x: x.get_assigned_users_count()),
-        Column[AnalyzedRole](w=22, n="# of PS", f=lambda x: x.originalPermissionsCount),
-        Column[AnalyzedRole](w=22, n="# of Flat PS", f=lambda x: x.totalPermissionsCount),
-        Column[AnalyzedRole](w=22, n="# of Total PS", f=lambda x: x.get_total_permissions_count()),
+        Column[AnalyzedRole](w=22, n="# Users", f=lambda x: x.usersCount),
+        Column[AnalyzedRole](w=22, n="# Capabilities", f=lambda x: x.capabilitiesCount),
+        Column[AnalyzedRole](w=22, n="# PS", f=lambda x: x.originalPermissionsCount),
+        Column[AnalyzedRole](w=22, n="# Total PS", f=lambda x: x.expandedPermissionsCount),
     ]
 
     def __init__(self, ws: Worksheet, data: OrdDict[str, AnalyzedRole]):

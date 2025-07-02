@@ -6,7 +6,7 @@ from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
-from folio_upm.dto.permission_type import INVALID, MUTABLE, DEPRECATED, QUESTIONABLE, UNPROCESSED
+from folio_upm.dto.permission_type import DEPRECATED, INVALID, MUTABLE, QUESTIONABLE, UNPROCESSED
 from folio_upm.dto.support import RoleCapabilitiesHolder
 from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
