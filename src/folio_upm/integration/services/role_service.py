@@ -67,7 +67,7 @@ class RoleService(metaclass=SingletonMeta):
             role_to_create = Role(name=role_name, description=role.description or "")
             created_role = self._client.post_role(role_to_create)
             self._log.info("Role is created: id=%s, name='%s'", created_role.id, role_name)
-            return EntityMigrationResult.for_role(created_role, "success", f"Role created: {created_role.id}")
+            return EntityMigrationResult.for_role(created_role, "success", "Role created successfully")
         except requests.HTTPError as e:
             resp = e.response
             error = HttpReqErr(message=str(e), status=resp.status_code, responseBody=resp.text)
