@@ -6,6 +6,7 @@ from folio_upm.dto.permission_type import MUTABLE
 from folio_upm.dto.results import AnalyzedRole, EurekaLoadResult, PermissionAnalysisResult
 from folio_upm.dto.support import CapabilityPlaceholder, RoleCapabilitiesHolder
 from folio_upm.services.capability_service import CapabilityService
+from folio_upm.utils import log_factory
 from folio_upm.utils.upm_env import Env
 
 
@@ -17,6 +18,7 @@ class RoleCapabilitiesProvider:
         roles: OrdDict[str, AnalyzedRole],
         eureka_load_result: EurekaLoadResult,
     ):
+        self._log = log_factory.get_logger(__class__.__name__)
         self._roles = roles
         self._ps_analysis_result = ps_analysis_result
         self._capability_service = CapabilityService(eureka_load_result)
@@ -42,7 +44,7 @@ class RoleCapabilitiesProvider:
         for expanded_ps in role_permissions:
             capability = self.__create_role_capability(expanded_ps, migration_strategy)
             if capability is None:
-                return None
+                continue
             if capability.permissionName not in capabilities_dict:
                 capabilities_dict[capability.permissionName] = capability
         capabilities = list(capabilities_dict.values())
