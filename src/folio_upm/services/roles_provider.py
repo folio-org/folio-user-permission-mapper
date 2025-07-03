@@ -1,31 +1,27 @@
 from collections import OrderedDict
-from typing import List, Optional
+from typing import List
 from typing import OrderedDict as OrdDict
 
 from folio_upm.dto.eureka import Role
 from folio_upm.dto.permission_type import MUTABLE
-from folio_upm.dto.results import AnalyzedRole, EurekaLoadResult, LoadResult, PermissionAnalysisResult
+from folio_upm.dto.results import AnalyzedRole, LoadResult, PermissionAnalysisResult
 from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.utils.sub_ps_helper import SubPermissionsHelper
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
 
 
 class RolesProvider:
 
-    def __init__(
-        self,
-        load_result: LoadResult,
-        ps_analysis_result: PermissionAnalysisResult,
-        eureka_load_result: Optional[EurekaLoadResult],
-    ):
+    def __init__(self, load_result: LoadResult, ps_analysis_result: PermissionAnalysisResult):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._load_result = load_result
-        self._eureka_load_result = eureka_load_result
         self._ps_analysis_result = ps_analysis_result
         self._log.info("Generating roles...")
+        self._system_roles_provider = SystemRolesProvider()
         self._users_by_ps_names = self.__collect_users_by_ps_name()
         self._roles = self.__create_roles()
         self._log.info("Roles generated successfully.")
@@ -42,20 +38,14 @@ class RolesProvider:
 
     def __create_role(self, analyzed_ps: AnalyzedPermissionSet) -> AnalyzedRole | None:
         name = analyzed_ps.get_first_value(lambda x: x.displayName)
-        description = analyzed_ps.get_first_value(lambda x: x.description)
-        if description is not None:
-            if len(description) >= 255:
-                desc_for_log = description.replace("\n", "\\n")
-                self._log.warning("Role description too long (max limit 255), shortening it: '%s'", desc_for_log)
-                description = description and description[:245] + "..."
-        else:
-            description = ""
+        description = self.__get_role_description(analyzed_ps)
 
         role = Role(name=name and name.strip(), description=description)
         source_ps_name = analyzed_ps.permissionName
 
-        expanded_sub_permissions = self.__expand_sub_permissions(analyzed_ps, [])
-
+        expanded_sub_permissions = SubPermissionsHelper(self._ps_analysis_result).flatten_sub_permissions(
+            source_ps_name
+        )
         is_system_generated = SystemRolesProvider().has_system_generated_ps(source_ps_name)
         if is_system_generated:
             role_name = SystemRolesProvider().get_eureka_role_name(source_ps_name)
@@ -104,7 +94,7 @@ class RolesProvider:
             expanded_from = IterableUtils.last(exp_list)
             result.append(ExpandedPermissionSet(permissionName=permission_name, expandedFrom=expanded_from))
             if ps_type == MUTABLE:
-                found_child_ap = self._ps_analysis_result[ps_type].get(permission_name, None)
+                found_child_ap = self._ps_analysis_result[ps_type].get(permission_name)
                 if found_child_ap is not None:
                     exp_list.append(permission_name)
                     result += self.__expand_sub_permissions(found_child_ap, exp_list=exp_list)
@@ -116,3 +106,15 @@ class RolesProvider:
         for expanded_ps in expanded_permissions:
             unique_permissions.add(expanded_ps.permissionName)
         return len(unique_permissions)
+
+    def __get_role_description(self, analyzed_ps: AnalyzedPermissionSet) -> str:
+        description = analyzed_ps.get_first_value(lambda x: x.description)
+        if description is not None:
+            if len(description) >= 255:
+                desc_for_log = description.replace("\n", "\\n")
+                self._log.warning("Role description too long (max limit 255), shortening it: '%s'", desc_for_log)
+                return description and description[:245] + "..."
+            else:
+                return description
+        else:
+            return ""

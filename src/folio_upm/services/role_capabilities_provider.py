@@ -58,7 +58,7 @@ class RoleCapabilitiesProvider:
         return None
 
     def __get_distributed_capabilities(self, expanded_ps) -> Optional[CapabilityPlaceholder]:
-        if expanded_ps.expandedFrom is None:
+        if len(expanded_ps.expandedFrom) == 0:
             ps_name = expanded_ps.permissionName
             permission_type = self._ps_analysis_result.identify_permission_type(ps_name)
             if permission_type != MUTABLE:

@@ -1,0 +1,120 @@
+from collections import OrderedDict
+
+from folio_upm.dto.okapi import PermissionSet
+from folio_upm.dto.results import PermissionAnalysisResult
+from folio_upm.dto.source_type import PS
+from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet, SourcedPermissionSet
+from folio_upm.utils.sub_ps_helper import SubPermissionsHelper
+
+
+class TestSubPermissionsUtils:
+
+    def test_get_sub_permissions_empty(self):
+        sub_ps_helper = SubPermissionsHelper(self.simple_ps_analysis_result())
+        expanded_ps = sub_ps_helper.flatten_sub_permissions("unknown")
+        assert expanded_ps == []
+
+    def test_get_sub_permissions(self):
+        sub_ps_helper = SubPermissionsHelper(self.simple_ps_analysis_result())
+        expanded_ps = sub_ps_helper.flatten_sub_permissions("user_ps")
+        assert expanded_ps == [
+            ExpandedPermissionSet(permissionName="okapi_set", expandedFrom=[]),
+            ExpandedPermissionSet(permissionName="okapi_perm", expandedFrom=[]),
+        ]
+
+    def test_nested_mutable_permissions(self):
+        sub_ps_helper = SubPermissionsHelper(self.nested_user_ps_sets())
+        expanded_ps = sub_ps_helper.flatten_sub_permissions("user_ps1")
+
+        assert expanded_ps == [
+            ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=[]),
+            ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=["user_ps1"]),
+            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=["user_ps1"]),
+            ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=["user_ps1"]),
+        ]
+
+    def test_nested_ps_with_self_reference(self):
+        sub_ps_helper = SubPermissionsHelper(self.ps_analys_result_with_self_ref())
+        expanded_ps = sub_ps_helper.flatten_sub_permissions("user_ps1")
+
+        assert expanded_ps == [
+            ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=["user_ps2"]),
+            ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=["user_ps1"]),
+            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=["user_ps2"]),
+            ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=["user_ps2"]),
+        ]
+
+    def simple_ps_analysis_result(self) -> PermissionAnalysisResult:
+        user_set = self.ps_set("user_ps", "User-Defined Ps", ["okapi_set", "okapi_perm"])
+
+        okapi_ps1 = self.ps_set("okapi_ps1", "Okapi PS #1", [])
+        okapi_ps2 = self.ps_set("okapi_ps2", "Okapi PS #2", [])
+        okapi_set = self.ps_set("ps1", "Okapi Permission Set", ["okapi_ps1", "okapi_ps2"])
+        okapi_perm = self.ps_set("ps1", "Okapi Permission", [])
+
+        return PermissionAnalysisResult(
+            mutable=self.analyzed_ps_dict([user_set]),
+            okapi=self.analyzed_ps_dict([okapi_ps1, okapi_ps2, okapi_set, okapi_perm]),
+        )
+
+    def nested_user_ps_sets(self) -> PermissionAnalysisResult:
+        user_ps1 = self.ps_set("user_ps1", "User-Defined Ps", ["user_ps2", "okapi_ps1", "user_ps3"])
+        user_ps2 = self.ps_set("user_ps2", "User-Defined Ps", ["user_ps3", "okapi_ps2"])
+        user_ps3 = self.ps_set("user_ps3", "User-Defined Ps", ["okapi_ps3", "okapi_ps4"])
+
+        okapi_ps1 = self.ps_set("okapi_ps1", "Okapi PS #1", [])
+        okapi_ps2 = self.ps_set("okapi_ps2", "Okapi PS #2", [])
+        okapi_ps3 = self.ps_set("okapi_ps3", "Okapi PS #3", [])
+
+        return PermissionAnalysisResult(
+            mutable=self.analyzed_ps_dict([user_ps1, user_ps2, user_ps3]),
+            okapi=self.analyzed_ps_dict([okapi_ps1, okapi_ps2, okapi_ps3]),
+        )
+
+    def ps_analys_result_with_self_ref(self) -> PermissionAnalysisResult:
+        user_ps1 = self.ps_set("user_ps1", "User-Defined Ps", ["user_ps1", "user_ps2", "okapi_ps1"])
+        user_ps2 = self.ps_set("user_ps2", "User-Defined Ps", ["user_ps1", "user_ps3", "okapi_ps2"])
+        user_ps3 = self.ps_set("user_ps3", "User-Defined Ps", ["user_ps1", "okapi_ps3", "okapi_ps4"])
+
+        okapi_ps1 = self.ps_set("okapi_ps1", "Okapi PS #1", [])
+        okapi_ps2 = self.ps_set("okapi_ps2", "Okapi PS #2", [])
+        okapi_ps3 = self.ps_set("okapi_ps3", "Okapi PS #3", [])
+
+        return PermissionAnalysisResult(
+            mutable=self.analyzed_ps_dict([user_ps1, user_ps2, user_ps3]),
+            okapi=self.analyzed_ps_dict([okapi_ps1, okapi_ps2, okapi_ps3]),
+        )
+
+    def ps_analys_result_with_unknown_ps(self) -> PermissionAnalysisResult:
+        user_ps1 = self.ps_set("user_ps1", "User-Defined Ps", ["user_ps2", "okapi_ps1", "unknown_ps"])
+        user_ps2 = self.ps_set("user_ps2", "User-Defined Ps", ["okapi_ps2", "okapi_ps3", "unknown_ps"])
+
+        okapi_ps1 = self.ps_set("okapi_ps1", "Okapi PS #1", [])
+        okapi_ps2 = self.ps_set("okapi_ps2", "Okapi PS #2", [])
+        okapi_ps3 = self.ps_set("okapi_ps3", "Okapi PS #3", [])
+
+        return PermissionAnalysisResult(
+            mutable=self.analyzed_ps_dict([user_ps1, user_ps2]),
+            okapi=self.analyzed_ps_dict([okapi_ps1, okapi_ps2, okapi_ps3]),
+        )
+
+    @staticmethod
+    def analyzed_ps(value: PermissionSet) -> AnalyzedPermissionSet:
+        return AnalyzedPermissionSet(
+            permissionName=value.permissionName,
+            sourcePermSets=[SourcedPermissionSet(src=PS, val=value)],
+        )
+
+    @staticmethod
+    def analyzed_ps_dict(analyzed_ps_list: list[PermissionSet]) -> OrderedDict[str, AnalyzedPermissionSet]:
+        return OrderedDict({ap.permissionName: TestSubPermissionsUtils.analyzed_ps(ap) for ap in analyzed_ps_list})
+
+    @staticmethod
+    def ps_set(name: str, display_name=None, sub_permissions=None) -> PermissionSet:
+        if sub_permissions is None:
+            sub_permissions = []
+        return PermissionSet(
+            permissionName=name,
+            displayName=display_name,
+            subPermissions=sub_permissions,
+        )

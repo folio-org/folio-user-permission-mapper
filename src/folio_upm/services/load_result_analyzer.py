@@ -31,7 +31,7 @@ class LoadResultAnalyzer:
     def __analyze_results(self) -> AnalysisResult:
         load_result = self._lr
         ps_result = self._ps_analysis_result
-        roles = RolesProvider(load_result, ps_result, self._eureka_lr).get_roles()
+        roles = RolesProvider(load_result, ps_result).get_roles()
         user_roles = UserRolesProvider(ps_result, roles).get_user_roles()
         role_capabilities = RoleCapabilitiesProvider(ps_result, roles, self._eureka_lr).get_role_capabilities()
 

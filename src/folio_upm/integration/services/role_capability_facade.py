@@ -15,8 +15,8 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("RoleCapabilityServiceFacade initialized.")
-        self._role_capability_service = RoleCapabilityService()
         self._role_service = RoleService()
+        self._role_capability_service = RoleCapabilityService()
         self._role_capability_set_service = RoleCapabilitySetService()
 
     def assign_role_capabilities(self, role_capabilities: List[RoleCapabilitiesHolder]):

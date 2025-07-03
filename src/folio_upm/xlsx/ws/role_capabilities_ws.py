@@ -60,7 +60,7 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
                 name=capability.name,
                 resource=capability.resource,
                 action=capability.action,
-                expandedFrom=capability.expandedFrom,
+                expandedFrom=", ".join(capability.expandedFrom),
                 excluded=False,
                 capabilityType=capability.capabilityType,
             )
