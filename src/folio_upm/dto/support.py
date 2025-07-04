@@ -3,6 +3,7 @@ from typing import Callable, List, Optional, Tuple
 from pydantic import BaseModel
 
 from folio_upm.dto.okapi import PermissionSet
+from folio_upm.dto.permission_type import PermissionType
 from folio_upm.dto.source_type import SourceType
 from folio_upm.utils.ordered_set import OrderedSet
 
@@ -15,13 +16,16 @@ class UserPermsHolder(BaseModel):
 class CapabilityPlaceholder(BaseModel):
     resolvedType: str
     permissionName: str
-    permissionType: str
+    permissionType: Optional[str]
     displayName: Optional[str] = None
-    expandedFrom: Optional[str] = None
+    expandedFrom: List[str] = []
     name: Optional[str] = None
     resource: Optional[str] = None
     action: Optional[str] = None
     capabilityType: Optional[str] = None
+
+    def get_permission_type_name(self) -> str:
+        return PermissionType.from_string(self.permissionType).get_visible_name()
 
 
 class RoleCapabilitiesHolder(BaseModel):
@@ -36,7 +40,7 @@ class SourcedPermissionSet(BaseModel):
 
 class ExpandedPermissionSet(BaseModel):
     permissionName: str
-    expandedFrom: Optional[str] = None
+    expandedFrom: List[str] = []
 
 
 class AnalyzedPermissionSet(BaseModel):
@@ -58,10 +62,16 @@ class AnalyzedPermissionSet(BaseModel):
 
     def get_sub_permissions(self, include_flat: bool = False) -> OrderedSet[str]:
         sub_permissions = OrderedSet()
+        if include_flat:
+            for source_perm_set in self.sourcePermSets:
+                if source_perm_set.src == SourceType.FLAT_PS:
+                    sub_permissions.add_all(source_perm_set.val.subPermissions)
+            return sub_permissions
+
         for source_perm_set in self.sourcePermSets:
-            if not include_flat and source_perm_set.src == SourceType.FLAT_PS:
-                continue
-            sub_permissions += source_perm_set.val.subPermissions
+            source = source_perm_set.src
+            if source == SourceType.PS or source == SourceType.OKAPI_PS:
+                sub_permissions += source_perm_set.val.subPermissions
         return sub_permissions
 
     def get_uq_display_names_str(self) -> str:

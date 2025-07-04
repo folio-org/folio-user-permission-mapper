@@ -4,7 +4,7 @@ from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
 from folio_upm.dto.migration import EntityMigrationResult
-from folio_upm.xlsx import constants
+from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
@@ -27,9 +27,9 @@ class MigrationResultWorksheet(AbstractWorksheet):
     @override
     def _get_row_fill_color(self, call_rs: EntityMigrationResult) -> Optional[PatternFill]:
         if call_rs.status == "error":
-            return constants.light_red_fill
+            return ws_constants.light_red_fill
         if call_rs.status == "skipped" or call_rs.status == "not_matched":
-            return constants.light_yellow_fill
+            return ws_constants.light_yellow_fill
         if call_rs.status == "success":
-            return constants.light_green_fill
-        return constants.almost_white_fill
+            return ws_constants.light_green_fill
+        return ws_constants.almost_white_fill

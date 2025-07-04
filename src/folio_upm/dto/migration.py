@@ -21,7 +21,7 @@ class EntityMigrationResult(BaseModel):
         return EntityMigrationResult(
             status=status,
             entityName="role",
-            entityId=role.id,
+            entityId=role.name,
             reason=reason,
             error=error,
         )

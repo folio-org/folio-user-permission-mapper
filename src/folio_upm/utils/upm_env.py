@@ -1,5 +1,5 @@
 import os
-from functools import lru_cache
+from functools import cache
 from typing import Optional
 
 import dotenv
@@ -62,7 +62,7 @@ class Env(metaclass=SingletonMeta):
             raise ValueError(f"Invalid storages: '{parsed_storages}'. Allowed values are: {allowed_values}'.")
         return parsed_storages
 
-    @lru_cache(maxsize=100)
+    @cache
     def get_env(self, env_variable_name, default_value: str | None = None, log_result=True) -> Optional[str]:
         env_variable_value = os.getenv(env_variable_name)
         if env_variable_value is None:
@@ -75,7 +75,7 @@ class Env(metaclass=SingletonMeta):
             self._log.info(f"Resolved value for {env_variable_name}: {env_variable_value}")
         return env_variable_value
 
-    @lru_cache(maxsize=100)
+    @cache
     def require_env(self, env_variable_name, default_value=None, log_result=True) -> str:
         env_variable_value = os.getenv(env_variable_name, default_value)
         if not env_variable_value:
