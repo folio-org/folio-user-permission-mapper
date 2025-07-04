@@ -64,7 +64,7 @@ class Env(metaclass=SingletonMeta):
             raise ValueError(f"Invalid storages: '{parsed_storages}'. Allowed values are: {allowed_values}'.")
         return parsed_storages
 
-    @cache
+    @cache  # noqa: B019
     def get_env(self, env_variable_name, default_value: str | None = None, log_result=True) -> Optional[str]:
         env_variable_value = os.getenv(env_variable_name)
         if env_variable_value is None:
@@ -73,15 +73,6 @@ class Env(metaclass=SingletonMeta):
         elif env_variable_value.strip() == "":
             self._log.debug(f"{env_variable_name} is set to an empty string, using default value: {default_value}")
             return default_value
-        if log_result:
-            self._log.info(f"Resolved value for {env_variable_name}: {env_variable_value}")
-        return env_variable_value
-
-    @cache
-    def require_env(self, env_variable_name, default_value=None, log_result=True) -> str:
-        env_variable_value = os.getenv(env_variable_name, default_value)
-        if not env_variable_value:
-            raise ValueError(f"{env_variable_name} is not set")
         if log_result:
             self._log.info(f"Resolved value for {env_variable_name}: {env_variable_value}")
         return env_variable_value
