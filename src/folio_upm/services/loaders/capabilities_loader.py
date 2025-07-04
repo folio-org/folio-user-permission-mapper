@@ -1,5 +1,4 @@
-from collections import OrderedDict
-from typing import OrderedDict as OrdDict
+from typing import Dict
 
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integration.clients.eureka_client import EurekaClient
@@ -13,7 +12,7 @@ class CapabilitiesLoader(metaclass=SingletonMeta):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._eureka_client = EurekaClient()
 
-    def load_capabilities(self) -> OrdDict[str, any]:
+    def load_capabilities(self) -> Dict[str, any]:
         self._log.info("Starting eureka data loading...")
         cql_all_query = "cql.allRecords=1"
         roles = self.__load_data_by_query("roles", "/roles", cql_all_query)
@@ -27,18 +26,16 @@ class CapabilitiesLoader(metaclass=SingletonMeta):
 
         self._log.info("Eureka data loaded successfully.")
 
-        return OrderedDict(
-            {
-                "roles": roles,
-                "capabilities": capabilities,
-                "capabilitySets": capability_sets,
-                "roleUsers": role_users,
-                "roleCapabilities": role_capabilities,
-                "userCapabilities": user_capabilities,
-                "roleCapabilitySets": role_capability_sets,
-                "userCapabilitySets": user_capability_sets,
-            }
-        )
+        return {
+            "roles": roles,
+            "capabilities": capabilities,
+            "capabilitySets": capability_sets,
+            "roleUsers": role_users,
+            "roleCapabilities": role_capabilities,
+            "userCapabilities": user_capabilities,
+            "roleCapabilitySets": role_capability_sets,
+            "userCapabilitySets": user_capability_sets,
+        }
 
     def __load_data_by_query(self, resource: str, path: str, query: str):
         return PagedDataLoader(resource, self.__load_resource_page(resource, path), query).load()

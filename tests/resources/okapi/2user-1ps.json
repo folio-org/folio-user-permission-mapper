@@ -1,0 +1,88 @@
+{
+  "okapiPermissions": [
+    {
+      "id": "mod-test-1.0.0",
+      "name": "Test Module",
+      "permissionSets": [
+        {
+          "permissionName": "m1_okapi_ps1",
+          "displayName": "Test: Okapi Permission #1"
+        },
+        {
+          "permissionName": "m1_okapi_ps2",
+          "displayName": "Test: Okapi Permission #2"
+        },
+        {
+          "permissionName": "m1_okapi.all",
+          "displayName": "Test: Okapi Permission Set",
+          "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+        }
+      ]
+    }
+  ],
+  "allPermissions": [
+    {
+      "permissionName": "m1_okapi_ps1",
+      "displayName": "Test: Okapi Permission #1",
+      "childOf": ["m1_okapi.all"]
+    },
+    {
+      "permissionName": "m1_okapi_ps2",
+      "displayName": "Test: Okapi Permission #2",
+      "childOf": ["m1_okapi.all"]
+    },
+    {
+      "permissionName": "m1_okapi.all",
+      "displayName": "Test: Okapi Permission Set",
+      "childOf": ["user_ps"],
+      "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+    },
+    {
+      "permissionName": "user_ps",
+      "displayName": "PS 1",
+      "description": "PS 1: Description",
+      "grantedTo": ["up_id1"],
+      "mutable": true,
+      "subPermissions": ["m1_okapi.all"]
+    }
+  ],
+  "allPermissionsExpanded": [
+    {
+      "permissionName": "m1_okapi_ps1",
+      "displayName": "Test: Okapi Permission #1",
+      "childOf": ["m1_okapi.all"]
+    },
+    {
+      "permissionName": "m1_okapi_ps2",
+      "displayName": "Test: Okapi Permission #2",
+      "childOf": ["m1_okapi.all"]
+    },
+    {
+      "permissionName": "m1_okapi.all",
+      "displayName": "Test: Okapi Permission Set",
+      "childOf": ["user_ps"],
+      "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+    },
+    {
+      "permissionName": "user_ps",
+      "displayName": "PS 1",
+      "description": "PS 1: Description",
+      "grantedTo": ["up_id1"],
+      "mutable": true,
+      "subPermissions": ["m1_okapi.all", "m1_okapi_ps1", "m1_okapi_ps2"]
+    }
+  ],
+  "allPermissionUsers": [
+    {
+      "id": "up_id1",
+      "userId": "User_A",
+      "permissions": ["user_ps"]
+    },
+    {
+      "id": "up_id2",
+      "userId": "User_B",
+      "permissions": ["user_ps"]
+    }
+  ],
+  "allPermissionUsersExpanded": []
+}

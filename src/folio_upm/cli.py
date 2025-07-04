@@ -3,7 +3,7 @@ import json
 
 import click
 
-from folio_upm.dto.results import AnalysisResult
+from folio_upm.dto.results import AnalysisResult, OkapiLoadResult
 from folio_upm.integration.services.eureka_migration_service import EurekaMigrationService
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
 from folio_upm.services.loaders.capabilities_loader import CapabilitiesLoader
@@ -14,7 +14,7 @@ from folio_upm.utils import log_factory
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
 from folio_upm.utils.upm_env import Env
 from folio_upm.xlsx.migration_result_service import MigrationResultService
-from folio_upm.xlsx.permission_result_service import PermissionResultService
+from folio_upm.xlsx.xlsx_report_provider import XlsxReportProvider
 
 xlsx_ext = "xlsx"
 json_gz_ext = "json.gz"
@@ -54,10 +54,10 @@ def generate_report():
     SystemRolesProvider().print_system_roles()
 
     storage_service = TenantStorageService()
-    load_result = storage_service.require_object(okapi_permissions_fn, json_gz_ext)
+    okapi_load_result = OkapiLoadResult(**storage_service.require_object(okapi_permissions_fn, json_gz_ext))
     eureka_load_result = EurekaResultLoader().get_load_result()
-    analysis_result = LoadResultAnalyzer(load_result, eureka_load_result).get_results()
-    workbook = PermissionResultService(analysis_result).generate_report()
+    analysis_result = LoadResultAnalyzer(okapi_load_result, eureka_load_result).get_results()
+    workbook = XlsxReportProvider(analysis_result).generate_report()
 
     result_fn = f"{mixed_analysis_result_fn}-{migration_strategy}"
     storage_service.save_object(result_fn, xlsx_ext, workbook, include_ts=True)

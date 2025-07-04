@@ -1,5 +1,4 @@
 import re
-from collections import OrderedDict
 from typing import List
 
 import requests
@@ -124,7 +123,7 @@ class RoleUsersService(metaclass=SingletonMeta):
 
     @staticmethod
     def __collect_roles_by_id(roles: List[Role]):
-        roles_by_ids = OrderedDict()
+        roles_by_ids = dict[str, Role]()
         for role in roles:
             if role.id not in roles_by_ids:
                 roles_by_ids[role.id] = role

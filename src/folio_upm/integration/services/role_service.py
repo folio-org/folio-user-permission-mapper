@@ -1,6 +1,4 @@
-from typing import List
-from typing import OrderedDict as OrdDict
-from typing import Set
+from typing import Dict, List, Set
 
 import requests
 
@@ -36,7 +34,7 @@ class RoleService(metaclass=SingletonMeta):
         loader = self._client.find_roles_by_query
         return PartitionedDataLoader("roles", role_names, loader, qb).load()
 
-    def create_roles(self, analyzed_roles: OrdDict[str, AnalyzedRole]):
+    def create_roles(self, analyzed_roles: Dict[str, AnalyzedRole]):
         self._log.info("Creating %s role(s)...", len(analyzed_roles))
         existing_role_names = self.__find_existing_roles(analyzed_roles)
         load_rs = []

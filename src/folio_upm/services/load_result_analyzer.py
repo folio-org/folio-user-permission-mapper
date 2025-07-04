@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from folio_upm.dto.eureka import UserRoles
-from folio_upm.dto.results import AnalysisResult, EurekaLoadResult, LoadResult
+from folio_upm.dto.results import AnalysisResult, EurekaLoadResult, OkapiLoadResult
 from folio_upm.dto.support import RoleCapabilitiesHolder
 from folio_upm.services.collectors.parent_perm_set_collector import ParentPermSetCollector
 from folio_upm.services.collectors.perm_set_stats_collector import PermSetStatisticsCollector
@@ -16,33 +16,33 @@ from folio_upm.utils import log_factory
 
 class LoadResultAnalyzer:
 
-    def __init__(self, analysis_json: dict, eureka_load_result=Optional[EurekaLoadResult]):
+    def __init__(self, okapi_load_rs: OkapiLoadResult, eureka_load_rs=Optional[EurekaLoadResult]):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("LoadResultAnalyzer initialized.")
-        self._analysis_json = analysis_json
-        self._lr = LoadResult(**analysis_json)
-        self._eureka_lr = eureka_load_result
-        self._ps_analysis_result = PermissionAnalyzer(self._lr).get_analysis_result()
+        self._analysis_json = okapi_load_rs
+        self._okapi_lr = okapi_load_rs
+        self._eureka_lr = eureka_load_rs
+        self._ps_analysis_result = PermissionAnalyzer(self._okapi_lr).get_analysis_result()
         self._result = self.__analyze_results()
 
     def get_results(self) -> AnalysisResult:
         return self._result
 
     def __analyze_results(self) -> AnalysisResult:
-        load_result = self._lr
-        ps_result = self._ps_analysis_result
-        roles = RolesProvider(load_result, ps_result).get_roles()
-        user_roles = UserRolesProvider(ps_result, roles).get_user_roles()
-        role_capabilities = RoleCapabilitiesProvider(ps_result, roles, self._eureka_lr).get_role_capabilities()
+        load_result = self._okapi_lr
+        ps_ar = self._ps_analysis_result
+        roles = RolesProvider(load_result, ps_ar).get_roles()
+        user_roles = UserRolesProvider(ps_ar, roles).get_user_roles()
+        role_capabilities = RoleCapabilitiesProvider(ps_ar, roles, self._eureka_lr).get_role_capabilities()
 
         self.__update_role_users_count(roles, user_roles)
         self.__update_role_capabilities_count(roles, role_capabilities)
 
         return AnalysisResult(
-            userStatistics=UserStatsCollector(load_result, ps_result).get(),
-            psStatistics=PermSetStatisticsCollector(ps_result, self._eureka_lr).get(),
-            userPermissionSets=UserPermSetCollector(load_result, ps_result).get(),
-            permSetNesting=ParentPermSetCollector(load_result, ps_result).get(),
+            userStatistics=UserStatsCollector(load_result, ps_ar).get(),
+            psStatistics=PermSetStatisticsCollector(ps_ar, self._eureka_lr).get(),
+            userPermissionSets=UserPermSetCollector(load_result, ps_ar).get(),
+            permSetNesting=ParentPermSetCollector(load_result, ps_ar).get(),
             roles=roles,
             roleUsers=user_roles,
             roleCapabilities=role_capabilities,

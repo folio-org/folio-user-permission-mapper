@@ -1,10 +1,8 @@
-from collections import OrderedDict
-from typing import List
-from typing import OrderedDict as OrdDict
+from typing import Dict, List
 
 from folio_upm.dto.eureka import Role
 from folio_upm.dto.permission_type import MUTABLE
-from folio_upm.dto.results import AnalyzedRole, LoadResult, PermissionAnalysisResult
+from folio_upm.dto.results import AnalyzedRole, OkapiLoadResult, PermissionAnalysisResult
 from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import IterableUtils
@@ -16,7 +14,7 @@ from folio_upm.utils.system_roles_provider import SystemRolesProvider
 
 class RolesProvider:
 
-    def __init__(self, load_result: LoadResult, ps_analysis_result: PermissionAnalysisResult):
+    def __init__(self, load_result: OkapiLoadResult, ps_analysis_result: PermissionAnalysisResult):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._load_result = load_result
         self._ps_analysis_result = ps_analysis_result
@@ -26,11 +24,11 @@ class RolesProvider:
         self._roles = self.__create_roles()
         self._log.info("Roles generated successfully.")
 
-    def get_roles(self) -> OrdDict[str, AnalyzedRole]:
+    def get_roles(self) -> Dict[str, AnalyzedRole]:
         return self._roles
 
-    def __create_roles(self) -> OrdDict[str, AnalyzedRole]:
-        result = OrderedDict[str, AnalyzedRole]()
+    def __create_roles(self) -> Dict[str, AnalyzedRole]:
+        result = dict[str, AnalyzedRole]()
         for analyzed_ps in self._ps_analysis_result.mutable.values():
             ar = self.__create_role(analyzed_ps)
             result[ar.role.name] = ar
@@ -63,7 +61,7 @@ class RolesProvider:
         )
 
     def __get_user_roles(self):
-        user_roles = OrderedDict()
+        user_roles = dict[str, OrderedSet[str]]()
         for ar in self._roles.values():
             for user in ar.users:
                 if user not in user_roles:
@@ -71,7 +69,7 @@ class RolesProvider:
                 user_roles[user].add(ar.role.name)
         return user_roles
 
-    def __collect_users_by_ps_name(self) -> dict[str, OrderedSet[str]]:
+    def __collect_users_by_ps_name(self) -> Dict[str, OrderedSet[str]]:
         users_by_ps_name = dict()
         for user_perm in self._load_result.allPermissionUsers:
             user_id = user_perm.userId

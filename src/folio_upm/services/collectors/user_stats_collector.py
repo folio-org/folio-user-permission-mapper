@@ -1,5 +1,5 @@
 from folio_upm.dto.permission_type import DEPRECATED, INVALID, MUTABLE, OKAPI
-from folio_upm.dto.results import LoadResult, PermissionAnalysisResult, UserStatistics
+from folio_upm.dto.results import OkapiLoadResult, PermissionAnalysisResult, UserStatistics
 
 
 class UserStatsCollector:
@@ -17,7 +17,7 @@ class UserStatsCollector:
     The statistics are computed by analyzing the user's permissions and classifying each permission set type.
     """
 
-    def __init__(self, load_result: LoadResult, ps_analysis_result: PermissionAnalysisResult):
+    def __init__(self, load_result: OkapiLoadResult, ps_analysis_result: PermissionAnalysisResult):
         self._all_type = "all"
         self._load_result = load_result
         self._ps_analysis_result = ps_analysis_result

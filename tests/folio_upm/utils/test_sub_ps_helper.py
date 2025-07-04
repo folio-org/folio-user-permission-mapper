@@ -16,32 +16,59 @@ class TestSubPermissionsUtils:
 
     def test_get_sub_permissions(self):
         sub_ps_helper = SubPermissionsHelper(self.simple_ps_analysis_result())
-        expanded_ps = sub_ps_helper.get_flatted_sub_pss("user_ps")
-        assert expanded_ps == [
+        result = sub_ps_helper.get_flatted_sub_pss("user_ps")
+
+        assert result == [
             ExpandedPermissionSet(permissionName="okapi_set", expandedFrom=[]),
             ExpandedPermissionSet(permissionName="okapi_perm", expandedFrom=[]),
         ]
 
     def test_nested_mutable_permissions(self):
         sub_ps_helper = SubPermissionsHelper(self.nested_user_ps_sets())
-        expanded_ps = sub_ps_helper.get_flatted_sub_pss("user_ps1")
 
-        assert expanded_ps == [
+        result = sub_ps_helper.get_flatted_sub_pss("user_ps1")
+        assert result == [
             ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=[]),
             ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=["user_ps1"]),
             ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=["user_ps1"]),
             ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=["user_ps1"]),
         ]
 
+        result2 = sub_ps_helper.get_flatted_sub_pss("user_ps2")
+        self.print_result(result2)
+        assert result2 == [
+            ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=[]),
+            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=["user_ps2"]),
+            ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=["user_ps2"]),
+        ]
+
+        result3 = sub_ps_helper.get_flatted_sub_pss("user_ps3")
+        self.print_result(result3)
+        assert result3 == [
+            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=[]),
+            ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=[]),
+        ]
+
     def test_nested_ps_with_self_reference(self):
         sub_ps_helper = SubPermissionsHelper(self.ps_analys_result_with_self_ref())
-        expanded_ps = sub_ps_helper.get_flatted_sub_pss("user_ps1")
+        result = sub_ps_helper.get_flatted_sub_pss("user_ps1")
 
-        assert expanded_ps == [
-            ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=["user_ps2"]),
+        assert result == [
+            ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=[]),
             ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=["user_ps1"]),
             ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=["user_ps2"]),
             ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=["user_ps2"]),
+        ]
+
+    def test_nested_ps_with_unknown_ps_name(self):
+        sub_ps_helper = SubPermissionsHelper(self.ps_analys_result_with_unknown_ps())
+        result = sub_ps_helper.get_flatted_sub_pss("user_ps1")
+
+        assert result == [
+            ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=[]),
+            ExpandedPermissionSet(permissionName="unknown_ps", expandedFrom=[]),
+            ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=["user_ps1"]),
+            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=["user_ps1"]),
         ]
 
     def simple_ps_analysis_result(self) -> PermissionAnalysisResult:
@@ -97,6 +124,12 @@ class TestSubPermissionsUtils:
             mutable=self.analyzed_ps_dict([user_ps1, user_ps2]),
             okapi=self.analyzed_ps_dict([okapi_ps1, okapi_ps2, okapi_ps3]),
         )
+
+    @staticmethod
+    def print_result(expanded_ps: list[ExpandedPermissionSet]):
+        print()
+        for v in expanded_ps:
+            print(f'ExpandedPermissionSet(permissionName="{v.permissionName}", expandedFrom={v.expandedFrom}),')
 
     @staticmethod
     def analyzed_ps(value: PermissionSet) -> AnalyzedPermissionSet:

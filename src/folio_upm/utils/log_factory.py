@@ -34,7 +34,7 @@ def _get_log_level():
 
 class CustomFormatter(logging.Formatter):
     def __init__(self, fmt=None):
-        super().__init__(fmt or " %(asctime)s %(levelname)-8s %(name)-20s %(message)s")
+        super().__init__(fmt or "%(asctime)s %(levelname)-8s %(name)-30s %(message)s")
 
     def format(self, record):
         log_color = _COLORS.get(record.levelname, _RESET)
@@ -47,10 +47,7 @@ def get_logger(name):
     if not logger.hasHandlers():
         log_level = _get_log_level()
         logger.setLevel(log_level)
-        name_pad = 25
-        padded_name = (name[:name_pad]).ljust(name_pad)
         console_handler = logging.StreamHandler()
-        formatter = CustomFormatter(f"%(asctime)s %(levelname)-8s {padded_name} %(message)s")
-        console_handler.setFormatter(formatter)
+        console_handler.setFormatter(CustomFormatter())
         logger.addHandler(console_handler)
     return logger

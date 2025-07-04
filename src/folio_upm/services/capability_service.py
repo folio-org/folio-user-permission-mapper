@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import Tuple
 
 from folio_upm.dto.eureka import Capability, CapabilitySet
@@ -14,8 +13,8 @@ class CapabilityService:
             self._capabilities_by_name = self.__get_capabilities_by_name()
             self._capability_sets_by_name = self.__get_capability_sets_by_name()
         else:
-            self._capabilities_by_name = OrderedDict()
-            self._capability_sets_by_name = OrderedDict()
+            self._capabilities_by_name = {}
+            self._capability_sets_by_name = {}
 
     def find_by_ps_name(self, ps_name: str) -> Tuple[Capability | CapabilitySet | None, str]:
         if self._eureka_load_result is None:
@@ -36,7 +35,7 @@ class CapabilityService:
 
     def __get_capabilities_by_name(self):
         capabilities = self._eureka_load_result.capabilities
-        capabilities_by_name = OrderedDict()
+        capabilities_by_name = {}
         for capability in capabilities:
             if capability.name in capabilities_by_name:
                 capabilities_by_name[capability.permission].append(capability)
@@ -45,11 +44,11 @@ class CapabilityService:
         return capabilities_by_name
 
     def __get_capability_sets_by_name(self):
-        capabilities = self._eureka_load_result.capabilitySets
-        capabilities_by_name = OrderedDict()
-        for capability_set in capabilities:
-            if capability_set.name in capabilities_by_name:
-                capabilities_by_name[capability_set.permission].append(capability_set)
+        capability_sets = self._eureka_load_result.capabilitySets
+        sets_by_name = {}
+        for capability_set in capability_sets:
+            if capability_set.name in sets_by_name:
+                sets_by_name[capability_set.permission].append(capability_set)
             else:
-                capabilities_by_name[capability_set.permission] = [capability_set]
-        return capabilities_by_name
+                sets_by_name[capability_set.permission] = [capability_set]
+        return sets_by_name

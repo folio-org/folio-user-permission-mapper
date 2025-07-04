@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import List, Set, Tuple
 
 from folio_upm.dto.permission_type import MUTABLE
@@ -14,9 +13,10 @@ class SubPermissionsHelper:
     def __init__(self, ps_analysis_result: PermissionAnalysisResult):
         self._log = log_factory.get_logger(__class__.__name__)
         self._ps_analysis_result = ps_analysis_result
-        self._parent_ps_names = OrderedDict[str, OrderedSet[str]]()
+        self._parent_ps_names = dict[str, OrderedSet[str]]()
 
     def get_flatted_sub_pss(self, permission_name) -> list[ExpandedPermissionSet]:
+        self._parent_ps_names = dict[str, OrderedSet[str]]()
         ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
         analyzed_ps = self._ps_analysis_result[ps_type].get(permission_name)
         if analyzed_ps is None:
@@ -24,12 +24,16 @@ class SubPermissionsHelper:
         _, parent_sub_ps = self.__get_sub_permissions(analyzed_ps, set(), None)
         sub_permissions = self.__expand_sub_permissions(analyzed_ps, set(), None)
 
+        parent_sub_ps_set = set(parent_sub_ps)
+
         result_sub_permissions = []
         for sp in parent_sub_ps:
             expanded_ps = ExpandedPermissionSet(permissionName=sp, expandedFrom=[])
             result_sub_permissions.append(expanded_ps)
 
         for sp in sub_permissions:
+            if sp in parent_sub_ps_set:
+                continue
             expanded_from = self._parent_ps_names.get(sp, OrderedSet()).to_list()
             expanded_ps = ExpandedPermissionSet(permissionName=sp, expandedFrom=expanded_from)
             result_sub_permissions.append(expanded_ps)

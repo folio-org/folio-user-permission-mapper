@@ -1,5 +1,4 @@
-from collections import OrderedDict
-from typing import OrderedDict as OrdDict
+from typing import Dict
 
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integration.services.okapi_service import OkapiService
@@ -13,7 +12,7 @@ class PermissionLoader(metaclass=SingletonMeta):
         self._permission_service = PermissionService()
         self._okapi_service = OkapiService()
 
-    def load_permission_data(self) -> OrdDict[str, any]:
+    def load_permission_data(self) -> Dict[str, any]:
         self._log.info("Permission loading started...")
         all_records_query = "cql.allRecords=1"
         pass
@@ -25,12 +24,10 @@ class PermissionLoader(metaclass=SingletonMeta):
         all_perm_users_expanded = self._permission_service.load_permission_users(all_perms_expanded)
 
         self._log.info("Permissions are loaded successfully.")
-        return OrderedDict(
-            {
-                "okapiPermissions": okapi_permissions,
-                "allPermissions": all_perms,
-                "allPermissionsExpanded": all_perms_expanded,
-                "allPermissionUsers": all_perm_users,
-                "allPermissionUsersExpanded": all_perm_users_expanded,
-            }
-        )
+        return {
+            "okapiPermissions": okapi_permissions,
+            "allPermissions": all_perms,
+            "allPermissionsExpanded": all_perms_expanded,
+            "allPermissionUsers": all_perm_users,
+            "allPermissionUsersExpanded": all_perm_users_expanded,
+        }

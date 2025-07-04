@@ -11,7 +11,7 @@ from folio_upm.xlsx.ws.user_roles import UserRolesWorksheet
 from folio_upm.xlsx.ws.user_stats_ws import UserStatsWorksheet
 
 
-class PermissionResultService:
+class XlsxReportProvider:
 
     _worksheet_definitions = [
         (PermissionNestingWorksheet, lambda ar: ar.permSetNesting),

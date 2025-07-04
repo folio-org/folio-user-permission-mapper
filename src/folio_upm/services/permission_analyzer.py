@@ -1,10 +1,8 @@
-from collections import OrderedDict
 from logging import INFO, WARN
 from typing import List
-from typing import OrderedDict as OrdDict
 
 from folio_upm.dto.okapi import PermissionSet
-from folio_upm.dto.results import LoadResult, PermissionAnalysisResult
+from folio_upm.dto.results import OkapiLoadResult, PermissionAnalysisResult
 from folio_upm.dto.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
 from folio_upm.dto.support import AnalyzedPermissionSet, SourcedPermissionSet
 from folio_upm.services.questionable_ps_validator import QuestionablePermissionValidator
@@ -15,10 +13,10 @@ from folio_upm.utils.service_utils import ServiceUtils
 
 class PermissionAnalyzer:
 
-    def __init__(self, load_result: LoadResult):
+    def __init__(self, load_result: OkapiLoadResult):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._load_result = load_result
-        self._analyzed_ps_dict = OrderedDict[str, AnalyzedPermissionSet]()
+        self._analyzed_ps_dict = dict[str, AnalyzedPermissionSet]()
         self._result = PermissionAnalysisResult()
         self.__analyze_permissions()
 
@@ -65,15 +63,6 @@ class PermissionAnalyzer:
         else:
             found_value.sourcePermSets.append(SourcedPermissionSet(src=src_type, val=ps))
 
-    def __collect_okapi_permissions(self) -> OrdDict[str, List[PermissionSet]]:
-        okapi_permissions = OrderedDict()
-        for module_desc in self._load_result.okapiPermissions:
-            for permission in module_desc.permissionSets:
-                if not okapi_permissions.get(permission):
-                    okapi_permissions[permission] = []
-                okapi_permissions[permission].append(permission)
-        return okapi_permissions
-
     def _put_permissions_in_buckets(self):
         for ps_name, ap in self._analyzed_ps_dict.items():
             self.__put_permission_in_bucket(ps_name, ap)
@@ -118,7 +107,7 @@ class PermissionAnalyzer:
         )
         self._log.info(f"Unprocessed permissions found: {len(rs.unprocessed)}")
         for t in [e for e in SourceType]:
-            self._log.info(f"System permissions filtered for type '{t.value}': {self._system_perms_count[t]}")
+            self._log.info(f"System permissions filtered for type '{t.value}': {self._system_perms_count.get(t, 0)}")
 
 
 class _Utils:

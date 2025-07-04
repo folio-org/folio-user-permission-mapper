@@ -1,6 +1,4 @@
-from collections import OrderedDict
-from typing import List, Optional
-from typing import OrderedDict as OrdDict
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, field_serializer
 
@@ -12,7 +10,7 @@ from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet, 
 from folio_upm.utils.ordered_set import OrderedSet
 
 
-class LoadResult(BaseModel):
+class OkapiLoadResult(BaseModel):
     okapiPermissions: List[ModuleDescriptor] = []
     allPermissions: List[PermissionSet] = []
     allPermissionsExpanded: List[PermissionSet] = []
@@ -25,17 +23,17 @@ class EurekaLoadResult(BaseModel):
 
 
 class PermissionAnalysisResult(BaseModel):
-    mutable: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
-    okapi: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
-    invalid: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
-    deprecated: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
-    questionable: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
-    unprocessed: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
+    mutable: Dict[str, AnalyzedPermissionSet] = {}
+    okapi: Dict[str, AnalyzedPermissionSet] = {}
+    invalid: Dict[str, AnalyzedPermissionSet] = {}
+    deprecated: Dict[str, AnalyzedPermissionSet] = {}
+    questionable: Dict[str, AnalyzedPermissionSet] = {}
+    unprocessed: Dict[str, AnalyzedPermissionSet] = {}
     systemPermissionNames: OrderedSet[str] = []
 
-    def __getitem__(self, ps_type: PermissionType) -> Optional[OrdDict[str, "AnalyzedPermissionSet"]]:
+    def __getitem__(self, ps_type: PermissionType) -> Optional[Dict[str, "AnalyzedPermissionSet"]]:
         if ps_type not in SUPPORTED_PS_TYPES:
-            return OrderedDict()
+            return {}
         return getattr(self, ps_type.get_name())
 
     def identify_permission_type(self, ps_name: str) -> PermissionType:
@@ -157,7 +155,7 @@ class AnalysisResult(BaseModel):
     userStatistics: List[UserStatistics]
     userPermissionSets: List[AnalyzedUserPermissionSet]
     permSetNesting: List[AnalyzedParentPermSets]
-    roles: OrdDict[str, AnalyzedRole]
+    roles: Dict[str, AnalyzedRole]
     roleUsers: List[UserRoles]
     roleCapabilities: List[RoleCapabilitiesHolder]
 

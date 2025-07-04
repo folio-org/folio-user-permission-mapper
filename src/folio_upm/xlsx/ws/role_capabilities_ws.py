@@ -1,6 +1,4 @@
-from typing import Optional
-from typing import OrderedDict as OrdDict
-from typing import override
+from typing import Dict, Optional, override
 
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
@@ -42,7 +40,7 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
         Column[RoleCapabilityRow](w=22, n="Capability Type", f=lambda x: x.capabilityType),
     ]
 
-    def __init__(self, ws: Worksheet, data: OrdDict[str, RoleCapabilitiesHolder]):
+    def __init__(self, ws: Worksheet, data: Dict[str, RoleCapabilitiesHolder]):
         super().__init__(ws, self._title, data, self._columns)
 
         self._red_types = [INVALID, MUTABLE]

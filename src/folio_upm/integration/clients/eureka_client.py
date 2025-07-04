@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import List
 
 from folio_upm.dto.cls_support import SingletonMeta
@@ -19,19 +18,19 @@ class EurekaClient(metaclass=SingletonMeta):
         return Role(**response_json)
 
     def post_user_roles(self, user_id: str, role_ids: list[str]) -> List[UserRole]:
-        body = OrderedDict({"userId": user_id, "roleIds": role_ids})
+        body = {"userId": user_id, "roleIds": role_ids}
         response = self._client.post_json("/roles/users", request_body=body)
         user_roles = response.get("userRoles", []) if response else []
         return [UserRole(**ur) for ur in user_roles]
 
     def post_role_capabilities(self, role_id: str, capability_ids: List[str]):
-        body = OrderedDict({"roleId": role_id, "capabilityIds": capability_ids})
+        body = {"roleId": role_id, "capabilityIds": capability_ids}
         response = self._client.post_json("/roles/capabilities", request_body=body)
         role_capabilities_json = response.get("roleCapabilities", []) if response else []
         return [RoleCapability(**rc) for rc in role_capabilities_json]
 
     def post_role_capability_sets(self, role_id, capability_set_ids: List[str]):
-        body = OrderedDict({"roleId": role_id, "capabilitySetIds": capability_set_ids})
+        body = {"roleId": role_id, "capabilitySetIds": capability_set_ids}
         response = self._client.post_json("/roles/capability-sets", request_body=body)
         role_capability_sets_json = response.get("roleCapabilitySets", []) if response else []
         return [RoleCapabilitySet(**rc) for rc in role_capability_sets_json]

@@ -1,8 +1,7 @@
-from collections import OrderedDict
 from typing import List
 
 from folio_upm.dto.permission_type import PermissionType
-from folio_upm.dto.results import AnalyzedParentPermSets, LoadResult, PermissionAnalysisResult
+from folio_upm.dto.results import AnalyzedParentPermSets, OkapiLoadResult, PermissionAnalysisResult
 from folio_upm.dto.source_type import FLAT_PS
 from folio_upm.dto.support import AnalyzedPermissionSet
 from folio_upm.utils import log_factory
@@ -12,7 +11,7 @@ from folio_upm.utils.service_utils import ServiceUtils
 
 class ParentPermSetCollector:
 
-    def __init__(self, load_result: LoadResult, ps_analysis_result: PermissionAnalysisResult):
+    def __init__(self, load_result: OkapiLoadResult, ps_analysis_result: PermissionAnalysisResult):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._load_result = load_result
         self._ps_analysis_result = ps_analysis_result
@@ -35,7 +34,7 @@ class ParentPermSetCollector:
     def __get_analyzed_parent_perm_set(
         self, ap: AnalyzedPermissionSet, ps_type: PermissionType
     ) -> List[AnalyzedParentPermSets]:
-        parent_ps_dict = OrderedDict()
+        parent_ps_dict = {}
 
         for source_perm_set in ap.sourcePermSets:
             if source_perm_set.src == FLAT_PS:

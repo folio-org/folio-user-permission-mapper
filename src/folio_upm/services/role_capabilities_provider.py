@@ -1,7 +1,6 @@
-from typing import List, Optional
-from typing import OrderedDict
-from typing import OrderedDict as OrdDict
+from typing import Dict, List, Optional
 
+from folio_upm.dto.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
 from folio_upm.dto.permission_type import MUTABLE
 from folio_upm.dto.results import AnalyzedRole, EurekaLoadResult, PermissionAnalysisResult
 from folio_upm.dto.support import CapabilityPlaceholder, RoleCapabilitiesHolder
@@ -15,7 +14,7 @@ class RoleCapabilitiesProvider:
     def __init__(
         self,
         ps_analysis_result: PermissionAnalysisResult,
-        roles: OrdDict[str, AnalyzedRole],
+        roles: Dict[str, AnalyzedRole],
         eureka_load_result: EurekaLoadResult,
     ):
         self._log = log_factory.get_logger(__class__.__name__)
@@ -39,7 +38,7 @@ class RoleCapabilitiesProvider:
     def __process_single_role(self, ar: AnalyzedRole, migration_strategy) -> Optional[RoleCapabilitiesHolder]:
         if ar.systemGenerated:
             return None
-        capabilities_dict = OrderedDict[str, CapabilityPlaceholder]()
+        capabilities_dict = dict[str, CapabilityPlaceholder]()
         role_permissions = ar.permissionSets
         for expanded_ps in role_permissions:
             capability = self.__create_role_capability(expanded_ps, migration_strategy)
@@ -50,10 +49,10 @@ class RoleCapabilitiesProvider:
         capabilities = list(capabilities_dict.values())
         return RoleCapabilitiesHolder(roleName=ar.role.name, capabilities=capabilities)
 
-    def __create_role_capability(self, expanded_ps, strategy: str) -> Optional[CapabilityPlaceholder]:
-        if strategy == "consolidated":
+    def __create_role_capability(self, expanded_ps, strategy: EurekaLoadStrategy) -> Optional[CapabilityPlaceholder]:
+        if strategy == CONSOLIDATED:
             return self.__get_consolidated_capabilities(expanded_ps)
-        if strategy == "distributed":
+        if strategy == DISTRIBUTED:
             return self.__get_distributed_capabilities(expanded_ps)
         return None
 

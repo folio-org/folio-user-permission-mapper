@@ -1,6 +1,4 @@
-from collections import OrderedDict
-from typing import List
-from typing import OrderedDict as OrdDict
+from typing import Dict, List
 
 from folio_upm.dto.eureka import UserRoles
 from folio_upm.dto.results import AnalyzedRole, PermissionAnalysisResult
@@ -11,7 +9,7 @@ from folio_upm.utils.upm_env import Env
 
 class UserRolesProvider:
 
-    def __init__(self, ps_analysis_result: PermissionAnalysisResult, roles: OrdDict[str, AnalyzedRole]):
+    def __init__(self, ps_analysis_result: PermissionAnalysisResult, roles: Dict[str, AnalyzedRole]):
         self._ps_analysis_result = ps_analysis_result
         self._roles = roles
         self._roles_by_ps_name = self.__collect_roles_by_src_ps_name()
@@ -27,8 +25,8 @@ class UserRolesProvider:
             return self.__get_consolidated_user_roles(user_roles)
         return self.__get_distributed_user_roles(user_roles)
 
-    def __get_user_roles(self) -> OrdDict[str, OrderedSet[str]]:
-        user_roles = OrderedDict()
+    def __get_user_roles(self) -> Dict[str, OrderedSet[str]]:
+        user_roles = {}
         for ar in self._roles.values():
             for user in ar.users:
                 if user not in user_roles:
@@ -36,14 +34,14 @@ class UserRolesProvider:
                 user_roles[user].add(ar.role.name)
         return user_roles
 
-    def __get_distributed_user_roles(self, user_roles: OrdDict[str, OrderedSet[str]]) -> List[UserRoles]:
+    def __get_distributed_user_roles(self, user_roles: Dict[str, OrderedSet[str]]) -> List[UserRoles]:
         distributed_user_roles = []
         for user_id, role_names in user_roles.items():
             new_role_names = self.__get_distributed_role_names(role_names)
             distributed_user_roles.append(UserRoles(userId=user_id, roles=new_role_names.to_list()))
         return distributed_user_roles
 
-    def __get_consolidated_user_roles(self, user_roles: OrdDict[str, OrderedSet[str]]) -> List[UserRoles]:
+    def __get_consolidated_user_roles(self, user_roles: Dict[str, OrderedSet[str]]) -> List[UserRoles]:
         consolidated_user_roles = []
         for user_id, role_names in user_roles.items():
             new_role_names = self.__get_consolidated_role_names(role_names)
@@ -83,8 +81,8 @@ class UserRolesProvider:
                 new_role_names.add(role_name)
         return new_role_names
 
-    def __collect_roles_by_src_ps_name(self) -> OrdDict[str, List[AnalyzedRole]]:
-        roles_by_ps_name = OrderedDict[str, List[AnalyzedRole]]()
+    def __collect_roles_by_src_ps_name(self) -> Dict[str, List[AnalyzedRole]]:
+        roles_by_ps_name = dict[str, List[AnalyzedRole]]()
         for role in self._roles.values():
             src_ps_name = role.source
             if src_ps_name not in roles_by_ps_name:

@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import Any, Sequence
 
 
@@ -23,4 +22,4 @@ class IterableUtils:
 
     @staticmethod
     def unique_values(iterable):
-        return list(OrderedDict.fromkeys(iterable).keys())
+        return list(dict.fromkeys(iterable).keys())

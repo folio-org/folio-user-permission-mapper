@@ -1,4 +1,4 @@
-from folio_upm.dto.results import AnalyzedUserPermissionSet, LoadResult, PermissionAnalysisResult
+from folio_upm.dto.results import AnalyzedUserPermissionSet, OkapiLoadResult, PermissionAnalysisResult
 
 
 class UserPermSetCollector:
@@ -9,7 +9,7 @@ class UserPermSetCollector:
         - permission set type (mutable, invalid, deprecated, okapi, etc.)
     """
 
-    def __init__(self, load_result: LoadResult, ps_analysis_result: PermissionAnalysisResult):
+    def __init__(self, load_result: OkapiLoadResult, ps_analysis_result: PermissionAnalysisResult):
         self._load_result = load_result
         self._ps_analysis_result = ps_analysis_result
         self._user_perm_sets = self.__collect_data()

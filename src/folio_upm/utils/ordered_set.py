@@ -1,5 +1,4 @@
-from collections import OrderedDict
-from typing import Any, Generic, Iterable, Iterator, List, Optional, TypeVar
+from typing import Any, Dict, Generic, Iterable, Iterator, List, Optional, TypeVar
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import CoreSchema, core_schema
@@ -16,7 +15,7 @@ class OrderedSet(Generic[T]):
         Args:
             value (iterable, optional): An iterable to initialize the OrderedSet with.
         """
-        self._data: OrderedDict[T, None] = OrderedDict()
+        self._data: Dict[T, None] = {}
         if value is None:
             return
 
