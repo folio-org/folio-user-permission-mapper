@@ -11,12 +11,12 @@ class TestSubPermissionsUtils:
 
     def test_get_sub_permissions_empty(self):
         sub_ps_helper = SubPermissionsHelper(self.simple_ps_analysis_result())
-        expanded_ps = sub_ps_helper.flatten_sub_permissions("unknown")
+        expanded_ps = sub_ps_helper.get_flatted_sub_pss("unknown")
         assert expanded_ps == []
 
     def test_get_sub_permissions(self):
         sub_ps_helper = SubPermissionsHelper(self.simple_ps_analysis_result())
-        expanded_ps = sub_ps_helper.flatten_sub_permissions("user_ps")
+        expanded_ps = sub_ps_helper.get_flatted_sub_pss("user_ps")
         assert expanded_ps == [
             ExpandedPermissionSet(permissionName="okapi_set", expandedFrom=[]),
             ExpandedPermissionSet(permissionName="okapi_perm", expandedFrom=[]),
@@ -24,7 +24,7 @@ class TestSubPermissionsUtils:
 
     def test_nested_mutable_permissions(self):
         sub_ps_helper = SubPermissionsHelper(self.nested_user_ps_sets())
-        expanded_ps = sub_ps_helper.flatten_sub_permissions("user_ps1")
+        expanded_ps = sub_ps_helper.get_flatted_sub_pss("user_ps1")
 
         assert expanded_ps == [
             ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=[]),
@@ -35,7 +35,7 @@ class TestSubPermissionsUtils:
 
     def test_nested_ps_with_self_reference(self):
         sub_ps_helper = SubPermissionsHelper(self.ps_analys_result_with_self_ref())
-        expanded_ps = sub_ps_helper.flatten_sub_permissions("user_ps1")
+        expanded_ps = sub_ps_helper.get_flatted_sub_pss("user_ps1")
 
         assert expanded_ps == [
             ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=["user_ps2"]),

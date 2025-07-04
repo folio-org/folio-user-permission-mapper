@@ -16,15 +16,19 @@ class SubPermissionsHelper:
         self._ps_analysis_result = ps_analysis_result
         self._parent_ps_names = OrderedDict[str, OrderedSet[str]]()
 
-    def flatten_sub_permissions(self, permission_name) -> list[ExpandedPermissionSet]:
+    def get_flatted_sub_pss(self, permission_name) -> list[ExpandedPermissionSet]:
         ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
         analyzed_ps = self._ps_analysis_result[ps_type].get(permission_name)
         if analyzed_ps is None:
             return []
-        self._log.debug("Expanding sub permissions for: %s", permission_name)
+        _, parent_sub_ps = self.__get_sub_permissions(analyzed_ps, set(), None)
         sub_permissions = self.__expand_sub_permissions(analyzed_ps, set(), None)
 
         result_sub_permissions = []
+        for sp in parent_sub_ps:
+            expanded_ps = ExpandedPermissionSet(permissionName=sp, expandedFrom=[])
+            result_sub_permissions.append(expanded_ps)
+
         for sp in sub_permissions:
             expanded_from = self._parent_ps_names.get(sp, OrderedSet()).to_list()
             expanded_ps = ExpandedPermissionSet(permissionName=sp, expandedFrom=expanded_from)
@@ -33,7 +37,6 @@ class SubPermissionsHelper:
         return sorted(result_sub_permissions, key=lambda p: (len(p.expandedFrom) > 0))
 
     def __expand_sub_permissions(self, ap, visited_ps_names: Set[str], root_ps_name) -> OrderedSet[str]:
-        self._parent_ps_names = OrderedDict[str, OrderedSet[str]]()
         result_set = OrderedSet[str]()
 
         mutable_ps_sets, other_ps_names = self.__get_sub_permissions(ap, visited_ps_names, root_ps_name)
