@@ -33,7 +33,7 @@
         },
         {
           "permissionName": "m2_okapi.all",
-          "displayName": "Test Module #3: All permissions",
+          "displayName": "Test Module #2: All permissions",
           "subPermissions": ["m2_okapi_ps1", "m2_okapi_ps2"]
         }
       ]

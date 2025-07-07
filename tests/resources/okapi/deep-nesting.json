@@ -1,0 +1,357 @@
+{
+  "okapiPermissions": [
+    {
+      "id": "mod-test1-1.0.0",
+      "name": "Test Module #1",
+      "permissionSets": [
+        {
+          "permissionName": "m1_okapi_ps1",
+          "displayName": "Test Module #1: Okapi Permission #1"
+        },
+        {
+          "permissionName": "m1_okapi.all",
+          "displayName": "Test Module #1: All permissions",
+          "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+        }
+      ]
+    },
+    {
+      "id": "mod-test2-1.0.0",
+      "name": "Test Module #2",
+      "permissionSets": [
+        {
+          "permissionName": "m2_okapi_ps1",
+          "displayName": "Test Module #2: Okapi Permission #2"
+        },
+        {
+          "permissionName": "m2_okapi.all",
+          "displayName": "Test Module #2: All permissions",
+          "subPermissions": ["m2_okapi_ps1"]
+        }
+      ]
+    },
+    {
+      "id": "mod-test3-1.0.0",
+      "name": "Test Module #3",
+      "permissionSets": [
+        {
+          "permissionName": "m3_okapi_ps1",
+          "displayName": "Test Module #3: Okapi Permission #1"
+        },
+        {
+          "permissionName": "m3_okapi.all",
+          "displayName": "Test Module #3: All permissions",
+          "subPermissions": ["m3_okapi_ps1"]
+        }
+      ]
+    },
+    {
+      "id": "mod-test4-1.0.0",
+      "name": "Test Module #4",
+      "permissionSets": [
+        {
+          "permissionName": "m4_okapi_ps1",
+          "displayName": "Test Module #4: Okapi Permission #1"
+        },
+        {
+          "permissionName": "m4_okapi.all",
+          "displayName": "Test Module #4: All permissions",
+          "subPermissions": ["m4_okapi_ps1"]
+        }
+      ]
+    }, {
+      "id": "mod-test5-1.0.0",
+      "name": "Test Module #5",
+      "permissionSets": [
+        {
+          "permissionName": "m5_okapi_ps1",
+          "displayName": "Test Module #5: Okapi Permission #1"
+        },
+        {
+          "permissionName": "m5_okapi.all",
+          "displayName": "Test Module #5: All permissions",
+          "subPermissions": ["m5_okapi_ps1"]
+        }
+      ]
+    },
+    {
+      "id": "mod-test6-1.0.0",
+      "name": "Test Module #6",
+      "permissionSets": [
+        {
+          "permissionName": "m6_okapi_ps1",
+          "displayName": "Test Module #6: Okapi Permission #1"
+        },
+        {
+          "permissionName": "m6_okapi.all",
+          "displayName": "Test Module #6: All permissions",
+          "subPermissions": ["m6_okapi_ps1"]
+        }
+      ]
+    }
+  ],
+  "allPermissions": [
+    {
+      "permissionName": "m1_okapi_ps1",
+      "displayName": "Test Module #1: Okapi Permission #1"
+    },
+    {
+      "permissionName": "m1_okapi.all",
+      "displayName": "Test Module #1: All permissions",
+      "subPermissions": ["m1_okapi_ps1"]
+    },
+    {
+      "permissionName": "m2_okapi_ps1",
+      "displayName": "Test Module #2: Okapi Permission #2"
+    },
+    {
+      "permissionName": "m2_okapi.all",
+      "displayName": "Test Module #2: All permissions",
+      "subPermissions": ["m2_okapi_ps1"]
+    },
+    {
+      "permissionName": "m3_okapi_ps1",
+      "displayName": "Test Module #3: Okapi Permission #1"
+    },
+    {
+      "permissionName": "m3_okapi.all",
+      "displayName": "Test Module #3: All permissions",
+      "subPermissions": ["m3_okapi_ps1"]
+    },
+    {
+      "permissionName": "m4_okapi_ps1",
+      "displayName": "Test Module #4: Okapi Permission #1"
+    },
+    {
+      "permissionName": "m4_okapi.all",
+      "displayName": "Test Module #4: All permissions",
+      "subPermissions": ["m4_okapi_ps1"]
+    },
+    {
+      "permissionName": "m5_okapi_ps1",
+      "displayName": "Test Module #5: Okapi Permission #1"
+    },
+    {
+      "permissionName": "m5_okapi.all",
+      "displayName": "Test Module #5: All permissions",
+      "subPermissions": ["m5_okapi_ps1"]
+    },
+    {
+      "permissionName": "m6_okapi_ps1",
+      "displayName": "Test Module #6: Okapi Permission #1"
+    },
+    {
+      "permissionName": "m6_okapi.all",
+      "displayName": "Test Module #6: All permissions",
+      "subPermissions": ["m6_okapi_ps1"]
+    },
+    {
+      "permissionName": "user_ps1",
+      "displayName": "PS 1",
+      "description": "PS 1 - Description",
+      "subPermissions": ["m1_okapi.all", "user_ps2"],
+      "mutable": true
+    },
+    {
+      "permissionName": "user_ps2",
+      "displayName": "PS 2",
+      "description": "PS 2 - Description",
+      "subPermissions": ["m2_okapi.all", "user_ps3"],
+      "mutable": true
+    },
+    {
+      "permissionName": "user_ps3",
+      "displayName": "PS 3",
+      "description": "PS 3 - Description",
+      "subPermissions": ["m3_okapi.all", "user_ps4"],
+      "mutable": true
+    },
+    {
+      "permissionName": "user_ps4",
+      "displayName": "PS 4",
+      "description": "PS 4 - Description",
+      "subPermissions": ["m4_okapi.all", "user_ps5"],
+      "mutable": true
+    },
+    {
+      "permissionName": "user_ps5",
+      "displayName": "PS 5",
+      "description": "PS 5 - Description",
+      "subPermissions": ["m5_okapi.all", "user_ps6"],
+      "mutable": true
+    },
+    {
+      "permissionName": "user_ps6",
+      "displayName": "PS 6",
+      "description": "PS 6 - Description",
+      "subPermissions": ["m6_okapi.all"],
+      "mutable": true
+    }
+  ],
+  "allPermissionsExpanded": [
+    {
+      "permissionName": "m1_okapi_ps1",
+      "displayName": "Test Module #1: Okapi Permission #1"
+    },
+    {
+      "permissionName": "m1_okapi.all",
+      "displayName": "Test Module #1: All permissions",
+      "subPermissions": ["m1_okapi_ps1"]
+    },
+    {
+      "permissionName": "m2_okapi_ps1",
+      "displayName": "Test Module #2: Okapi Permission #2"
+    },
+    {
+      "permissionName": "m2_okapi.all",
+      "displayName": "Test Module #2: All permissions",
+      "subPermissions": ["m2_okapi_ps1"]
+    },
+    {
+      "permissionName": "m3_okapi_ps1",
+      "displayName": "Test Module #3: Okapi Permission #1"
+    },
+    {
+      "permissionName": "m3_okapi.all",
+      "displayName": "Test Module #3: All permissions",
+      "subPermissions": ["m3_okapi_ps1"]
+    },
+    {
+      "permissionName": "m4_okapi_ps1",
+      "displayName": "Test Module #4: Okapi Permission #1"
+    },
+    {
+      "permissionName": "m4_okapi.all",
+      "displayName": "Test Module #4: All permissions",
+      "subPermissions": ["m4_okapi_ps1"]
+    },
+    {
+      "permissionName": "m5_okapi_ps1",
+      "displayName": "Test Module #5: Okapi Permission #1"
+    },
+    {
+      "permissionName": "m5_okapi.all",
+      "displayName": "Test Module #5: All permissions",
+      "subPermissions": ["m5_okapi_ps1"]
+    },
+    {
+      "permissionName": "m6_okapi_ps1",
+      "displayName": "Test Module #6: Okapi Permission #1"
+    },
+    {
+      "permissionName": "m6_okapi.all",
+      "displayName": "Test Module #6: All permissions",
+      "subPermissions": ["m6_okapi_ps1"]
+    },
+    {
+      "permissionName": "user_ps1",
+      "displayName": "PS 1",
+      "description": "PS 1 - Description",
+      "subPermissions": [
+        "m1_okapi.all",
+        "m1_okapi_ps1",
+        "user_ps2",
+        "m2_okapi.all",
+        "m2_okapi_ps1",
+        "user_ps3",
+        "m3_okapi.all",
+        "m3_okapi_ps1",
+        "user_ps4",
+        "m4_okapi.all",
+        "m4_okapi_ps1",
+        "user_ps5",
+        "m5_okapi.all",
+        "m5_okapi_ps1",
+        "user_ps6",
+        "m6_okapi.all",
+        "m6_okapi_ps1"
+      ],
+      "mutable": true
+    },
+    {
+      "permissionName": "user_ps2",
+      "displayName": "PS 2",
+      "description": "PS 2 - Description",
+      "subPermissions": [
+        "m2_okapi.all",
+        "m2_okapi_ps1",
+        "user_ps3",
+        "m3_okapi.all",
+        "m3_okapi_ps1",
+        "user_ps4",
+        "m4_okapi.all",
+        "m4_okapi_ps1",
+        "user_ps5",
+        "m5_okapi.all",
+        "m5_okapi_ps1",
+        "user_ps6",
+        "m6_okapi.all",
+        "m6_okapi_ps1"
+      ],
+      "mutable": true
+    },
+    {
+      "permissionName": "user_ps3",
+      "displayName": "PS 3",
+      "description": "PS 3 - Description",
+      "subPermissions": [
+        "m3_okapi.all",
+        "m3_okapi_ps1",
+        "user_ps4",
+        "m4_okapi.all",
+        "m4_okapi_ps1",
+        "user_ps5",
+        "m5_okapi.all",
+        "m5_okapi_ps1",
+        "user_ps6",
+        "m6_okapi.all",
+        "m6_okapi_ps1"
+      ],
+      "mutable": true
+    },
+    {
+      "permissionName": "user_ps4",
+      "displayName": "PS 4",
+      "description": "PS 4 - Description",
+      "subPermissions": [
+        "m4_okapi.all",
+        "m4_okapi_ps1",
+        "user_ps5",
+        "m5_okapi.all",
+        "m5_okapi_ps1",
+        "user_ps6",
+        "m6_okapi.all",
+        "m6_okapi_ps1"
+      ],
+      "mutable": true
+    },
+    {
+      "permissionName": "user_ps5",
+      "displayName": "PS 5",
+      "description": "PS 5 - Description",
+      "subPermissions": [
+        "m5_okapi.all",
+        "m5_okapi_ps1",
+        "user_ps6",
+        "m6_okapi.all",
+        "m6_okapi_ps1"
+      ],
+      "mutable": true
+    },
+    {
+      "permissionName": "user_ps6",
+      "displayName": "PS 6",
+      "description": "PS 6 - Description",
+      "subPermissions": ["m6_okapi.all", "m6_okapi_ps1"],
+      "mutable": true
+    }
+  ],
+  "allPermissionUsers": [
+    {
+      "id": "up_id1",
+      "userId": "user_A",
+      "permissions": ["user_ps1"]
+    }
+  ],
+  "allPermissionUsersExpanded": []
+}
