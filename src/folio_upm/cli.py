@@ -50,7 +50,8 @@ def collect_capabilities():
 @cli.command("generate-report")
 def generate_report():
     migration_strategy = Env().get_migration_strategy()
-    _log.info("Generating report for strategy: %s ...", migration_strategy)
+    strategy_name = migration_strategy
+    _log.info("Generating report for strategy: %s ...", strategy_name)
     SystemRolesProvider().print_system_roles()
 
     storage_service = TenantStorageService()
@@ -59,10 +60,10 @@ def generate_report():
     analysis_result = LoadResultAnalyzer(okapi_load_result, eureka_load_result).get_results()
     workbook = XlsxReportProvider(analysis_result).generate_report()
 
-    result_fn = f"{mixed_analysis_result_fn}-{migration_strategy.get_name()}"
+    result_fn = f"{mixed_analysis_result_fn}-{strategy_name}"
     storage_service.save_object(result_fn, xlsx_ext, workbook, include_ts=True)
     storage_service.save_object(result_fn, json_gz_ext, analysis_result.model_dump())
-    _log.info("Report is successfully generated for strategy: %s", migration_strategy)
+    _log.info("Report is successfully generated for strategy: %s", strategy_name)
 
 
 @cli.command("run-eureka-migration")
