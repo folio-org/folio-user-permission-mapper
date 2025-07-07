@@ -44,15 +44,15 @@ class TestDistributedLoadResultAnalyzer:
         Env().require_env.cache_clear()
 
     @pytest.mark.parametrize("filename", TestDataProvider.get_data())
-    def test_distributed_strategy(self, filename):
-        os.environ["EUREKA_ROLE_LOAD_STRATEGY"] = DISTRIBUTED.get_name()
-        self.perform_test(filename, DISTRIBUTED)
-        del os.environ["EUREKA_ROLE_LOAD_STRATEGY"]
-
-    @pytest.mark.parametrize("filename", TestDataProvider.get_data())
     def test_consolidated_strategy(self, filename):
         os.environ["EUREKA_ROLE_LOAD_STRATEGY"] = CONSOLIDATED.get_name()
         self.perform_test(filename, CONSOLIDATED)
+        del os.environ["EUREKA_ROLE_LOAD_STRATEGY"]
+
+    @pytest.mark.parametrize("filename", TestDataProvider.get_data())
+    def test_distributed_strategy(self, filename):
+        os.environ["EUREKA_ROLE_LOAD_STRATEGY"] = DISTRIBUTED.get_name()
+        self.perform_test(filename, DISTRIBUTED)
         del os.environ["EUREKA_ROLE_LOAD_STRATEGY"]
 
     @staticmethod

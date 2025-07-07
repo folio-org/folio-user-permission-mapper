@@ -71,7 +71,7 @@ def run_eureka_migration():
     _log.info("Running eureka migration for strategy: %s ...", migration_strategy)
     result_fn = f"{mixed_analysis_result_fn}-{migration_strategy}"
     storage_service = TenantStorageService()
-    analysis_result_dict = storage_service.get_object(result_fn, json_gz_ext)
+    analysis_result_dict = storage_service.require_object(result_fn, json_gz_ext)
     analysis_result = AnalysisResult(**analysis_result_dict)
     migration_result = EurekaMigrationService().migrate_to_eureka(analysis_result)
     migration_result_report = MigrationResultService(migration_result).generate_report()
