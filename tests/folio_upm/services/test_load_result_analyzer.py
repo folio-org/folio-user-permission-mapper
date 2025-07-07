@@ -64,6 +64,7 @@ class TestDistributedLoadResultAnalyzer:
         expected_dict = JsonUtils.read_file(_Utils.get_file_key(expected_file_key))
         Assert.compare_json_str(expected_dict, _Utils.to_comparable_json(actual))
 
+
 class Assert:
 
     @staticmethod
@@ -88,7 +89,7 @@ class _Utils:
         return {
             "roles": [{"name": r.role.name, "description": r.role.description} for r in rs.roles.values()],
             "roleUsers": [x.model_dump() for x in rs.roleUsers],
-            "roleCapabilities": role_capabilities
+            "roleCapabilities": role_capabilities,
         }
 
     @staticmethod

@@ -59,7 +59,8 @@
           "subPermissions": ["m4_okapi_ps1"]
         }
       ]
-    }, {
+    },
+    {
       "id": "mod-test5-1.0.0",
       "name": "Test Module #5",
       "permissionSets": [
