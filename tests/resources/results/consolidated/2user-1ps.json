@@ -17,7 +17,7 @@
   "roleCapabilities": [
     {
       "roleName": "PS 1",
-      "ps": "m1_okapi.all"
+      "ps": ["m1_okapi.all"]
     }
   ]
 }

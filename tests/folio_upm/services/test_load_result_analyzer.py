@@ -5,9 +5,11 @@ import pytest
 from folio_upm.dto.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
 from folio_upm.dto.results import AnalysisResult, EurekaLoadResult, OkapiLoadResult
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
+from folio_upm.services.permission_analyzer import PermissionAnalyzer
 from folio_upm.utils import log_factory
 from folio_upm.utils.file_utils import FileUtils
 from folio_upm.utils.json_utils import JsonUtils
+from folio_upm.utils.sub_ps_helper import SubPermissionsHelper
 
 _dir_name = os.path.dirname(__file__)
 _log = log_factory.get_logger("TestDistributedLoadResultAnalyzer")
@@ -61,14 +63,6 @@ class TestDistributedLoadResultAnalyzer:
         expected_dict = JsonUtils.read_file(_Utils.get_file_key(expected_file_key))
         Assert.compare_json_str(expected_dict, _Utils.to_comparable_json(actual))
 
-    @staticmethod
-    def print_data():
-        file_name = _Utils.get_file_key("../../resources/tmp/fs09000000-okapi-permissions.json.gz")
-        binary_json_gz = FileUtils.read_binary_data(file_name)
-        json_dict = JsonUtils.from_json_gz(binary_json_gz)
-        print(len(json_dict.keys()))
-
-
 class Assert:
 
     @staticmethod
@@ -88,14 +82,12 @@ class _Utils:
 
     @staticmethod
     def to_comparable_json(rs: AnalysisResult) -> dict:
+        role_capabilities = _Utils.__get_role_capabilities(rs)
+
         return {
             "roles": [{"name": r.role.name, "description": r.role.description} for r in rs.roles.values()],
             "roleUsers": [x.model_dump() for x in rs.roleUsers],
-            "roleCapabilities": [
-                {"roleName": rc.roleName, "ps": ch.permissionName}
-                for rc in rs.roleCapabilities
-                for ch in rc.capabilities
-            ],
+            "roleCapabilities": role_capabilities
         }
 
     @staticmethod
@@ -119,3 +111,15 @@ class _Utils:
     @staticmethod
     def get_file_key(filename: str) -> str:
         return str(os.path.join(_dir_name, filename))
+
+    @staticmethod
+    def __get_role_capabilities(rs):
+        role_capabilities = {}
+        for rch in rs.roleCapabilities:
+            role_name = rch.roleName
+            for ch in rch.capabilities:
+                if role_name not in role_capabilities:
+                    role_capabilities[role_name] = []
+                role_capabilities[role_name].append(ch.permissionName)
+        role_capabilities = [{"roleName": role_name, "ps": pss} for role_name, pss in role_capabilities.items()]
+        return role_capabilities

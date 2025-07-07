@@ -15,7 +15,7 @@ class SubPermissionsHelper:
         self._ps_analysis_result = ps_analysis_result
         self._parent_ps_names = dict[str, OrderedSet[str]]()
 
-    def get_flatted_sub_pss(self, permission_name) -> list[ExpandedPermissionSet]:
+    def expand_sub_ps(self, permission_name) -> list[ExpandedPermissionSet]:
         self._parent_ps_names = dict[str, OrderedSet[str]]()
         ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
         analyzed_ps = self._ps_analysis_result[ps_type].get(permission_name)

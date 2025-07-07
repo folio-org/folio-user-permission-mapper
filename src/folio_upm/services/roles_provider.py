@@ -41,7 +41,7 @@ class RolesProvider:
         role = Role(name=name and name.strip(), description=description)
         source_ps_name = analyzed_ps.permissionName
 
-        expanded_sub_permissions = SubPermissionsHelper(self._ps_analysis_result).get_flatted_sub_pss(source_ps_name)
+        expanded_sub_permissions = SubPermissionsHelper(self._ps_analysis_result).expand_sub_ps(source_ps_name)
         is_system_generated = SystemRolesProvider().has_system_generated_ps(source_ps_name)
         if is_system_generated:
             role_name = SystemRolesProvider().get_eureka_role_name(source_ps_name)

@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from folio_upm.dto.eureka import UserRoles
+from folio_upm.dto.eureka_load_strategy import CONSOLIDATED
 from folio_upm.dto.results import AnalyzedRole, PermissionAnalysisResult
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
@@ -21,7 +22,7 @@ class UserRolesProvider:
     def __collect_user_roles(self) -> List[UserRoles]:
         strategy = Env().get_migration_strategy()
         user_roles = self.__get_user_roles()
-        if strategy == "consolidated":
+        if strategy == CONSOLIDATED:
             return self.__get_consolidated_user_roles(user_roles)
         return self.__get_distributed_user_roles(user_roles)
 
