@@ -5,11 +5,10 @@ import pytest
 from folio_upm.dto.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
 from folio_upm.dto.results import AnalysisResult, EurekaLoadResult, OkapiLoadResult
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
-from folio_upm.services.permission_analyzer import PermissionAnalyzer
 from folio_upm.utils import log_factory
 from folio_upm.utils.file_utils import FileUtils
 from folio_upm.utils.json_utils import JsonUtils
-from folio_upm.utils.sub_ps_helper import SubPermissionsHelper
+from folio_upm.utils.upm_env import Env
 
 _dir_name = os.path.dirname(__file__)
 _log = log_factory.get_logger("TestDistributedLoadResultAnalyzer")
@@ -41,6 +40,8 @@ class TestDistributedLoadResultAnalyzer:
         os.environ["TENANT_ID"] = "test_tenant"
         yield
         del os.environ["TENANT_ID"]
+        Env().get_env.cache_clear()
+        Env().require_env.cache_clear()
 
     @pytest.mark.parametrize("filename", TestDataProvider.get_data())
     def test_distributed_strategy(self, filename):

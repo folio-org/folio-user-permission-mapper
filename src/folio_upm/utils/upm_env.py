@@ -76,3 +76,12 @@ class Env(metaclass=SingletonMeta):
         if log_result:
             self._log.info(f"Resolved value for {env_variable_name}: {env_variable_value}")
         return env_variable_value
+
+    @cache  # noqa: B950
+    def require_env(self, env_variable_name, default_value=None, log_result=True) -> str:
+        env_variable_value = os.getenv(env_variable_name, default_value)
+        if not env_variable_value:
+            raise ValueError(f"{env_variable_name} is not set")
+        if log_result:
+            self._log.info(f"Resolved value for {env_variable_name}: {env_variable_value}")
+        return env_variable_value

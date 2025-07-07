@@ -48,6 +48,7 @@ class SubPermissionsHelper:
         new_visited_ps_names = visited_ps_names | mutable_ps_names_set
 
         new_root_ps_name = ap.permissionName
+        result_set.add_all([x.permissionName for x in mutable_ps_sets])
         result_set.add_all(other_ps_names)
         for mutable_ap in mutable_ps_sets:
             result_set.add_all(self.__expand_sub_permissions(mutable_ap, new_visited_ps_names, new_root_ps_name))
