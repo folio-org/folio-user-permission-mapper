@@ -8,11 +8,12 @@ from folio_upm.utils.upm_env import Env
 
 class EurekaResultLoader:
 
-    def __init__(self, use_ref_file: bool = True):
+    def __init__(self, use_ref_file: bool = True, src_file_name: str = "eureka-capabilities"):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._tenant_storage_service = TenantStorageService()
-        self._eureka_load_result = self.__load_eureka_capabilities()
         self._use_ref_file = use_ref_file
+        self._src_file_name = src_file_name
+        self._eureka_load_result = self.__load_eureka_capabilities()
 
     def get_load_result(self) -> Optional[EurekaLoadResult]:
         if self._eureka_load_result is None:
@@ -23,7 +24,7 @@ class EurekaResultLoader:
         return self._eureka_load_result
 
     def __load_eureka_capabilities(self) -> Optional[EurekaLoadResult]:
-        eureka_load_result_dict = self._tenant_storage_service.get_object("eureka-capabilities", "json.gz")
+        eureka_load_result_dict = self._tenant_storage_service.get_object(self._src_file_name, "json.gz")
         if eureka_load_result_dict is not None:
             self._log.info("Tenant-related eureka capabilities found in storage.")
             return EurekaLoadResult(**eureka_load_result_dict)

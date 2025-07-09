@@ -49,7 +49,8 @@ def collect_capabilities():
 
 @cli.command("analyze-hash-roles")
 def analyze_hash_roles():
-    eureka_load_rs = EurekaResultLoader(use_ref_file=False).get_load_result()
+    eureka_rs_loader = EurekaResultLoader(use_ref_file=False, src_file_name=eureka_capabilities_cleanup_prep_fn)
+    eureka_load_rs = eureka_rs_loader.get_load_result()
     if eureka_load_rs is None:
         __collect_capabilities(eureka_capabilities_cleanup_prep_fn)
     # hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
@@ -101,8 +102,8 @@ def download_json(source_file, out_file):
 
 
 @cli.command("explain-permissions")
-@click.option("--name", "-n", type=str, default=None)
-@click.option("--file", "-f", type=str, default=None)
+@click.option("--name", "-n", type=str, default=None, help="Name of the permission to explain")
+@click.option("--file", "-f", type=str, default=None, help="File containing permission names to explain")
 def explain_permissions(name, file):
     """Explain a permission by its name."""
     _log.info("Explaining permission: %s", name)
