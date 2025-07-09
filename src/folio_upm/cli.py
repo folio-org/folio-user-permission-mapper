@@ -89,8 +89,8 @@ def run_eureka_migration():
 
 
 @cli.command("download-json")
-@click.argument("source_file", type=str, help="The source file key in the storage.")
-@click.argument("out_file", type=str, help="The output file path where the JSON will be saved.")
+@click.argument("source_file", type=str)
+@click.argument("out_file", type=str)
 def download_json(source_file, out_file):
     storage_service = TenantStorageService()
     analysis_result_dict = storage_service.get_ref_object_by_key(source_file)
@@ -101,18 +101,8 @@ def download_json(source_file, out_file):
 
 
 @cli.command("explain-permissions")
-@click.option(
-    param_decls=["--name", "-n"],
-    type=str,
-    default=None,
-    help="Name of the permission name (or display name) to explain.",
-)
-@click.option(
-    param_decls=["--file", "-f"],
-    type=str,
-    default=None,
-    help="File containing permission names (or display names) to explain, one per line.",
-)
+@click.option("--name", "-n", type=str, default=None)
+@click.option("--file", "-f", type=str, default=None)
 def explain_permissions(name, file):
     """Explain a permission by its name."""
     _log.info("Explaining permission: %s", name)
@@ -137,6 +127,7 @@ def __collect_capabilities(result_fn: str):
     storage_service = TenantStorageService()
     capability_load_result = CapabilitiesLoader().load_capabilities()
     storage_service.save_object(result_fn, json_gz_ext, capability_load_result)
+
 
 if __name__ == "__main__":
     try:
