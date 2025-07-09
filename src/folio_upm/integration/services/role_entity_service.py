@@ -8,7 +8,7 @@ from folio_upm.dto.eureka import Role
 from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory
-from folio_upm.utils.common_utils import CqlQueryUtils
+from folio_upm.utils.cql_query_utils import CqlQueryUtils
 from folio_upm.utils.loading_utils import PartitionedDataLoader
 from folio_upm.utils.ordered_set import OrderedSet
 
@@ -53,10 +53,11 @@ class RoleEntityService(metaclass=SingletonMeta):
         role_name = role.name
         resp = err.response
         response_text = resp.text or ""
-        self._log.warn("Failed to create role-%s for role '%s': %s", self._name, role_name, err)
         if resp.status_code == 400 and "Relation already exists for role" in response_text:
             self._log.info("Handling existing entities in role-%s for role '%s'", self._name, role_name)
             return self.__handle_existing_entities_response(role, entity_ids, err)
+        msg_template = "Failed to create role-%s for role '%s': %s, responseBody: %s"
+        self._log.warn(msg_template, self._name, role_name, err, err.response.text)
         return self.__create_error_result(role, entity_ids, err)
 
     def __handle_existing_entities_response(self, role, entity_ids, err):

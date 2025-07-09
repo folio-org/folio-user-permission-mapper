@@ -1,4 +1,5 @@
-from folio_upm.utils.common_utils import CqlQueryUtils, IterableUtils
+from folio_upm.utils.common_utils import IterableUtils
+from folio_upm.utils.cql_query_utils import CqlQueryUtils
 from folio_upm.utils.ordered_set import OrderedSet
 
 

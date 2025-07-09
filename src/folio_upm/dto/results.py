@@ -1,17 +1,16 @@
-from collections import OrderedDict
-from typing import List, Optional
-from typing import OrderedDict as OrdDict
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, field_serializer
 
-from folio_upm.dto.eureka import Capability, CapabilitySet, Role, RoleUsers, UserPermission, UserRoles
+from folio_upm.dto.eureka import Capability, CapabilitySet, Role, UserPermission, UserRoles
 from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet
+from folio_upm.dto.permission_type import SUPPORTED_PS_TYPES, PermissionType
 from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet, RoleCapabilitiesHolder
 from folio_upm.utils.ordered_set import OrderedSet
 
 
-class LoadResult(BaseModel):
+class OkapiLoadResult(BaseModel):
     okapiPermissions: List[ModuleDescriptor] = []
     allPermissions: List[PermissionSet] = []
     allPermissionsExpanded: List[PermissionSet] = []
@@ -24,50 +23,50 @@ class EurekaLoadResult(BaseModel):
 
 
 class PermissionAnalysisResult(BaseModel):
-    mutable: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
-    okapi: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
-    invalid: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
-    deprecated: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
-    questionable: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
-    unprocessed: OrdDict[str, AnalyzedPermissionSet] = OrderedDict()
+    mutable: Dict[str, AnalyzedPermissionSet] = {}
+    okapi: Dict[str, AnalyzedPermissionSet] = {}
+    invalid: Dict[str, AnalyzedPermissionSet] = {}
+    deprecated: Dict[str, AnalyzedPermissionSet] = {}
+    questionable: Dict[str, AnalyzedPermissionSet] = {}
+    unprocessed: Dict[str, AnalyzedPermissionSet] = {}
     systemPermissionNames: OrderedSet[str] = []
-    _all_types: List[str] = ["mutable", "invalid", "deprecated", "questionable", "unprocessed", "okapi"]
 
-    def __getitem__(self, key: str) -> Optional[OrdDict[str, "AnalyzedPermissionSet"]]:
-        if key not in self._all_types:
-            return OrderedDict()
-        return getattr(self, key)
+    def __getitem__(self, ps_type: PermissionType) -> Optional[Dict[str, "AnalyzedPermissionSet"]]:
+        if ps_type not in SUPPORTED_PS_TYPES:
+            return {}
+        return getattr(self, ps_type.get_name())
 
-    def identify_permission_type(self, ps_name: str) -> Optional[str]:
-        for ps_type in self._all_types:
-            if ps_name in getattr(self, ps_type):
-                return ps_type
-        return "unknown"
+    def identify_permission_type(self, ps_name: str) -> PermissionType:
+        for ps_type in SUPPORTED_PS_TYPES:
+            key = ps_type.get_name()
+            if ps_name in getattr(self, key):
+                return PermissionType.from_string(key)
+        return PermissionType.UNKNOWN
 
-    def get_types(self):
-        return self._all_types
+    @staticmethod
+    def get_supported_types() -> List[PermissionType]:
+        return SUPPORTED_PS_TYPES
 
 
 class UserStatistics(BaseModel):
     userId: str
     mutablePermissionSetsCount: int
-    invalidPermissionSetsCount: int
     okapiPermissionSetsCount: int
+    invalidPermissionSetsCount: int
     deprecatedPermissionSetsCount: int
     allPermissionSetsCount: int
 
 
 class AnalyzedRole(BaseModel):
     role: Role
-    users: OrderedSet[str]
     permissionSets: List[ExpandedPermissionSet]
     source: str
-    systemGenerated: bool
-    originalPermissionsCount: int
-    totalPermissionsCount: int
-
-    def get_assigned_users_count(self) -> int:
-        return len(self.users)
+    users: OrderedSet[str]
+    usersCount: int = 0
+    systemGenerated: bool = False
+    capabilitiesCount: int = 0
+    originalPermissionsCount: int = 0
+    expandedPermissionsCount: int = 0
 
     def get_total_permissions_count(self) -> int:
         return len(self.permissionSets)
@@ -80,7 +79,7 @@ class AnalyzedRole(BaseModel):
 class PsStatistics(BaseModel):
     name: str
     displayNames: List[str]
-    type: str
+    permissionType: str = None
     uniqueSources: List[str]
     refCount: int
     note: Optional[str]
@@ -105,10 +104,13 @@ class PsStatistics(BaseModel):
     def get_uq_display_names_str(self) -> str:
         return "\n".join(sorted(self.displayNames))
 
+    def get_permission_type_name(self) -> str:
+        return PermissionType.from_string(self.permissionType).get_visible_name()
+
 
 class AnalyzedParentPermSets(BaseModel):
     permissionName: str
-    permissionType: str
+    permissionType: str = None
     displayName: Optional[str] = None
     parentPermissionName: str
     parentDisplayName: Optional[str] = None
@@ -116,10 +118,15 @@ class AnalyzedParentPermSets(BaseModel):
     parentPsSources: OrderedSet[str]
 
     def get_parent_types_str(self):
-        return ", ".join(sorted(self.parentPsTypes)) or "not found"
+        sorted_types = sorted(self.parentPsTypes)
+        visible_parent_types = [PermissionType.from_string(p).get_visible_name() for p in sorted_types]
+        return ", ".join(visible_parent_types) or "not found"
 
     def get_parent_sources_str(self):
         return ", ".join(sorted(self.parentPsSources))
+
+    def get_permission_type_name(self) -> str:
+        return PermissionType.from_string(self.permissionType).get_visible_name()
 
     @field_serializer("parentPsTypes", "parentPsSources")
     def serialize_ordered_set(self, value: OrderedSet[str]) -> List[str]:
@@ -128,8 +135,12 @@ class AnalyzedParentPermSets(BaseModel):
 
 class AnalyzedUserPermissionSet(BaseModel):
     userId: str
-    psName: str
-    psType: Optional[str]
+    permissionName: str
+    displayName: Optional[str] = None
+    permissionType: Optional[str] = None
+
+    def get_permission_type_name(self) -> str:
+        return PermissionType.from_string(self.permissionType).get_visible_name()
 
 
 class AnalyzedRoleCapabilities(BaseModel):
@@ -144,7 +155,7 @@ class AnalysisResult(BaseModel):
     userStatistics: List[UserStatistics]
     userPermissionSets: List[AnalyzedUserPermissionSet]
     permSetNesting: List[AnalyzedParentPermSets]
-    roles: OrdDict[str, AnalyzedRole]
+    roles: Dict[str, AnalyzedRole]
     roleUsers: List[UserRoles]
     roleCapabilities: List[RoleCapabilitiesHolder]
 

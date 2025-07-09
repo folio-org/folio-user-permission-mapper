@@ -1,4 +1,3 @@
-import os
 from io import BytesIO
 
 from openpyxl.workbook import Workbook
@@ -7,6 +6,7 @@ from typing_extensions import override
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.storage.tenant_storage import TenantStorage
 from folio_upm.utils import log_factory
+from folio_upm.utils.file_utils import FileUtils
 from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env
 from folio_upm.utils.xlsx_utils import XlsxUtils
@@ -43,36 +43,10 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
         self.__write_binary_data(file_key, object_data)
 
     def __write_binary_data(self, file_key, binary_data: BytesIO):
-        self.__create_temp_directory()
+        FileUtils.create_directory_safe(self._out_folder)
         file = f"{self._out_folder}/{file_key}"
-        self._log.debug("Saving file: '%s' ...", file)
-
-        if self.__file_exists(file_key):
-            self._log.debug("File '%s' already exists, overriding it", file)
-
-        with open(file, "wb") as f:
-            binary_data.seek(0)
-            f.write(binary_data.getbuffer())
-            self._log.debug("Data saved to file '%s'", file)
+        FileUtils.write_binary_data(file, binary_data)
 
     def __read_binary_data(self, file_key) -> BytesIO | None:
         file = f"{self._out_folder}/{file_key}"
-        if not os.path.exists(file):
-            self._log.warn("File '%s' not found", file)
-            return None
-
-        with open(file, "rb") as f:
-            file_bytes_buffer = BytesIO(f.read())
-            file_bytes_buffer.seek(0)
-            self._log.debug("Returning file: '%s'", file)
-            return file_bytes_buffer
-
-    def __create_temp_directory(self):
-        directory = f"{self._out_folder}/{self._tenant_id}"
-        if not os.path.exists(directory):
-            self._log.debug("Creating directory: %s", directory)
-            os.makedirs(directory)
-        return directory
-
-    def __file_exists(self, file_key):
-        return os.path.exists(f"{self._out_folder}/{file_key}")
+        return FileUtils.read_binary_data(file)

@@ -14,9 +14,9 @@ class S3Storage(metaclass=SingletonMeta):
 
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
-        self._log.debug("S3Client initialized.")
         self._bucket = Env().get_s3_bucket()
         self._s3_client = self.__init_client()
+        self._log.debug("S3Client initialized.")
 
     def upload_file(self, path, file_obj: BytesIO, override: bool = True):
         file_obj.seek(0)

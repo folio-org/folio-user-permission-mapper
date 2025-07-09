@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integration.clients.okapi_client import OkapiClient
 from folio_upm.utils import log_factory
@@ -18,16 +16,16 @@ class OkapiService(metaclass=SingletonMeta):
         for descriptor in module_descriptors:
             permission_sets = descriptor.get("permissionSets", [])
             module_id = descriptor.get("id")
-
             if not permission_sets:
                 self._log.debug(f"No permission sets found for module: {module_id}")
-            value = OrderedDict(
-                {
-                    "id": descriptor.get("id"),
-                    "name": descriptor.get("name"),
-                    "permissionSets": descriptor.get("permissionSets", []),
-                }
-            )
-            result.append(value)
+            result.append(self.__get_value(descriptor))
 
         return result
+
+    @staticmethod
+    def __get_value(descriptor):
+        return {
+            "id": descriptor.get("id"),
+            "name": descriptor.get("name"),
+            "permissionSets": descriptor.get("permissionSets", []),
+        }

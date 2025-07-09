@@ -1,10 +1,11 @@
 import os
-from functools import lru_cache
+from functools import cache
 from typing import Optional
 
 import dotenv
 
 from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.dto.eureka_load_strategy import EurekaLoadStrategy
 from folio_upm.utils import log_factory
 from folio_upm.utils.service_utils import ServiceUtils
 
@@ -47,12 +48,13 @@ class Env(metaclass=SingletonMeta):
         str_var = self.get_env(env_variable_name, str(default_value))
         return ServiceUtils.parse_bool(str_var, default_value)
 
-    def get_migration_strategy(self):
-        resolved_strategy = self.get_env("EUREKA_ROLE_LOAD_STRATEGY", default_value="distributed")
-        allowed_values = {"distributed", "consolidated"}
-        if resolved_strategy not in allowed_values:
+    def get_migration_strategy(self) -> EurekaLoadStrategy:
+        resolved_strategy_name = self.get_env("EUREKA_ROLE_LOAD_STRATEGY", default_value="distributed")
+        eureka_load_strategy = EurekaLoadStrategy.from_string(resolved_strategy_name)
+        if eureka_load_strategy is None:
+            allowed_values = EurekaLoadStrategy.get_names()
             raise ValueError(f"Invalid role migration strategy provided. Allowed values are: {allowed_values}.")
-        return resolved_strategy
+        return eureka_load_strategy
 
     def get_enabled_storages(self):
         storages = self.get_env("ENABLED_STORAGES", default_value="local")
@@ -62,7 +64,7 @@ class Env(metaclass=SingletonMeta):
             raise ValueError(f"Invalid storages: '{parsed_storages}'. Allowed values are: {allowed_values}'.")
         return parsed_storages
 
-    @lru_cache(maxsize=100)
+    @cache  # noqa: B019
     def get_env(self, env_variable_name, default_value: str | None = None, log_result=True) -> Optional[str]:
         env_variable_value = os.getenv(env_variable_name)
         if env_variable_value is None:
@@ -75,7 +77,7 @@ class Env(metaclass=SingletonMeta):
             self._log.info(f"Resolved value for {env_variable_name}: {env_variable_value}")
         return env_variable_value
 
-    @lru_cache(maxsize=100)
+    @cache  # noqa: B019
     def require_env(self, env_variable_name, default_value=None, log_result=True) -> str:
         env_variable_value = os.getenv(env_variable_name, default_value)
         if not env_variable_value:

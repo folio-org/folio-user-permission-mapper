@@ -1,0 +1,44 @@
+{
+  "roles": [
+    {
+      "name": "PS 1",
+      "description": "PS 1 - Description"
+    },
+    {
+      "name": "PS 2",
+      "description": "PS 2 - Description"
+    },
+    {
+      "name": "PS 2.1",
+      "description": "PS 2.1 - Description"
+    }
+  ],
+  "roleUsers": [
+    {
+      "userId": "user_A",
+      "roles": ["PS 1"]
+    },
+    {
+      "userId": "user_B",
+      "roles": ["PS 1"]
+    },
+    {
+      "userId": "user_C",
+      "roles": ["PS 1", "PS 2", "PS 2.1"]
+    }
+  ],
+  "roleCapabilities": [
+    {
+      "roleName": "PS 1",
+      "ps": ["m1_okapi.all"]
+    },
+    {
+      "roleName": "PS 2",
+      "ps": ["m2_okapi.all"]
+    },
+    {
+      "roleName": "PS 2.1",
+      "ps": ["m3_okapi.all"]
+    }
+  ]
+}

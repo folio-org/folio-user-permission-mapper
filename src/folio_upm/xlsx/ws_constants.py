@@ -1,6 +1,6 @@
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
-almost_white = "f2f2f2"
+almost_white = "fafafa"
 light_red = "ffe1e5"
 light_gray = "bababa"
 lightest_gray = "d9d9d9"

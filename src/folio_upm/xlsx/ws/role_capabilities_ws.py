@@ -1,13 +1,12 @@
-from typing import Optional
-from typing import OrderedDict as OrdDict
-from typing import override
+from typing import Dict, Optional, override
 
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
+from folio_upm.dto.permission_type import DEPRECATED, INVALID, MUTABLE, QUESTIONABLE, UNPROCESSED
 from folio_upm.dto.support import RoleCapabilitiesHolder
-from folio_upm.xlsx import constants
+from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
@@ -32,21 +31,20 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
         Column[RoleCapabilityRow](w=60, n="Role Name", f=lambda x: x.roleName),
         Column[RoleCapabilityRow](w=80, n="PS Name", f=lambda x: x.source),
         Column[RoleCapabilityRow](w=80, n="PS Display Name", f=lambda x: x.sourceDisplayName),
+        Column[RoleCapabilityRow](w=20, n="Match Status", f=lambda x: x.resolvedType),
         Column[RoleCapabilityRow](w=18, n="PS Type", f=lambda x: x.sourceType),
         Column[RoleCapabilityRow](w=80, n="Expanded From", f=lambda x: x.expandedFrom),
-        Column[RoleCapabilityRow](w=20, n="Map Target", f=lambda x: x.resolvedType),
         Column[RoleCapabilityRow](w=60, n="Capability Name", f=lambda x: x.name),
         Column[RoleCapabilityRow](w=60, n="Capability Resource", f=lambda x: x.resource),
         Column[RoleCapabilityRow](w=60, n="Capability Action", f=lambda x: x.action),
         Column[RoleCapabilityRow](w=22, n="Capability Type", f=lambda x: x.capabilityType),
     ]
 
-    def __init__(self, ws: Worksheet, data: OrdDict[str, RoleCapabilitiesHolder]):
+    def __init__(self, ws: Worksheet, data: Dict[str, RoleCapabilitiesHolder]):
         super().__init__(ws, self._title, data, self._columns)
 
-        self._red_types = ["invalid", "mutable"]
-        self._yellow_types = ["deprecated", "questionable", "unprocessed"]
-        self._yellow_res_types = ["deprecated", "questionable", "unprocessed"]
+        self._red_types = [INVALID, MUTABLE]
+        self._yellow_types = [DEPRECATED, QUESTIONABLE, UNPROCESSED]
 
     @override
     def _get_iterable_data(self):
@@ -56,11 +54,11 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
                 resolvedType=capability.resolvedType,
                 source=capability.permissionName,
                 sourceDisplayName=capability.displayName,
-                sourceType=capability.permissionType,
+                sourceType=capability.get_permission_type_name(),
                 name=capability.name,
                 resource=capability.resource,
                 action=capability.action,
-                expandedFrom=capability.expandedFrom,
+                expandedFrom=", ".join(capability.expandedFrom),
                 excluded=False,
                 capabilityType=capability.capabilityType,
             )
@@ -71,7 +69,7 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
     @override
     def _get_row_fill_color(self, value: RoleCapabilityRow) -> Optional[PatternFill]:
         if value.sourceType in self._red_types or value.sourceType is None:
-            return constants.light_red_fill
-        if value.excluded or (value.sourceType in self._yellow_types) or value.resolvedType == "unknown":
-            return constants.light_yellow_fill
-        return constants.almost_white_fill
+            return ws_constants.light_red_fill
+        if value.excluded or (value.sourceType in self._yellow_types) or value.resolvedType == "not_found":
+            return ws_constants.light_yellow_fill
+        return ws_constants.almost_white_fill

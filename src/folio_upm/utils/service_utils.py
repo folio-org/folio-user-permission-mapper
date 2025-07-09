@@ -6,6 +6,12 @@ from folio_upm.dto.okapi import PermissionSet
 class ServiceUtils:
 
     @staticmethod
+    def bool_to_char(value: bool | None) -> chr:
+        if value is None:
+            return chr(0x003F)
+        return chr(0x2705) if value else chr(0x2BBD)
+
+    @staticmethod
     def parse_bool(value: str, default_val: bool) -> bool:
         if not value:
             return default_val

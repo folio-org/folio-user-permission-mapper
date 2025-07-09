@@ -1,4 +1,5 @@
-from folio_upm.dto.results import LoadResult, PermissionAnalysisResult, UserStatistics
+from folio_upm.dto.permission_type import DEPRECATED, INVALID, MUTABLE, OKAPI
+from folio_upm.dto.results import OkapiLoadResult, PermissionAnalysisResult, UserStatistics
 
 
 class UserStatsCollector:
@@ -16,7 +17,7 @@ class UserStatsCollector:
     The statistics are computed by analyzing the user's permissions and classifying each permission set type.
     """
 
-    def __init__(self, load_result: LoadResult, ps_analysis_result: PermissionAnalysisResult):
+    def __init__(self, load_result: OkapiLoadResult, ps_analysis_result: PermissionAnalysisResult):
         self._all_type = "all"
         self._load_result = load_result
         self._ps_analysis_result = ps_analysis_result
@@ -37,17 +38,17 @@ class UserStatsCollector:
         for ps_name in user_permission.permissions:
             ps_type = self._ps_analysis_result.identify_permission_type(ps_name)
             if ps_type not in counts:
-                counts[ps_type] = 0
+                counts[ps_type.get_name()] = 0
             if self._all_type not in counts:
                 counts[self._all_type] = 0
-            counts[ps_type] += 1
+            counts[ps_type.get_name()] += 1
             counts[self._all_type] += 1
 
         return UserStatistics(
             userId=user_permission.userId,
-            mutablePermissionSetsCount=counts.get("mutable", 0),
-            invalidPermissionSetsCount=counts.get("invalid", 0),
-            okapiPermissionSetsCount=counts.get("okapi", 0),
-            deprecatedPermissionSetsCount=counts.get("deprecated", 0),
+            mutablePermissionSetsCount=counts.get(MUTABLE.get_name(), 0),
+            invalidPermissionSetsCount=counts.get(INVALID.get_name(), 0),
+            okapiPermissionSetsCount=counts.get(OKAPI.get_name(), 0),
+            deprecatedPermissionSetsCount=counts.get(DEPRECATED.get_name(), 0),
             allPermissionSetsCount=counts.get(self._all_type, 0),
         )

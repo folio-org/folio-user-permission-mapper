@@ -1,11 +1,10 @@
 import re
-from collections import OrderedDict
 from typing import List
 
 import requests
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import Role, RoleUsers, UserRoles
+from folio_upm.dto.eureka import Role, UserRoles
 from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.integration.services.role_service import RoleService
@@ -63,11 +62,12 @@ class RoleUsersService(metaclass=SingletonMeta):
 
     def __handle_error_response(self, user_id, role_ids, roles_by_id: dict[str, Role], err):
         resp = err.response
-        self._log.warn("Failed to create user-roles for user '%s': %s", user_id, err)
         response_text = resp.text or ""
         if resp.status_code == 400 and "Relations between user and roles already exists" in response_text:
             self._log.info("Handling existing user-role relations for user '%s'", user_id)
             return self.__handle_existing_roles_response(user_id, role_ids, roles_by_id, err)
+        msg_template = "Failed to create user-roles for user '%s': %s, responseBody: %s"
+        self._log.warn(msg_template, user_id, err, err.response.text)
         return self.__create_err_result(user_id, role_ids, roles_by_id, err)
 
     def __handle_existing_roles_response(self, user_id, role_ids, roles_by_id, err):
@@ -123,7 +123,7 @@ class RoleUsersService(metaclass=SingletonMeta):
 
     @staticmethod
     def __collect_roles_by_id(roles: List[Role]):
-        roles_by_ids = OrderedDict()
+        roles_by_ids = dict[str, Role]()
         for role in roles:
             if role.id not in roles_by_ids:
                 roles_by_ids[role.id] = role
