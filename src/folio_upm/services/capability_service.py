@@ -9,7 +9,7 @@ class CapabilityService:
 
     def __init__(self, eureka_load_result: EurekaLoadResult):
         self._eureka_load_result = eureka_load_result
-        if self._eureka_load_result:
+        if self._eureka_load_result is not None:
             self._capabilities_by_name = self.__get_capabilities_by_name()
             self._capability_sets_by_name = self.__get_capability_sets_by_name()
         else:

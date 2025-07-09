@@ -2,7 +2,16 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, field_serializer
 
-from folio_upm.dto.eureka import Capability, CapabilitySet, Role, UserPermission, UserRoles
+from folio_upm.dto.eureka import (
+    Capability,
+    CapabilitySet,
+    Role,
+    UserPermission,
+    UserRoles,
+    RoleCapability,
+    RoleCapabilitySet,
+    UserRole,
+)
 from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet
 from folio_upm.dto.permission_type import SUPPORTED_PS_TYPES, PermissionType
@@ -18,6 +27,10 @@ class OkapiLoadResult(BaseModel):
 
 
 class EurekaLoadResult(BaseModel):
+    roles: List[Role] = []
+    roleCapabilities: List[RoleCapability] = []
+    roleCapabilitySets: List[RoleCapabilitySet] = []
+    roleUsers: List[UserRole] = []
     capabilities: List[Capability] = []
     capabilitySets: List[CapabilitySet] = []
 
@@ -164,3 +177,9 @@ class EurekaMigrationResult(BaseModel):
     roles: List[EntityMigrationResult] = []
     roleUsers: List[EntityMigrationResult] = []
     roleCapabilities: List[EntityMigrationResult] = []
+
+
+class HashRoleAnalysisResult(BaseModel):
+    roles: List[Role]
+    roleCapabilities: List[UserStatistics]
+    roleUsers: List[AnalyzedUserPermissionSet]
