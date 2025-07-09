@@ -50,7 +50,7 @@ def collect_capabilities():
 @cli.command("analyze-hash-roles")
 def analyze_hash_roles():
     eureka_rs_loader = EurekaResultLoader(use_ref_file=False, src_file_name=eureka_capabilities_cleanup_prep_fn)
-    eureka_load_rs = eureka_rs_loader.get_load_result()
+    eureka_load_rs = eureka_rs_loader.find_load_result()
     if eureka_load_rs is None:
         __collect_capabilities(eureka_capabilities_cleanup_prep_fn)
     # hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
