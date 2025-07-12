@@ -1,4 +1,4 @@
-from typing import Dict, List, Set
+from typing import List, Set
 
 import requests
 
@@ -34,16 +34,16 @@ class RoleService(metaclass=SingletonMeta):
         loader = self._client.find_roles_by_query
         return PartitionedDataLoader("roles", role_names, loader, qb).load()
 
-    def create_roles(self, analyzed_roles: Dict[str, AnalyzedRole]):
+    def create_roles(self, analyzed_roles: List[AnalyzedRole]):
         self._log.info("Creating %s role(s)...", len(analyzed_roles))
         existing_role_names = self.__find_existing_roles(analyzed_roles)
         load_rs = []
-        for ar in list(analyzed_roles.values()):
+        for ar in analyzed_roles:
             load_rs.append(self.__verify_and_create_role(ar, existing_role_names))
         return load_rs
 
     def __find_existing_roles(self, analyzed_roles):
-        role_names = [ar.role.name for ar in analyzed_roles.values() if ar.role.name]
+        role_names = [ar.role.name for ar in analyzed_roles if ar.role.name]
         found_roles = self.find_roles_by_names(role_names)
         return set([role.name for role in found_roles])
 

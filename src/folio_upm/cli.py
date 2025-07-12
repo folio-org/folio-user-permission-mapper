@@ -3,8 +3,9 @@ import json
 
 import click
 
-from folio_upm.dto.results import AnalysisResult, OkapiLoadResult
+from folio_upm.dto.results import AnalysisResult, OkapiLoadResult, PreparedEurekaData
 from folio_upm.integration.services.eureka_migration_service import EurekaMigrationService
+from folio_upm.services.eureka_hash_role_analyzer import EurekaHashRoleAnalyzer
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
 from folio_upm.services.loaders.capabilities_loader import CapabilitiesLoader
 from folio_upm.services.loaders.eureka_result_loader import EurekaResultLoader
@@ -14,6 +15,7 @@ from folio_upm.storage.tenant_storage_service import TenantStorageService
 from folio_upm.utils import log_factory
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
 from folio_upm.utils.upm_env import Env
+from folio_upm.xlsx.eureka_xlsx_report_provider import EurekaXlsxReportProvider
 from folio_upm.xlsx.migration_result_service import MigrationResultService
 from folio_upm.xlsx.ps_xlsx_report_provider import PsXlsxReportProvider
 
@@ -22,6 +24,7 @@ json_gz_ext = "json.gz"
 okapi_permissions_fn = "okapi-permissions"
 eureka_capabilities_fn = "eureka-capabilities"
 eureka_capabilities_cleanup_prep_fn = "eureka-capabilities-cleanup-prep"
+eureka_clean_up_analysis_result_fn = "eureka-clean-up-analysis-result"
 mixed_analysis_result_fn = "analysis-result"
 eureka_migration_result_fn = "migration-result"
 
@@ -53,7 +56,10 @@ def analyze_hash_roles():
     eureka_load_rs = eureka_rs_loader.find_load_result()
     if eureka_load_rs is None:
         __collect_capabilities(eureka_capabilities_cleanup_prep_fn)
-    # hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
+    hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
+    workbook = EurekaXlsxReportProvider(hash_role_analysis_result).generate_report()
+    storage_service = TenantStorageService()
+    storage_service.save_object(eureka_clean_up_analysis_result_fn, xlsx_ext, workbook, include_ts=True)
 
 
 @cli.command("generate-report")
@@ -66,12 +72,15 @@ def generate_report():
     storage_service = TenantStorageService()
     okapi_load_result = OkapiLoadResult(**storage_service.require_object(okapi_permissions_fn, json_gz_ext))
     eureka_load_result = EurekaResultLoader().find_load_result()
-    analysis_result = LoadResultAnalyzer(okapi_load_result, eureka_load_result).get_results()
+    load_result_analyzer = LoadResultAnalyzer(okapi_load_result, eureka_load_result)
+    analysis_result = load_result_analyzer.get_results()
     workbook = PsXlsxReportProvider(analysis_result).generate_report()
 
     result_fn = f"{mixed_analysis_result_fn}-{strategy_name}"
     storage_service.save_object(result_fn, xlsx_ext, workbook, include_ts=True)
-    storage_service.save_object(result_fn, json_gz_ext, analysis_result.model_dump())
+
+    prepared_eureka_data = load_result_analyzer.get_prepared_eureka_data()
+    storage_service.save_object(result_fn, json_gz_ext, prepared_eureka_data.model_dump())
     _log.info("Report is successfully generated for strategy: %s", strategy_name)
 
 
@@ -82,7 +91,7 @@ def run_eureka_migration():
     result_fn = f"{mixed_analysis_result_fn}-{migration_strategy.get_name()}"
     storage_service = TenantStorageService()
     analysis_result_dict = storage_service.require_object(result_fn, json_gz_ext)
-    analysis_result = AnalysisResult(**analysis_result_dict)
+    analysis_result = PreparedEurekaData(**analysis_result_dict)
     migration_result = EurekaMigrationService().migrate_to_eureka(analysis_result)
     migration_result_report = MigrationResultService(migration_result).generate_report()
     storage_service.save_object(eureka_migration_result_fn, json_gz_ext, migration_result.model_dump())

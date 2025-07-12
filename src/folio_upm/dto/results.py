@@ -173,13 +173,13 @@ class AnalysisResult(BaseModel):
     roleCapabilities: List[RoleCapabilitiesHolder]
 
 
+class PreparedEurekaData(BaseModel):
+    roles: List[AnalyzedRole]
+    roleUsers: List[UserRoles]
+    roleCapabilities: List[RoleCapabilitiesHolder]
+
+
 class EurekaMigrationResult(BaseModel):
     roles: List[EntityMigrationResult] = []
     roleUsers: List[EntityMigrationResult] = []
     roleCapabilities: List[EntityMigrationResult] = []
-
-
-class HashRoleAnalysisResult(BaseModel):
-    roles: List[Role]
-    roleCapabilities: List[UserStatistics]
-    roleUsers: List[AnalyzedUserPermissionSet]

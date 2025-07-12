@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from folio_upm.dto.eureka import UserRoles
-from folio_upm.dto.results import AnalysisResult, EurekaLoadResult, OkapiLoadResult
+from folio_upm.dto.results import AnalysisResult, EurekaLoadResult, OkapiLoadResult, PreparedEurekaData
 from folio_upm.dto.support import RoleCapabilitiesHolder
 from folio_upm.services.collectors.parent_perm_set_collector import ParentPermSetCollector
 from folio_upm.services.collectors.perm_set_stats_collector import PermSetStatisticsCollector
@@ -27,6 +27,13 @@ class LoadResultAnalyzer:
 
     def get_results(self) -> AnalysisResult:
         return self._result
+
+    def get_prepared_eureka_data(self) -> PreparedEurekaData:
+        return PreparedEurekaData(
+            roles=list(self._result.roles.values()),
+            roleUsers=self._result.roleUsers,
+            roleCapabilities=self._result.roleCapabilities,
+        )
 
     def __analyze_results(self) -> AnalysisResult:
         load_result = self._okapi_lr

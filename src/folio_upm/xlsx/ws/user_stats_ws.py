@@ -22,7 +22,6 @@ class UserStatsWorksheet(AbstractWorksheet):
 
     def __init__(self, ws: Worksheet, data: List[UserStatistics]):
         super().__init__(ws, self._title, data, self._columns)
-        self._data = data
 
     @override
     def _get_row_fill_color(self, user_stats: UserStatistics) -> Optional[PatternFill]:

@@ -34,9 +34,19 @@ class RoleCapability(BaseModel):
     capabilityId: str
 
 
+class RoleCapabilities(BaseModel):
+    roleId: str
+    capabilityIds: List[str] = []
+
+
 class RoleCapabilitySet(BaseModel):
     roleId: str
     capabilitySetId: str
+
+
+class RoleCapabilitySets(BaseModel):
+    roleId: str
+    capabilitySetId: List[str] = []
 
 
 class Capability(BaseModel):

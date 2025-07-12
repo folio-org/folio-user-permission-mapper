@@ -30,7 +30,6 @@ class PermissionStatsWorksheet(AbstractWorksheet):
     def __init__(self, ws: Worksheet, data: List[PsStatistics]):
         super().__init__(ws, self.title, data, self._columns)
         self._yellow_types = [x.get_name() for x in [DEPRECATED, QUESTIONABLE, UNPROCESSED]]
-        self._data = data
 
     @override
     def _get_row_fill_color(self, ps_stats: PsStatistics) -> Optional[PatternFill]:

@@ -20,9 +20,8 @@ class MigrationResultWorksheet(AbstractWorksheet):
         Column[EntityMigrationResult](w=150, n="Error Response Body", f=lambda x: x.error and x.error.responseBody),
     ]
 
-    def __init__(self, ws: Worksheet, title: str, data: List[EntityMigrationResult]):
+    def __init__(self, ws: Worksheet, data: List[EntityMigrationResult], title: str):
         super().__init__(ws, title, data, self._columns)
-        self._data = data
 
     @override
     def _get_row_fill_color(self, call_rs: EntityMigrationResult) -> Optional[PatternFill]:
