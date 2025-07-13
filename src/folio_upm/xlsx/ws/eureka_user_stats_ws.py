@@ -17,7 +17,8 @@ class EurekaUserStatsWorksheet(AbstractWorksheet):
     _columns = [
         Column[EurekaUserStats](w=40, n="User Id", f=lambda x: x.userId),
         Column[EurekaUserStats](w=20, n="# Roles", f=lambda x: x.totalRoles),
-        Column[EurekaUserStats](w=30, n="# Role Capabilities", f=lambda x: x.roleCapabilities),
+        Column[EurekaUserStats](w=20, n="# Hash-Roles", f=lambda x: x.hashRoles),
+        Column[EurekaUserStats](w=25, n="# Role Capabilities", f=lambda x: x.roleCapabilities),
         Column[EurekaUserStats](w=30, n="# Role Capability Sets", f=lambda x: x.roleCapabilitySets),
         Column[EurekaUserStats](w=36, n="# Hash-Role Capabilities", f=lambda x: x.hashRoleCapabilities),
         Column[EurekaUserStats](w=25, n="# Hash-Role Capability Sets", f=lambda x: x.hashRoleCapabilitySets),

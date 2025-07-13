@@ -23,7 +23,7 @@ xlsx_ext = "xlsx"
 json_gz_ext = "json.gz"
 okapi_permissions_fn = "okapi-permissions"
 eureka_capabilities_fn = "eureka-capabilities"
-eureka_capabilities_cleanup_prep_fn = "eureka-capabilities-cleanup-prep"
+eureka_capabilities_cleanup_prep_fn = "capabilities-cleanup-prep"
 eureka_clean_up_analysis_result_fn = "eureka-clean-up-analysis-result"
 mixed_analysis_result_fn = "analysis-result"
 eureka_migration_result_fn = "migration-result"
@@ -52,10 +52,13 @@ def collect_capabilities():
 
 @cli.command("analyze-hash-roles")
 def analyze_hash_roles():
-    eureka_rs_loader = EurekaResultLoader(use_ref_file=False, src_file_name=eureka_capabilities_cleanup_prep_fn)
+    migration_strategy = Env().get_migration_strategy()
+    strategy_name = migration_strategy.get_name()
+    file_name = f"{eureka_capabilities_cleanup_prep_fn}-{strategy_name}"
+    eureka_rs_loader = EurekaResultLoader(use_ref_file=False, src_file_name=file_name)
     eureka_load_rs = eureka_rs_loader.find_load_result()
     if eureka_load_rs is None:
-        __collect_capabilities(eureka_capabilities_cleanup_prep_fn)
+        __collect_capabilities(file_name)
     hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
     workbook = EurekaXlsxReportProvider(hash_role_analysis_result).generate_report()
     storage_service = TenantStorageService()
@@ -65,7 +68,7 @@ def analyze_hash_roles():
 @cli.command("generate-report")
 def generate_report():
     migration_strategy = Env().get_migration_strategy()
-    strategy_name = migration_strategy
+    strategy_name = migration_strategy.get_name()
     _log.info("Generating report for strategy: %s ...", strategy_name)
     SystemRolesProvider().print_system_roles()
 

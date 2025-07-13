@@ -60,7 +60,7 @@ class Capability(BaseModel):
     permission: str
     endpoints: List[Endpoint] = []
     dummyCapability: bool
-    capability_type: str = Field(..., alias="type", serialization_alias="type")
+    capabilityType: str = Field(..., alias="type", serialization_alias="type")
 
 
 class CapabilitySet(BaseModel):
@@ -73,7 +73,7 @@ class CapabilitySet(BaseModel):
     moduleId: str
     permission: str
     capabilities: Optional[List[str]] = []
-    capability_type: str = Field(..., alias="type", serialization_alias="type")
+    capabilityType: str = Field(..., alias="type", serialization_alias="type")
 
 
 class UserPermission(BaseModel):

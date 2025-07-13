@@ -1,7 +1,9 @@
 from enum import Enum
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 from pydantic import BaseModel
+
+from folio_upm.dto.eureka import RoleUsers, UserRoles
 
 
 class CleanUpType(Enum):
@@ -21,6 +23,10 @@ class CleanUpType(Enum):
         return self.value[0]
 
 
+KEEP = CleanUpType.KEEP
+REMOVE = CleanUpType.REMOVE
+
+
 class UserCapabilities(BaseModel):
     allCapabilities: List[str] = []
     allCapabilitySets: List[str] = []
@@ -29,8 +35,21 @@ class UserCapabilities(BaseModel):
     hashRoleCapabilities: List[str] = []
     hashRoleCapabilitySets: List[str] = []
 
+
+class EurekaRoleCapability(BaseModel):
+    roleId: str
+    roleName: str
+    c_type: str
+    capabilityId: str
+    name: str
+    resource: str
+    action: str
+    capabilityType: str
+
+
 class EurekaUserStats(BaseModel):
     userId: str
+    hashRoles: int
     totalRoles: int
     allCapabilities: int
     allCapabilitySets: int
@@ -38,6 +57,7 @@ class EurekaUserStats(BaseModel):
     roleCapabilitySets: int
     hashRoleCapabilities: int
     hashRoleCapabilitySets: int
+
 
 class EurekaRoleStats(BaseModel):
     roleId: str
@@ -47,36 +67,16 @@ class EurekaRoleStats(BaseModel):
     capabilitiesNum: int
     capabilitySetsNum: int
 
+
 class CleanUpRole(BaseModel):
     roleId: str
     roleName: str
     isHashRole: bool = False
     type: CleanUpType = CleanUpType.KEEP
 
-class CleanUpRoleCapability(BaseModel):
-    roleId: str
-    roleName: str
-    capabilityId: str
-    type: CleanUpType = CleanUpType.KEEP
-
-class CleanUpRoleCapabilitySet(BaseModel):
-    roleId: str
-    roleName: str
-    capabilitySetId: str
-    type: CleanUpType = CleanUpType.KEEP
 
 class HashRolesAnalysisResult(BaseModel):
     userStats: List[EurekaUserStats]
     roleStats: List[EurekaRoleStats]
-    roles: List[CleanUpRole]
-    roleCapabilities: List[CleanUpRoleCapability]
-    roleCapabilitySets: List[CleanUpRoleCapabilitySet]
-
-
-class EurekaCleanUpData(BaseModel):
-    roles: List[CleanUpRole] = []
-    roleCapabilities: List[CleanUpRoleCapability] = []
-    roleCapabilitySets: List[CleanUpRoleCapabilitySet] = []
-
-KEEP = CleanUpType.KEEP
-REMOVE = CleanUpType.REMOVE
+    userRoles: List[UserRoles]
+    roleCapabilities: List[EurekaRoleCapability]
