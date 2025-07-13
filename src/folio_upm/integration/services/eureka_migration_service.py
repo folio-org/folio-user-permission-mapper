@@ -1,6 +1,5 @@
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.results import AnalysisResult, EurekaMigrationResult, PreparedEurekaData
-from folio_upm.integration.clients.eureka_client import EurekaClient
+from folio_upm.dto.results import EurekaMigrationResult, PreparedEurekaData
 from folio_upm.integration.services.role_capability_facade import RoleCapabilityFacade
 from folio_upm.integration.services.role_service import RoleService
 from folio_upm.integration.services.role_users_service import RoleUsersService

@@ -1,7 +1,4 @@
-from openpyxl import Workbook
-
 from folio_upm.dto.results import EurekaMigrationResult
-from folio_upm.utils import log_factory
 from folio_upm.xlsx.abstract_result_service import AbstractResultService, WsDef
 from folio_upm.xlsx.ws.migration_result_ws import MigrationResultWorksheet
 

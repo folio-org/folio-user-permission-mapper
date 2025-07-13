@@ -6,11 +6,11 @@ from folio_upm.dto.eureka import (
     Capability,
     CapabilitySet,
     Role,
-    UserPermission,
-    UserRoles,
     RoleCapability,
     RoleCapabilitySet,
+    UserPermission,
     UserRole,
+    UserRoles,
 )
 from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.okapi import ModuleDescriptor, PermissionSet

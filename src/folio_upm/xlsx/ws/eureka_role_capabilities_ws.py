@@ -3,7 +3,7 @@ from typing import List
 from openpyxl.worksheet.worksheet import Worksheet
 
 from folio_upm.dto.clean_up import EurekaRoleCapability
-from folio_upm.xlsx.abstract_ws import Column, AbstractWorksheet
+from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
 class EurekaRoleCapabilitiesWorksheet(AbstractWorksheet):

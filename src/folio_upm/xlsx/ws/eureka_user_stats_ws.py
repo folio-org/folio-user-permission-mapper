@@ -20,10 +20,10 @@ class EurekaUserStatsWorksheet(AbstractWorksheet):
         Column[EurekaUserStats](w=20, n="# Hash-Roles", f=lambda x: x.hashRoles),
         Column[EurekaUserStats](w=25, n="# Role Capabilities", f=lambda x: x.roleCapabilities),
         Column[EurekaUserStats](w=30, n="# Role Capability Sets", f=lambda x: x.roleCapabilitySets),
-        Column[EurekaUserStats](w=36, n="# Hash-Role Capabilities", f=lambda x: x.hashRoleCapabilities),
-        Column[EurekaUserStats](w=25, n="# Hash-Role Capability Sets", f=lambda x: x.hashRoleCapabilitySets),
-        Column[EurekaUserStats](w=30, n="# All Capabilities", f=lambda x: x.allCapabilities),
-        Column[EurekaUserStats](w=30, n="# All Capability Sets", f=lambda x: x.allCapabilitySets),
+        Column[EurekaUserStats](w=32, n="# Hash-Role Capabilities", f=lambda x: x.hashRoleCapabilities),
+        Column[EurekaUserStats](w=36, n="# Hash-Role Capability Sets", f=lambda x: x.hashRoleCapabilitySets),
+        Column[EurekaUserStats](w=25, n="# All Capabilities", f=lambda x: x.allCapabilities),
+        Column[EurekaUserStats](w=28, n="# All Capability Sets", f=lambda x: x.allCapabilitySets),
     ]
 
     def __init__(self, ws: Worksheet, data: List[EurekaUserStats]):

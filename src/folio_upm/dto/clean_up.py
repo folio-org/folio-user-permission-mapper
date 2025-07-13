@@ -1,9 +1,9 @@
 from enum import Enum
-from typing import Optional, List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
-from folio_upm.dto.eureka import RoleUsers, UserRoles
+from folio_upm.dto.eureka import Capability, CapabilitySet, Role, UserRoles
 
 
 class CleanUpType(Enum):
@@ -75,8 +75,21 @@ class CleanUpRole(BaseModel):
     type: CleanUpType = CleanUpType.KEEP
 
 
+class EurekaCleanUpResult(BaseModel):
+    roleId: str
+    capabilityIds: List[str]
+    capabilitySetIds: List[str]
+
+
+class CleanHashRole(BaseModel):
+    role: Role
+    capabilities: List[Capability]
+    capabilitySets: List[CapabilitySet]
+
+
 class HashRolesAnalysisResult(BaseModel):
     userStats: List[EurekaUserStats]
     roleStats: List[EurekaRoleStats]
     userRoles: List[UserRoles]
     roleCapabilities: List[EurekaRoleCapability]
+    cleanHashRoles: List[CleanHashRole]

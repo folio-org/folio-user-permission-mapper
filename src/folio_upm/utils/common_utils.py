@@ -1,4 +1,4 @@
-from typing import Any, Sequence
+from typing import Any, Iterable, List, Sequence, Set
 
 
 class IterableUtils:
@@ -23,3 +23,8 @@ class IterableUtils:
     @staticmethod
     def unique_values(iterable):
         return list(dict.fromkeys(iterable).keys())
+
+    @staticmethod
+    def intersection(sets: Iterable[List[Any]]) -> Set[Any]:
+        _sets = [set(x) for x in sets]
+        return set.intersection(*_sets)

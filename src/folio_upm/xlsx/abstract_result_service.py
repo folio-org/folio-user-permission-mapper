@@ -8,10 +8,10 @@ from folio_upm.utils import log_factory
 
 class WsDef:
 
-    def __init__(self, ws_class, data_extractor, title: Optional[str]=None):
+    def __init__(self, ws_class, data_extractor, title: Optional[str] = None):
         self.ws_class = ws_class
         self.data_extractor = data_extractor
-        self.title= title
+        self.title = title
 
 
 class AbstractResultService:

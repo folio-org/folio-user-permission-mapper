@@ -3,7 +3,7 @@ import json
 
 import click
 
-from folio_upm.dto.results import AnalysisResult, OkapiLoadResult, PreparedEurekaData
+from folio_upm.dto.results import OkapiLoadResult, PreparedEurekaData
 from folio_upm.integration.services.eureka_migration_service import EurekaMigrationService
 from folio_upm.services.eureka_hash_role_analyzer import EurekaHashRoleAnalyzer
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
@@ -53,7 +53,9 @@ def collect_capabilities():
 @cli.command("analyze-hash-roles")
 def analyze_hash_roles():
     migration_strategy = Env().get_migration_strategy()
+    storage_service = TenantStorageService()
     strategy_name = migration_strategy.get_name()
+    _log.info("Analyzing hash-role capabilities for: %s", strategy_name)
     file_name = f"{eureka_capabilities_cleanup_prep_fn}-{strategy_name}"
     eureka_rs_loader = EurekaResultLoader(use_ref_file=False, src_file_name=file_name)
     eureka_load_rs = eureka_rs_loader.find_load_result()
@@ -61,8 +63,8 @@ def analyze_hash_roles():
         __collect_capabilities(file_name)
     hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
     workbook = EurekaXlsxReportProvider(hash_role_analysis_result).generate_report()
-    storage_service = TenantStorageService()
-    storage_service.save_object(eureka_clean_up_analysis_result_fn, xlsx_ext, workbook, include_ts=True)
+    result_fn = f"{eureka_clean_up_analysis_result_fn}-{strategy_name}"
+    storage_service.save_object(result_fn, xlsx_ext, workbook, include_ts=True)
 
 
 @cli.command("generate-report")
@@ -90,15 +92,19 @@ def generate_report():
 @cli.command("run-eureka-migration")
 def run_eureka_migration():
     migration_strategy = Env().get_migration_strategy()
-    _log.info("Running eureka migration for strategy: %s ...", migration_strategy.get_name())
-    result_fn = f"{mixed_analysis_result_fn}-{migration_strategy.get_name()}"
+    strategy_name = migration_strategy.get_name()
+    _log.info("Running eureka migration for strategy: %s ...", strategy_name)
+
+    result_fn = f"{mixed_analysis_result_fn}-{strategy_name}"
     storage_service = TenantStorageService()
     analysis_result_dict = storage_service.require_object(result_fn, json_gz_ext)
     analysis_result = PreparedEurekaData(**analysis_result_dict)
     migration_result = EurekaMigrationService().migrate_to_eureka(analysis_result)
     migration_result_report = MigrationResultService(migration_result).generate_report()
-    storage_service.save_object(eureka_migration_result_fn, json_gz_ext, migration_result.model_dump())
-    storage_service.save_object(eureka_migration_result_fn, xlsx_ext, migration_result_report, include_ts=True)
+
+    migration_result_fn = f"{eureka_migration_result_fn}-{strategy_name}"
+    storage_service.save_object(migration_result_fn, json_gz_ext, migration_result.model_dump())
+    storage_service.save_object(migration_result_fn, xlsx_ext, migration_result_report, include_ts=True)
 
 
 @cli.command("download-json")

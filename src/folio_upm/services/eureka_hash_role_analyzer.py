@@ -1,10 +1,18 @@
 import re
 from typing import Dict, List
 
-from folio_upm.dto.clean_up import HashRolesAnalysisResult, EurekaUserStats, EurekaRoleStats, UserCapabilities, \
-    EurekaRoleCapability
-from folio_upm.dto.eureka import UserRoles
+from folio_upm.dto.clean_up import (
+    CleanHashRole,
+    EurekaRoleCapability,
+    EurekaRoleStats,
+    EurekaUserStats,
+    HashRolesAnalysisResult,
+    UserCapabilities,
+)
+from folio_upm.dto.eureka import Role, UserRoles
 from folio_upm.dto.results import EurekaLoadResult
+from folio_upm.utils import log_factory
+from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
 
 
@@ -12,6 +20,7 @@ class EurekaHashRoleAnalyzer:
 
     def __init__(self, eureka_load_result: EurekaLoadResult):
         self._lr = eureka_load_result
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._roles_by_id = self.__get_roles_by_id()
         self._hash_role_ids = self._get_hash_role_ids()
         self._capabilities_by_id = {cap.id: cap for cap in self._lr.capabilities}
@@ -26,8 +35,8 @@ class EurekaHashRoleAnalyzer:
     def get_result(self) -> HashRolesAnalysisResult:
         return self._result
 
-    def __get_roles_by_id(self) -> Dict[str, str]:
-        return {role.id: role.name for role in self._lr.roles}
+    def __get_roles_by_id(self) -> Dict[str, Role]:
+        return {role.id: role for role in self._lr.roles}
 
     @staticmethod
     def get_as_dict(iterable_obj, key_extractor, value_extractor) -> Dict[str, List[str]]:
@@ -45,6 +54,7 @@ class EurekaHashRoleAnalyzer:
             userStats=self.__get_user_stats(),
             userRoles=self.__get_user_roles_for_ws(),
             roleCapabilities=self.__get_role_capabilities_for_ws(),
+            cleanHashRoles=self.__get_remaining_hash_role_capabilities(),
         )
 
     def __get_role_stats(self):
@@ -127,7 +137,7 @@ class EurekaHashRoleAnalyzer:
         result = []
         for role in self._lr.roles:
             result += [self.__generate_capability(role, "capability", x) for x in self._rc.get(role.id, [])]
-            result += [self.__generate_capability(role, "capabilitySet", x) for x in self._rcs.get(role.id, [])]
+            result += [self.__generate_capability(role, "capability-set", x) for x in self._rcs.get(role.id, [])]
         return result
 
     def __generate_capability(self, role, c_type, capabilityOrSetId: str) -> EurekaRoleCapability:
@@ -146,15 +156,45 @@ class EurekaHashRoleAnalyzer:
             capabilityType=capabilityOrSet.capabilityType,
         )
 
-
     def __get_user_roles_for_ws(self) -> List[UserRoles]:
         user_roles = []
         for user_id, role_ids in self._user_roles.items():
-            role_names = [self._roles_by_id.get(role_id) for role_id in role_ids]
+            role_names = [self._roles_by_id[role_id].name for role_id in role_ids]
             role_names = [name for name in role_names if name is not None]
             user_roles.append(UserRoles(userId=user_id, roles=role_names))
         return user_roles
 
+    def __get_remaining_hash_role_capabilities(self) -> List[CleanHashRole]:
+        result = []
+        for role_id, users_ids in self._role_users.items():
+            if role_id not in self._hash_role_ids:
+                continue
+
+            hash_role_id = role_id
+            hash_role_set_ids = set(self._rcs.get(hash_role_id, []))
+            hash_role_capability_ids = set(self._rc.get(hash_role_id, []))
+
+            users_capability_set_ids = []
+            users_capability_ids = []
+            for user_id in users_ids:
+                user_capabilities = self._users_capabilities.get(user_id, UserCapabilities())
+                users_capability_ids.append(user_capabilities.roleCapabilities)
+                users_capability_set_ids.append(user_capabilities.roleCapabilitySets)
+
+            shared_set_ids = IterableUtils.intersection(users_capability_set_ids)
+            shared_capability_ids = IterableUtils.intersection(users_capability_ids)
+            remaining_set_ids = hash_role_set_ids - shared_set_ids
+            remaining_capability_ids = hash_role_capability_ids - shared_capability_ids
+
+            result.append(
+                CleanHashRole(
+                    role=self._roles_by_id[role_id],
+                    capabilities=[self._capabilities_by_id[x] for x in remaining_capability_ids],
+                    capabilitySets=[self._capability_sets_by_id[x] for x in remaining_set_ids],
+                )
+            )
+
+        return result
 
     @staticmethod
     def is_sha1_hash(s: str) -> bool:

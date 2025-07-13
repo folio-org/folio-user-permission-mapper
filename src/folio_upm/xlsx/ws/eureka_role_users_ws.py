@@ -19,8 +19,4 @@ class EurekaRoleUsersWorksheet(AbstractWorksheet):
 
     @override
     def _get_iterable_data(self):
-        return [
-            (user_roles.userId, role_name)
-            for user_roles in self._data
-            for role_name in user_roles.roles
-        ]
+        return [(user_roles.userId, role_name) for user_roles in self._data for role_name in user_roles.roles]

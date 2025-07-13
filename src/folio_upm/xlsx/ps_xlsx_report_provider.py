@@ -1,7 +1,4 @@
-from openpyxl import Workbook
-
 from folio_upm.dto.results import AnalysisResult
-from folio_upm.utils import log_factory
 from folio_upm.xlsx.abstract_result_service import AbstractResultService, WsDef
 from folio_upm.xlsx.ws.ps_nesting_ws import PermissionNestingWorksheet
 from folio_upm.xlsx.ws.ps_stats_ws import PermissionStatsWorksheet
