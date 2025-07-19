@@ -20,7 +20,7 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
         self._out_folder = ".temp"
 
     @override
-    def _get_json_gz(self, file_key):
+    def _find_json_gz(self, file_key):
         json_bytes_buffer = self.__read_binary_data(file_key)
         return json_bytes_buffer and JsonUtils.from_json_gz(json_bytes_buffer)
 

@@ -300,7 +300,7 @@ You can use a `.env` file to manage these variables.
 This command is used to normalize the project (applies import sorting, code formatting, and linting):
 
 ```bash
- poetry run isort . && poetry run black . && poetry run flake8 
+ poetry run isort . && poetry run black . && poetry run flake8 && poetry run pytest
 ```
 
 ---

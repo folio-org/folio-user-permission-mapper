@@ -64,7 +64,7 @@ def analyze_hash_roles():
     hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
     workbook = EurekaXlsxReportProvider(hash_role_analysis_result).generate_report()
     result_fn = f"{eureka_clean_up_analysis_result_fn}-{strategy_name}"
-    storage_service.save_object(result_fn, xlsx_ext, workbook, include_ts=True)
+    storage_service.save_object(result_fn, xlsx_ext, workbook)
 
 
 @cli.command("generate-report")
@@ -82,7 +82,7 @@ def generate_report():
     workbook = PsXlsxReportProvider(analysis_result).generate_report()
 
     result_fn = f"{mixed_analysis_result_fn}-{strategy_name}"
-    storage_service.save_object(result_fn, xlsx_ext, workbook, include_ts=True)
+    storage_service.save_object(result_fn, xlsx_ext, workbook)
 
     prepared_eureka_data = load_result_analyzer.get_prepared_eureka_data()
     storage_service.save_object(result_fn, json_gz_ext, prepared_eureka_data.model_dump())
@@ -104,7 +104,7 @@ def run_eureka_migration():
 
     migration_result_fn = f"{eureka_migration_result_fn}-{strategy_name}"
     storage_service.save_object(migration_result_fn, json_gz_ext, migration_result.model_dump())
-    storage_service.save_object(migration_result_fn, xlsx_ext, migration_result_report, include_ts=True)
+    storage_service.save_object(migration_result_fn, xlsx_ext, migration_result_report)
 
 
 @cli.command("download-json")
@@ -112,7 +112,7 @@ def run_eureka_migration():
 @click.argument("out_file", type=str)
 def download_json(source_file, out_file):
     storage_service = TenantStorageService()
-    analysis_result_dict = storage_service.get_ref_object_by_key(source_file)
+    analysis_result_dict = storage_service.find_object_by_key(source_file)
     if analysis_result_dict is None:
         raise FileNotFoundError(f"File not found: {source_file}")
     with open(out_file, "w") as f:

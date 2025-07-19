@@ -20,7 +20,7 @@ class S3TenantStorage(TenantStorage, metaclass=SingletonMeta):
         self._storage = S3Storage()
 
     @override
-    def _get_json_gz(self, file_key) -> dict | None:
+    def _find_json_gz(self, file_key) -> dict | None:
         return self.__get_s3_object(file_key, lambda body: JsonUtils.from_json_gz(body))
 
     @override

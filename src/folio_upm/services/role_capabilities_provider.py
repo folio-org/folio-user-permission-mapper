@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 from folio_upm.dto.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
 from folio_upm.dto.permission_type import MUTABLE
 from folio_upm.dto.results import AnalyzedRole, EurekaLoadResult, PermissionAnalysisResult
-from folio_upm.dto.support import CapabilityPlaceholder, RoleCapabilitiesHolder, ExpandedPermissionSet
+from folio_upm.dto.support import CapabilityPlaceholder, ExpandedPermissionSet, RoleCapabilitiesHolder
 from folio_upm.services.capability_service import CapabilityService
 from folio_upm.utils import log_factory
 from folio_upm.utils.upm_env import Env

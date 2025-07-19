@@ -16,8 +16,8 @@ class TenantStorage:
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._override_reports = override_reports
 
-    def save_object(self, object_name: str, object_ext: str, object_data: Any = None, include_ts: bool = False):
-        file_key = self._get_file_key(object_name, object_ext, include_ts)
+    def save_object(self, object_name: str, object_ext: str, object_data: Any = None):
+        file_key = self._get_file_key(object_name, object_ext, include_ts=True)
         if object_ext == "json.gz":
             self._save_json_gz(file_key, object_data)
         elif object_ext == "json":
@@ -27,32 +27,32 @@ class TenantStorage:
         else:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
 
-    def get_object(self, object_name: str, object_ext: str):
+    def find_object(self, object_name: str, object_ext: str):
         file_key = self._get_file_key(object_name, object_ext, include_ts=False)
         if object_ext == "json.gz":
-            return self._get_json_gz(file_key)
+            return self._find_json_gz(file_key)
         elif object_ext == "json":
-            return self._get_json(file_key)
+            return self._find_json(file_key)
         else:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
             return None
 
-    def get_ref_object_by_key(self, ref_key):
+    def find_object_by_key(self, ref_key):
         if ref_key.endswith("json.gz"):
-            return self._get_json_gz(ref_key)
+            return self._find_json_gz(ref_key)
         elif ref_key.endswith("json"):
-            return self._get_json(ref_key)
+            return self._find_json(ref_key)
         else:
             self._log.error("Unsupported object type: %s, file=%s", ref_key, ref_key)
         return None
 
-    def _get_json(self, file_key: str):
+    def _find_json(self, file_key: str):
         pass
 
     def _save_json(self, file_key: str, object_data: Any):
         pass
 
-    def _get_json_gz(self, object_name: str):
+    def _find_json_gz(self, object_name: str):
         pass
 
     def _save_json_gz(self, object_name: str, object_data: Any):
@@ -68,5 +68,5 @@ class TenantStorage:
         file_name = f"{self._tenant_id}-{file_name}"
         if include_ts:
             now = datetime.now(tz=UTC)
-            file_name += f"-{now.strftime("%Y%m%d%H%M%S") + f"{now.microsecond // 1000:03d}"}"
+            file_name += f"-{now.strftime("%Y-%m-%d_%H-%M-%S.%f")}"
         return f"{self._tenant_id}/{file_name}.{extension}"

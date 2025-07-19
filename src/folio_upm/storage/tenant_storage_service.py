@@ -22,27 +22,27 @@ class TenantStorageService(metaclass=SingletonMeta):
         if "local" in storages_set:
             self._storages.append(LocalTenantStorage())
 
-    def save_object(self, object_name: str, object_ext: str, object_data: Any = None, include_ts: bool = False):
+    def save_object(self, object_name: str, object_ext: str, object_data: Any = None):
         for storage in self._storages:
-            storage.save_object(object_name, object_ext, object_data, include_ts)
+            storage.save_object(object_name, object_ext, object_data)
 
-    def get_object(self, object_name: str, object_ext: str):
+    def find_object(self, object_name: str, object_ext: str):
         for storage in self._storages:
-            found_object = storage.get_object(object_name, object_ext)
+            found_object = storage.find_object(object_name, object_ext)
             if found_object is not None:
                 return found_object
         return None
 
     def require_object(self, object_name: str, object_ext: str):
         for storage in self._storages:
-            found_object = storage.get_object(object_name, object_ext)
+            found_object = storage.find_object(object_name, object_ext)
             if found_object is not None:
                 return found_object
         raise FileNotFoundError(f"File not found in storages {self._storage_names}: {object_name}.{object_ext}.")
 
-    def get_ref_object_by_key(self, object_name: str):
+    def find_object_by_key(self, object_key: str):
         for storage in self._storages:
-            found_object = storage.get_ref_object_by_key(object_name)
+            found_object = storage.find_object_by_key(object_key)
             if found_object is not None:
                 return found_object
         return None
