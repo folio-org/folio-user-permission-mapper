@@ -30,7 +30,6 @@ class PermissionService(metaclass=SingletonMeta):
             list(all_granted_to_unique),
             lambda q: self._client.load_user_permissions_by_ids(q),
             lambda ids: CqlQueryUtils.any_match_by_field("id", ids),
-            int(Env().require_env("PERMISSION_IDS_PARTITION_SIZE", default_value=50)),
         )
 
         return partitioned_data_loader.load()

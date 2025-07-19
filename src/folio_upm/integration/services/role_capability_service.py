@@ -23,8 +23,12 @@ class RoleCapabilityService(RoleEntityService, metaclass=SingletonMeta):
         return entity.capabilityId
 
     @override
-    def _assign_entities_to_role(self, role_id, capability_set_ids) -> List[RoleCapability]:
-        return self._client.post_role_capabilities(role_id, capability_set_ids)
+    def _assign_entities_to_role(self, role_id, capability_ids) -> List[RoleCapability]:
+        return self._client.post_role_capabilities(role_id, capability_ids)
+
+    @override
+    def _update_role_entities(self, role_id, capability_ids) -> None:
+        return self._client.update_role_capabilities(role_id, capability_ids)
 
     @override
     def _create_success_result(self, role, entity_id) -> EntityMigrationResult:
@@ -37,3 +41,14 @@ class RoleCapabilityService(RoleEntityService, metaclass=SingletonMeta):
     @override
     def _create_error_result(self, role, entity_id, error) -> EntityMigrationResult:
         return EntityMigrationResult.for_role_capability(role, entity_id, "error", "Failed to perform request", error)
+
+    @override
+    def _create_error_update_result(self, role, entity_ids, error) -> EntityMigrationResult:
+        return EntityMigrationResult.for_role_capabilities(
+            role, entity_ids, "error", "Failed to perform request", error
+        )
+
+    @override
+    def _create_update_result(self, role, entity_ids) -> EntityMigrationResult:
+        return EntityMigrationResult.for_role_capabilities(role, entity_ids, "success")
+

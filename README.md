@@ -104,7 +104,7 @@ The command will do the following actions:
 
 #### Output
 
-- `<tenant_id>/<tenant_id>-okapi-permissions.json.gz`
+- `<tenant_id>/<tenant_id>-okapi-permissions-<timestamp>.json.gz`
 
 ### Environment Variables
 
@@ -148,7 +148,7 @@ The command will do the following actions:
 
 #### Output
 
-- `<tenant_id>/<tenant_id>-eureka-capabilities.json.gz`
+- `<tenant_id>/<tenant_id>-eureka-capabilities-<timestamp>.json.gz`
 
 ### Environment Variables
 
@@ -172,20 +172,21 @@ The command will do the following actions:
 
 The command will do the following actions:
 
-- Load `okapi-permissions.gson.gz` and _(optionally)_ `eureka-capabilities` from storage.
+- Load latest `okapi-permissions-<timestamp>.json.gz` and _(optionally)_ latest
+  `eureka-capabilities-<timestamp>.json.gz` from storage.
 - Analyze and combine the data to provide report and data for eureka migration.
 - Generate both an Excel report and a gzipped JSON analysis result.
 - Store generated files in the configured storage (s3, local).
 
 #### Requires
 
-- Access to the AWS S3 bucket or local storage where `okapi-permissions.gson.gz` is stored.
-- The `collect-permissions` and (_optionally_)`collect-capabilities` commands must be run before this command.
+- Access to the AWS S3 bucket or local storage where `okapi-permissions-<timestamp>.json.gz` is stored.
+- The `collect-permissions` and (_optionally_) `collect-capabilities` commands must be run before this command.
 
 #### Output
 
-- `<tenant_id>/<tenant_id>-analysis-result-<generation_timestamp>.xlsx`
-- `<tenant_id>/<tenant_id>-analysis-result.json.gz`
+- `<tenant_id>/<tenant_id>-analysis-result-<strategy>-<timestamp>.xlsx`
+- `<tenant_id>/<tenant_id>-analysis-result-<strategy>-<timestamp>.json.gz`
 
 ### Environment Variables
 
@@ -199,6 +200,7 @@ The command will do the following actions:
 | SYSTEM_GENERATED_PERM_MAPPINGS |               | false    | Comma-separated list of system-generated permission mappings to highlight in analysis (e.g., `folio_admin:AdminRole`)                       |
 | REF_CAPABILITIES_FILE_KEY      |               | false    | File key in storage that can be used as reference for capabilities (Recommended to pull this data for tenant with all applications enabled) |
 | DOTENV                         | .env          | false    | Custom `.env` file                                                                                                                          |
+| EUREKA_ROLE_LOAD_STRATEGY      | distributed   | true     | Approach how roles must be generated (one of: distributed, consolidated)                                                                    |
 
 ---
 
@@ -208,7 +210,7 @@ The command will do the following actions:
 
 The command will do the following actions:
 
-- Load `<tenant>-analysis-result.json.gz` and from storage.
+- Load latest `analysis-result-<timestamp>.json.gz` and from storage.
 - Create roles (values specified in `SYSTEM_GENERATED_PERM_MAPPINGS` will be skipped)</br>
   _If a role exists, it will be skipped (skipped operations will be visible in error report)._
 - Assign capabilities and capability-sets to a role</br>
@@ -217,7 +219,7 @@ The command will do the following actions:
 - All users, that had roles, defined in `SYSTEM_GENERATED_PERM_MAPPINGS`, will be assigned to the role with the same
   name as the role.</br>
   _If a user already has a role, it will be skipped (skipped operations will be visible in error report)._
-- Save a report with occurred errors to storage.
+- Save a report with performed operations into storage (s3, local).
 
 #### Requires
 
@@ -230,23 +232,111 @@ The command will do the following actions:
 - new user-role relations
 - new role-capability relations
 - new role capability-set relations
-- `<tenant_id>/<tenant_id>-eureka-migration-report.json.gz`
+- `<tenant_id>/<tenant_id>-eureka-migration-report-<strategy>-<timestamp>.json.gz`
 
 ### Environment Variables:
 
-| Env Variable                   | Default Value         | Required | Description                                                                                                                                              |
-|:-------------------------------|:----------------------|:---------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| AWS_ACCESS_KEY_ID              |                       | true     | AWS access key                                                                                                                                           |
-| AWS_SECRET_ACCESS_KEY          |                       | true     | AWS secret key                                                                                                                                           |
-| AWS_REGION                     | `us-east-1`           | false    | AWS S3 Region                                                                                                                                            |
-| AWS_S3_ENDPOINT                |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)                                                                                                   |
-| EUREKA_URL                     | http://localhost:8000 | true     | Kong Gateway URL                                                                                                                                         |
-| TENANT_ID                      |                       | true     | The tenant ID for the FOLIO environment                                                                                                                  |
-| EUREKA_ADMIN_USERNAME          |                       | true     | The username for the admin user in Eureka                                                                                                                |
-| EUREKA_ADMIN_PASSWORD          |                       | true     | The password for the admin user in Eureka                                                                                                                |
-| EUREKA_ROLE_LOAD_STRATEGY      | distributed           | true     | Approach how roles must be generated (one of: distributed, consolidated)                                                                                 |
-| SYSTEM_GENERATED_PERM_MAPPINGS |                       | false    | Comma-separated list of system-generated permission mappings that will be applied differently (see: command description) (e.g., `folio_admin:AdminRole`) |
-| CAPABILITY_IDS_PARTITION_SIZE  | 50                    | false    | The max number of permission names provided for capability/capability-set querying                                                                       |
+| Env Variable              | Default Value         | Required | Description                                                              |
+|:--------------------------|:----------------------|:---------|:-------------------------------------------------------------------------|
+| AWS_ACCESS_KEY_ID         |                       | true     | AWS access key                                                           |
+| AWS_SECRET_ACCESS_KEY     |                       | true     | AWS secret key                                                           |
+| AWS_REGION                | `us-east-1`           | false    | AWS S3 Region                                                            |
+| AWS_S3_ENDPOINT           |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)                   |
+| EUREKA_URL                | http://localhost:8000 | true     | Kong Gateway URL                                                         |
+| TENANT_ID                 |                       | true     | The tenant ID for the FOLIO environment                                  |
+| EUREKA_ADMIN_USERNAME     |                       | true     | The username for the admin user in Eureka                                |
+| EUREKA_ADMIN_PASSWORD     |                       | true     | The password for the admin user in Eureka                                |
+| EUREKA_ROLE_LOAD_STRATEGY | distributed           | true     | Approach how roles must be generated (one of: distributed, consolidated) |
+
+---
+
+### `analyze-hash-roles`
+
+#### Description
+
+The command will do the following actions:
+
+- (_if it wasn't executed before_) Collect the following data from Eureka-based deployment:
+    - capabilities
+    - capability sets
+    - roles
+    - user roles
+    - role capabilities relations
+    - role capability-set relations
+    - user capability relations
+    - role capability-set relations
+- Save them as a gzipped JSON file to the configured storage.
+- Analyze and combine the data to provide report and data for a hash-roles cleanup process.
+- Generate both an Excel report and a gzipped JSON analysis result.
+- Store generated files in the configured storage (s3, local).
+    
+#### Requires
+
+- The `run-eureka-migration`command must be run before this command.
+
+#### Output
+
+- new roles
+- new user-role relations
+- new role-capability relations
+- new role capability-set relations
+- `<tenant_id>/<tenant_id>-capabilities-cleanup-data-<strategy>-<timestamp>.json.gz`
+- `<tenant_id>/<tenant_id>-capabilities-cleanup-data-<strategy>-<timestamp>.xlsx`
+- `<tenant_id>/<tenant_id>-eureka-cleanup-data-<strategy>-<timestamp>.json.gz`
+
+### Environment Variables:
+
+| Env Variable              | Default Value         | Required | Description                                                           |
+|:--------------------------|:----------------------|:---------|:----------------------------------------------------------------------|
+| AWS_ACCESS_KEY_ID         |                       | true     | AWS access key                                                        |
+| AWS_SECRET_ACCESS_KEY     |                       | true     | AWS secret key                                                        |
+| AWS_REGION                | `us-east-1`           | false    | AWS S3 Region                                                         |
+| AWS_S3_ENDPOINT           |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)                |
+| TENANT_ID                 |                       | true     | The tenant ID for the FOLIO environment                               |
+| EUREKA_URL                | http://localhost:8000 | true     | Kong Gateway URL                                                      |
+| EUREKA_ADMIN_USERNAME     |                       | true     | The username for the admin user in Eureka                             |
+| EUREKA_ADMIN_PASSWORD     |                       | true     | The password for the admin user in Eureka                             |
+| EUREKA_ROLE_LOAD_STRATEGY | distributed           | true     | Approach how roles were generated (one of: distributed, consolidated) |
+
+
+---
+
+---
+
+### `cleanup-hash-roles`
+
+#### Description
+
+The command will do the following actions:
+
+- Load latest `eureka-cleanup-data-<strategy>-<timestamp>.json.gz`
+- Perform role-capabilities and role-capability-set update operations to remove duplicated relations
+- Remove hash-roles with empty relations
+- Save a report with performed operations into storage (s3, local).
+
+#### Requires
+
+- The `analyze-hash-roles` command must be run before this command.
+
+#### Output
+
+- clean hash-roles
+- `<tenant_id>/<tenant_id>-cleanup-result-<strategy>-<timestamp>.json.gz`
+
+### Environment Variables:
+
+| Env Variable              | Default Value         | Required | Description                                                           |
+|:--------------------------|:----------------------|:---------|:----------------------------------------------------------------------|
+| AWS_ACCESS_KEY_ID         |                       | true     | AWS access key                                                        |
+| AWS_SECRET_ACCESS_KEY     |                       | true     | AWS secret key                                                        |
+| AWS_REGION                | `us-east-1`           | false    | AWS S3 Region                                                         |
+| AWS_S3_ENDPOINT           |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)                |
+| TENANT_ID                 |                       | true     | The tenant ID for the FOLIO environment                               |
+| EUREKA_URL                | http://localhost:8000 | true     | Kong Gateway URL                                                      |
+| EUREKA_ADMIN_USERNAME     |                       | true     | The username for the admin user in Eureka                             |
+| EUREKA_ADMIN_PASSWORD     |                       | true     | The password for the admin user in Eureka                             |
+| EUREKA_ROLE_LOAD_STRATEGY | distributed           | true     | Approach how roles were generated (one of: distributed, consolidated) |
+
 
 ---
 
@@ -292,8 +382,8 @@ You can use a `.env` file to manage these variables.
 |:-----------------------|:--------------|:---------|:-----------------------------------------------------------------------|
 | DOTENV                 | .env          | false    | Custom `.env` file location _(preferable to pass it as variable)_      |
 | LOG_LEVEL              | INFO          | false    | Log level (one of: INFO, DEBUG, WARN, ERROR, CRITICAL)                 |
-| ENABLED_STORAGES       |               | false    | Enabled storage for data loading and report output (one of: local, s3) |
-| ENABLE_REPORT_COLORING |               | false    | Boolean value, defines if row colors will be applied for xlsx reports  |
+| ENABLED_STORAGES       | s3            | false    | Enabled storage for data loading and report output (one of: local, s3) |
+| ENABLE_REPORT_COLORING | false         | false    | Boolean value, defines if row colors will be applied for xlsx reports  |
 
 ### Development
 

@@ -57,7 +57,7 @@ class Env(metaclass=SingletonMeta):
         return eureka_load_strategy
 
     def get_enabled_storages(self):
-        storages = self.get_env("ENABLED_STORAGES", default_value="local")
+        storages = self.get_env("ENABLED_STORAGES", default_value="s3")
         parsed_storages = [x.strip() for x in storages.split(",")]
         allowed_values = {"s3", "local"}
         if not set(parsed_storages) <= allowed_values:

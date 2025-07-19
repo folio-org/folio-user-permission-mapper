@@ -27,6 +27,10 @@ class RoleCapabilitySetService(RoleEntityService, metaclass=SingletonMeta):
         return self._client.post_role_capability_sets(role_id, capability_set_ids)
 
     @override
+    def _update_role_entities(self, role_id, set_ids) -> None:
+        return self._client.update_role_capability_sets(role_id, set_ids)
+
+    @override
     def _create_success_result(self, role, entity_id) -> EntityMigrationResult:
         return EntityMigrationResult.for_role_capability_set(role, entity_id, "success")
 
@@ -38,4 +42,14 @@ class RoleCapabilitySetService(RoleEntityService, metaclass=SingletonMeta):
     def _create_error_result(self, role, entity_id, error) -> EntityMigrationResult:
         return EntityMigrationResult.for_role_capability_set(
             role, entity_id, "error", "Failed to perform request", error
+        )
+
+    @override
+    def _create_update_result(self, role, entity_ids) -> EntityMigrationResult:
+        return EntityMigrationResult.for_role_capability_sets(role, entity_ids, "success")
+
+    @override
+    def _create_error_update_result(self, role, entity_ids, error) -> EntityMigrationResult:
+        return EntityMigrationResult.for_role_capability_sets(
+            role, entity_ids, "error", "Failed to perform request", error
         )

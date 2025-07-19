@@ -1,5 +1,6 @@
 from typing import List
 
+from folio_upm.dto.cleanup import CleanHashRole
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.support import RoleCapabilitiesHolder
@@ -16,8 +17,8 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("RoleCapabilityServiceFacade initialized.")
         self._role_service = RoleService()
-        self._role_capability_service = RoleCapabilityService()
-        self._role_capability_set_service = RoleCapabilitySetService()
+        self._rc_service = RoleCapabilityService()
+        self._rcs_service = RoleCapabilitySetService()
 
     def assign_role_capabilities(self, role_capabilities: List[RoleCapabilitiesHolder]):
         migration_results = []
@@ -30,18 +31,26 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
                 continue
             capability_sets, capabilities, issues = self.__find_by_permission_names(rch)
             migration_results += [self.__create_unmatched_result(role_by_name, i) for i in issues]
-            role_capability_assign_rs = self._role_capability_service.assign_to_role(role_by_name, capabilities)
-            role_set_assign_rs = self._role_capability_set_service.assign_to_role(role_by_name, capability_sets)
+            role_capability_assign_rs = self._rc_service.assign_to_role(role_by_name, capabilities)
+            role_set_assign_rs = self._rcs_service.assign_to_role(role_by_name, capability_sets)
             migration_results += role_capability_assign_rs
             migration_results += role_set_assign_rs
         return migration_results
 
+
+    def update_role_capabilities(self, clean_hash_roles: List[CleanHashRole]):
+        cleanup_result = []
+        for hr in clean_hash_roles:
+            cleanup_result.append(self._rc_service.update(hr.role, hr.capabilities))
+            cleanup_result.append(self._rcs_service.update(hr.role, hr.capabilitySets))
+        return cleanup_result
+
     def __find_by_permission_names(self, rch: RoleCapabilitiesHolder):
         unmatched_ps_names = OrderedSet[str]([x.permissionName for x in rch.capabilities])
-        capability_sets = self._role_capability_set_service.find_by_ps_names(unmatched_ps_names.to_list())
+        capability_sets = self._rcs_service.find_by_ps_names(unmatched_ps_names.to_list())
         unmatched_ps_names.remove_all([cs.permission for cs in capability_sets])
 
-        capabilities = self._role_capability_service.find_by_ps_names(unmatched_ps_names.to_list())
+        capabilities = self._rc_service.find_by_ps_names(unmatched_ps_names.to_list())
         unmatched_ps_names.remove_all([c.permission for c in capabilities])
         unmatched_names = unmatched_ps_names.to_list()
         if unmatched_names:

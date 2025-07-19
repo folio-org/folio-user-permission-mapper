@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel
 
 from folio_upm.dto.eureka import Role
@@ -27,6 +29,16 @@ class EntityMigrationResult(BaseModel):
         )
 
     @staticmethod
+    def for_removed_role(role_id: str, status: str, reason=None, error=None):
+        return EntityMigrationResult(
+            status=status,
+            entityName="role",
+            entityId=role_id,
+            reason=reason,
+            error=error,
+        )
+
+    @staticmethod
     def for_role_capability(role: Role, capability_id: str, status: str, reason=None, error=None):
         return EntityMigrationResult(
             status=status,
@@ -37,11 +49,31 @@ class EntityMigrationResult(BaseModel):
         )
 
     @staticmethod
+    def for_role_capabilities(role, capability_ids: List[str], status: str, reason=None, error=None):
+        return EntityMigrationResult(
+            status=status,
+            entityName="role-capabilities",
+            entityId=f"Role: '{role.name}' -> {role.id}\nCapabilities: {capability_ids}",
+            reason=reason,
+            error=error,
+        )
+
+    @staticmethod
     def for_role_capability_set(role, set_id: str, status: str, reason=None, error=None):
         return EntityMigrationResult(
             status=status,
             entityName="role-capability-set",
             entityId=f"Role: '{role.name}' -> {role.id}\nCapabilitySet: {set_id}",
+            reason=reason,
+            error=error,
+        )
+
+    @staticmethod
+    def for_role_capability_sets(role, set_ids: List[str], status: str, reason=None, error=None):
+        return EntityMigrationResult(
+            status=status,
+            entityName="role-capability-sets",
+            entityId=f"Role: '{role.name}' -> {role.id}\nCapabilitySets: {set_ids}",
             reason=reason,
             error=error,
         )

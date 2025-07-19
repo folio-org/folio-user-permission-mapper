@@ -1,4 +1,5 @@
 from io import BytesIO
+from typing import Optional
 
 import boto3
 from botocore.exceptions import ClientError
@@ -6,6 +7,7 @@ from mypy_boto3_s3 import S3Client
 
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
+from folio_upm.utils.file_utils import FileUtils
 from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env
 
@@ -46,6 +48,28 @@ class S3Storage(metaclass=SingletonMeta):
             return None
 
         return self.__get_object(file_key)
+
+    def find_latest_key_by_prefix(self, prefix: str) -> Optional[str]:
+        try:
+            paginator = self._s3_client.get_paginator('list_objects_v2')
+            page_iterator = paginator.paginate(Bucket=self._bucket, Prefix=prefix)
+
+            matching_keys = []
+            for page in page_iterator:
+                for obj in page.get('Contents', []):
+                    matching_keys.append(obj['Key'])
+
+            if not matching_keys:
+                self._log.debug(f"No files found with prefix: {prefix}")
+                return None
+
+            latest_key = FileUtils.get_latest_file_key(matching_keys)
+            self._log.debug(f"Found {len(matching_keys)} files with prefix '{prefix}', latest: {latest_key}")
+            return latest_key
+
+        except Exception as e:
+            self._log.error(f"Error finding latest file with prefix '%s'", prefix, e)
+            return None
 
     def __get_object(self, file_key):
         bucket_name = self._bucket

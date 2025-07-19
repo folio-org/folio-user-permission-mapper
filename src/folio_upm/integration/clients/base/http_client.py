@@ -39,6 +39,22 @@ class HttpClient:
         response.raise_for_status()
         return response.json()
 
+
+    def put_json(self, path, request_body: Any, params: dict | None = None) -> None:
+        body_json_str = JsonUtils.to_json(request_body)
+        response = requests.put(
+            self.__prepare_url(path),
+            params=params,
+            data=body_json_str,
+            headers=self.__get_headers(),
+            timeout=self._timeout,
+        )
+        response.raise_for_status()
+
+    def delete(self, path: str) -> None:
+        response = requests.post(path, headers=self.__get_headers(), timeout=self._timeout)
+        response.raise_for_status()
+
     def __prepare_url(self, path: str) -> str:
         _path = path
         if path.startswith("/"):

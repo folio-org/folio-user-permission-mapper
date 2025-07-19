@@ -1,7 +1,7 @@
 import re
 from typing import Dict, List
 
-from folio_upm.dto.clean_up import (
+from folio_upm.dto.cleanup import (
     CleanHashRole,
     EurekaRoleCapability,
     EurekaRoleStats,

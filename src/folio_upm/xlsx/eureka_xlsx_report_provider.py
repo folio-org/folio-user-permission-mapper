@@ -1,4 +1,4 @@
-from folio_upm.dto.clean_up import HashRolesAnalysisResult
+from folio_upm.dto.cleanup import HashRolesAnalysisResult
 from folio_upm.xlsx.abstract_result_service import AbstractResultService, WsDef
 from folio_upm.xlsx.ws.clean_hash_roles_ws import CleanHashRolesWorksheet
 from folio_upm.xlsx.ws.eureka_role_capabilities_ws import EurekaRoleCapabilitiesWorksheet

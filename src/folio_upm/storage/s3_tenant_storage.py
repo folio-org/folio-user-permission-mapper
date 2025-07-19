@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from openpyxl.workbook import Workbook
 from typing_extensions import override
@@ -20,8 +20,12 @@ class S3TenantStorage(TenantStorage, metaclass=SingletonMeta):
         self._storage = S3Storage()
 
     @override
-    def _find_json_gz(self, file_key) -> dict | None:
+    def _get_json_gz(self, file_key) -> dict | None:
         return self.__get_s3_object(file_key, lambda body: JsonUtils.from_json_gz(body))
+
+    @override
+    def _find_latest_object_by_name(self, prefix: str) -> Optional[str]:
+        return self._storage.find_latest_key_by_prefix(prefix)
 
     @override
     def _save_json_gz(self, file_key, object_data: dict):

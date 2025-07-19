@@ -2,6 +2,7 @@ from typing import List, Set
 
 import requests
 
+from folio_upm.dto.cleanup import CleanHashRole
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.dto.eureka import Role
 from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
@@ -42,6 +43,14 @@ class RoleService(metaclass=SingletonMeta):
             load_rs.append(self.__verify_and_create_role(ar, existing_role_names))
         return load_rs
 
+    def delete_roles(self, clean_hash_roles: List[CleanHashRole]) -> List[EntityMigrationResult]:
+        roles_to_delete = [hash_role.role.id for hash_role in clean_hash_roles if self.__should_delete(hash_role)]
+        self._log.info("Removing roles: %s", roles_to_delete)
+        remove_rs = []
+        for role_id in roles_to_delete:
+            remove_rs.append(self.__delete_role_safe(role_id))
+        return remove_rs
+
     def __find_existing_roles(self, analyzed_roles):
         role_names = [ar.role.name for ar in analyzed_roles if ar.role.name]
         found_roles = self.find_roles_by_names(role_names)
@@ -75,3 +84,20 @@ class RoleService(metaclass=SingletonMeta):
                 self._log.info("Role '%s' already exists in 'mod-roles-keycloak'.", role_name)
             self._log.warn("Failed to create role '%s': %s, responseBody: %s", role_name, e, e.response.text)
             return EntityMigrationResult.for_role(role, status, "Failed to perform request", error)
+
+    def __delete_role_safe(self, role_id: str) -> EntityMigrationResult:
+        try:
+            self._log.debug("Removing role: %s...", role_id)
+            self._client.delete_role(role_id)
+            self._log.info("Role is removed: %s", role_id)
+            return EntityMigrationResult.for_removed_role(role_id, "success", "Role removed successfully")
+        except requests.HTTPError as e:
+            resp = e.response
+            error = HttpReqErr(message=str(e), status=resp.status_code, responseBody=resp.text)
+            status = "not_found" if resp.status_code == 404 else "error"
+            self._log.warn("Failed to remove role '%s': %s, responseBody: %s", role_id, e, e.response.text)
+            return EntityMigrationResult.for_removed_role(role_id, status, "Failed to perform request", error)
+
+    @staticmethod
+    def __should_delete(role: CleanHashRole) -> bool:
+        return not role.capabilities and not role.capabilitySets

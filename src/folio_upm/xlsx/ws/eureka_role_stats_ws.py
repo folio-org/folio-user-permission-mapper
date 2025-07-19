@@ -2,7 +2,7 @@ from typing import List
 
 from openpyxl.worksheet.worksheet import Worksheet
 
-from folio_upm.dto.clean_up import EurekaRoleStats
+from folio_upm.dto.cleanup import EurekaRoleStats
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 

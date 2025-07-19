@@ -17,6 +17,9 @@ class EurekaClient(metaclass=SingletonMeta):
         response_json = self._client.post_json("/roles", role.model_dump())
         return Role(**response_json)
 
+    def delete_role(self, role_id):
+        self._client.delete("/roles/" + role_id)
+
     def post_user_roles(self, user_id: str, role_ids: list[str]) -> List[UserRole]:
         body = {"userId": user_id, "roleIds": role_ids}
         response = self._client.post_json("/roles/users", request_body=body)
@@ -29,11 +32,19 @@ class EurekaClient(metaclass=SingletonMeta):
         role_capabilities_json = response.get("roleCapabilities", []) if response else []
         return [RoleCapability(**rc) for rc in role_capabilities_json]
 
+    def update_role_capabilities(self, role_id: str, capability_ids: List[str]):
+        body = {"roleId": role_id, "capabilityIds": capability_ids}
+        response = self._client.post_json("/roles/capabilities", request_body=body)
+        role_capabilities_json = response.get("roleCapabilities", []) if response else []
+        return [RoleCapability(**rc) for rc in role_capabilities_json]
+
     def post_role_capability_sets(self, role_id, capability_set_ids: List[str]):
         body = {"roleId": role_id, "capabilitySetIds": capability_set_ids}
-        response = self._client.post_json("/roles/capability-sets", request_body=body)
-        role_capability_sets_json = response.get("roleCapabilitySets", []) if response else []
-        return [RoleCapabilitySet(**rc) for rc in role_capability_sets_json]
+        self._client.put_json("/roles/capability-sets", request_body=body)
+
+    def update_role_capability_sets(self, role_id: str, capability_set_ids: List[str]):
+        body = {"roleId": role_id, "capabilitySetIds": capability_set_ids}
+        self._client.put_json("/roles/capability-sets", request_body=body)
 
     def find_roles_by_query(self, cql_query: str) -> List[Role]:
         self._log.debug("Retrieving roles by query: query=%s", cql_query)
@@ -64,3 +75,5 @@ class EurekaClient(metaclass=SingletonMeta):
         query_params = {"query": query, "limit": limit, "offset": offset}
         response_json = self._client.get_json(path, params=query_params)
         return response_json.get(resource, [])
+
+

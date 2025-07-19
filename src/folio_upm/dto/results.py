@@ -180,6 +180,11 @@ class PreparedEurekaData(BaseModel):
 
 
 class EurekaMigrationResult(BaseModel):
-    roles: List[EntityMigrationResult] = []
-    roleUsers: List[EntityMigrationResult] = []
-    roleCapabilities: List[EntityMigrationResult] = []
+    roles: List[EntityMigrationResult]
+    roleUsers: List[EntityMigrationResult]
+    roleCapabilities: List[EntityMigrationResult]
+
+
+class EurekaCleanUpResult(BaseModel):
+    roles: List[EntityMigrationResult]
+    roleCapabilities: List[EntityMigrationResult]

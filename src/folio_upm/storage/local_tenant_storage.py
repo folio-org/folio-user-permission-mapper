@@ -1,4 +1,5 @@
 from io import BytesIO
+from typing import Optional
 
 from openpyxl.workbook import Workbook
 from typing_extensions import override
@@ -20,9 +21,13 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
         self._out_folder = ".temp"
 
     @override
-    def _find_json_gz(self, file_key):
+    def _get_json_gz(self, file_key):
         json_bytes_buffer = self.__read_binary_data(file_key)
         return json_bytes_buffer and JsonUtils.from_json_gz(json_bytes_buffer)
+
+    @override
+    def _find_latest_object_by_name(self, prefix: str) -> Optional[str]:
+        return FileUtils.find_latest_key_by_prefix(self._out_folder, prefix)
 
     @override
     def _save_json_gz(self, file_key, object_data: dict):

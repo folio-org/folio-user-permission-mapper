@@ -3,7 +3,7 @@ from typing import List, Optional, override
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
-from folio_upm.dto.clean_up import EurekaUserStats
+from folio_upm.dto.cleanup import EurekaUserStats
 from folio_upm.dto.permission_type import DEPRECATED, QUESTIONABLE, UNPROCESSED
 from folio_upm.dto.results import PsStatistics
 from folio_upm.xlsx import ws_constants

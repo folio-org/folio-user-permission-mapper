@@ -1,10 +1,10 @@
 import re
-from typing import Any, List
+from typing import Any, List, Union
 
 import requests
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import Role
+from folio_upm.dto.eureka import Role, Capability, CapabilitySet
 from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory
@@ -37,6 +37,16 @@ class RoleEntityService(metaclass=SingletonMeta):
             return self.__assign_entity_ids_to_role(role, entity_ids)
         except requests.HTTPError as err:
             return self.__handle_error_response(role, entity_ids, err)
+
+    def update(self, role: Role, entities: List[Union[Capability, CapabilitySet]]):
+        entity_ids = [entity.id for entity in entities]
+        if not entities:
+            self._log.info("No entities provided for role '%s': %s.", role.name, self._name)
+        try:
+            self._update_role_entities(role.id, entity_ids)
+            return self._create_update_result(role.id, entity_ids)
+        except requests.HTTPError as err:
+            return self._create_error_update_result(role , entity_ids, err)
 
     def __assign_entity_ids_to_role(self, role, entity_ids):
         role_id = role.id
@@ -96,8 +106,17 @@ class RoleEntityService(metaclass=SingletonMeta):
     def _create_success_result(self, role, entity_id) -> EntityMigrationResult:
         pass
 
+    def _create_update_result(self, role, entity_ids) -> EntityMigrationResult:
+        pass
+
     def _create_skipped_result(self, role, entity_id) -> EntityMigrationResult:
         pass
 
     def _create_error_result(self, role, entity_id, error) -> EntityMigrationResult:
+        pass
+
+    def _update_role_entities(self, role_id, entity_ids) -> None:
+        pass
+
+    def _create_error_update_result(self, role, entity_ids, error) -> EntityMigrationResult:
         pass

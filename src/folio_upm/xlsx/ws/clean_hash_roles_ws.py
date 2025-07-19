@@ -3,7 +3,7 @@ from typing import List, override
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
-from folio_upm.dto.clean_up import CleanHashRole
+from folio_upm.dto.cleanup import CleanHashRole
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 
