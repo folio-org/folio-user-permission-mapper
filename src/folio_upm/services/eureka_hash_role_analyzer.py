@@ -177,24 +177,34 @@ class EurekaHashRoleAnalyzer:
             users_capability_set_ids = []
             users_capability_ids = []
             for user_id in users_ids:
-                user_capabilities = self._users_capabilities.get(user_id, UserCapabilities())
-                users_capability_ids.append(user_capabilities.roleCapabilities)
-                users_capability_set_ids.append(user_capabilities.roleCapabilitySets)
+                role_capability_ids, role_capability_set_ids = self.__get_assigned_capabilities(user_id)
+                users_capability_set_ids.append(role_capability_set_ids)
+                users_capability_ids.append(role_capability_ids)
 
             shared_set_ids = IterableUtils.intersection(users_capability_set_ids)
             shared_capability_ids = IterableUtils.intersection(users_capability_ids)
             remaining_set_ids = hash_role_set_ids - shared_set_ids
             remaining_capability_ids = hash_role_capability_ids - shared_capability_ids
 
-            result.append(
-                CleanHashRole(
-                    role=self._roles_by_id[role_id],
-                    capabilities=[self._capabilities_by_id[x] for x in remaining_capability_ids],
-                    capabilitySets=[self._capability_sets_by_id[x] for x in remaining_set_ids],
-                )
+            cleaned_hash_role = CleanHashRole(
+                role=self._roles_by_id[role_id],
+                capabilities=[self._capabilities_by_id[x] for x in remaining_capability_ids],
+                capabilitySets=[self._capability_sets_by_id[x] for x in remaining_set_ids],
             )
 
+            result.append(cleaned_hash_role)
+
         return result
+
+    def __get_assigned_capabilities(self, user_id):
+        user_capabilities = self._users_capabilities.get(user_id, UserCapabilities())
+        role_capability_set_ids = OrderedSet[str](user_capabilities.roleCapabilitySets)
+        all_role_capability_ids = OrderedSet[str](user_capabilities.roleCapabilities)
+        for capability_set_id in role_capability_set_ids:
+            set_by_id = self._capability_sets_by_id.get(capability_set_id, None)
+            if set_by_id is not None:
+                all_role_capability_ids.add_all(set_by_id.capabilities)
+        return all_role_capability_ids.to_list(), role_capability_set_ids.to_list()
 
     @staticmethod
     def is_sha1_hash(s: str) -> bool:

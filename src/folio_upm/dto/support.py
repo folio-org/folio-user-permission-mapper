@@ -62,16 +62,11 @@ class AnalyzedPermissionSet(BaseModel):
 
     def get_sub_permissions(self, include_flat: bool = False) -> OrderedSet[str]:
         sub_permissions = OrderedSet()
-        if include_flat:
-            for source_perm_set in self.sourcePermSets:
-                if source_perm_set.src == SourceType.FLAT_PS:
-                    sub_permissions.add_all(source_perm_set.val.subPermissions)
-            return sub_permissions
-
         for source_perm_set in self.sourcePermSets:
-            source = source_perm_set.src
-            if source == SourceType.PS or source == SourceType.OKAPI_PS:
-                sub_permissions += source_perm_set.val.subPermissions
+            if source_perm_set.src == SourceType.FLAT_PS:
+                sub_permissions += source_perm_set.val.subPermissions if include_flat else []
+                continue
+            sub_permissions += source_perm_set.val.subPermissions
         return sub_permissions
 
     def get_uq_display_names_str(self) -> str:

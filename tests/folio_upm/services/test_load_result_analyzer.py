@@ -20,6 +20,7 @@ class TestDataProvider:
     def get_data():
         return [
             pytest.param("1user-1ps.json", id="Single role assignment"),
+            pytest.param("1user-nested-ps.json", id="Single role assignment with nested okapi permission set"),
             pytest.param("2user-1ps.json", id="2 users share a simple role"),
             pytest.param("2user-2ps.json", id="2 users share 2 same permission sets => 2 users with 2 same roles"),
             pytest.param("3user-many-ps+shared-ps.json", id="shared ps between 3 users + individual permissions"),
