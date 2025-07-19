@@ -4,7 +4,6 @@ from folio_upm.utils import log_factory
 from folio_upm.utils.cql_query_utils import CqlQueryUtils
 from folio_upm.utils.loading_utils import PagedDataLoader, PartitionedDataLoader
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.upm_env import Env
 
 
 class PermissionService(metaclass=SingletonMeta):

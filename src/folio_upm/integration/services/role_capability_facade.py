@@ -37,7 +37,6 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
             migration_results += role_set_assign_rs
         return migration_results
 
-
     def update_role_capabilities(self, clean_hash_roles: List[CleanHashRole]):
         cleanup_result = []
         for hr in clean_hash_roles:

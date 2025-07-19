@@ -51,13 +51,13 @@ class S3Storage(metaclass=SingletonMeta):
 
     def find_latest_key_by_prefix(self, prefix: str) -> Optional[str]:
         try:
-            paginator = self._s3_client.get_paginator('list_objects_v2')
+            paginator = self._s3_client.get_paginator("list_objects_v2")
             page_iterator = paginator.paginate(Bucket=self._bucket, Prefix=prefix)
 
             matching_keys = []
             for page in page_iterator:
-                for obj in page.get('Contents', []):
-                    matching_keys.append(obj['Key'])
+                for obj in page.get("Contents", []):
+                    matching_keys.append(obj["Key"])
 
             if not matching_keys:
                 self._log.debug(f"No files found with prefix: {prefix}")
@@ -68,7 +68,7 @@ class S3Storage(metaclass=SingletonMeta):
             return latest_key
 
         except Exception as e:
-            self._log.error(f"Error finding latest file with prefix '%s'", prefix, e)
+            self._log.error("Error finding latest file with prefix '%s'", prefix, e)
             return None
 
     def __get_object(self, file_key):

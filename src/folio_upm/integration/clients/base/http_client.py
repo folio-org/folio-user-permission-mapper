@@ -39,7 +39,6 @@ class HttpClient:
         response.raise_for_status()
         return response.json()
 
-
     def put_json(self, path, request_body: Any, params: dict | None = None) -> None:
         body_json_str = JsonUtils.to_json(request_body)
         response = requests.put(

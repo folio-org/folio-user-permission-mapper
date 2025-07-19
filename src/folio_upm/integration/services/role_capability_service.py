@@ -51,4 +51,3 @@ class RoleCapabilityService(RoleEntityService, metaclass=SingletonMeta):
     @override
     def _create_update_result(self, role, entity_ids) -> EntityMigrationResult:
         return EntityMigrationResult.for_role_capabilities(role, entity_ids, "success")
-

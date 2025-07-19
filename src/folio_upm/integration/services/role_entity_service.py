@@ -4,7 +4,7 @@ from typing import Any, List, Union
 import requests
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import Role, Capability, CapabilitySet
+from folio_upm.dto.eureka import Capability, CapabilitySet, Role
 from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory
@@ -46,7 +46,7 @@ class RoleEntityService(metaclass=SingletonMeta):
             self._update_role_entities(role.id, entity_ids)
             return self._create_update_result(role.id, entity_ids)
         except requests.HTTPError as err:
-            return self._create_error_update_result(role , entity_ids, err)
+            return self._create_error_update_result(role, entity_ids, err)
 
     def __assign_entity_ids_to_role(self, role, entity_ids):
         role_id = role.id

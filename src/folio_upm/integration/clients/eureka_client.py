@@ -75,5 +75,3 @@ class EurekaClient(metaclass=SingletonMeta):
         query_params = {"query": query, "limit": limit, "offset": offset}
         response_json = self._client.get_json(path, params=query_params)
         return response_json.get(resource, [])
-
-
