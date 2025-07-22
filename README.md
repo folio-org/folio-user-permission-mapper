@@ -119,7 +119,6 @@ The command will do the following actions:
 | OKAPI_ADMIN_USERNAME          |                       | true     | The username for the admin user in Okapi                          |
 | OKAPI_ADMIN_PASSWORD          |                       | true     | The password for the admin user in Okapi                          |
 | PERMISSION_IDS_PARTITION_SIZE | 50                    | true     | The max number of permissions provided in any match query         |
-| DOTENV                        | .env                  | false    | Custom `.env` file location _(preferable to pass it as variable)_ |
 
 ---
 
@@ -162,7 +161,6 @@ The command will do the following actions:
 | TENANT_ID             |                       | true     | The tenant ID for the FOLIO environment                           |
 | EUREKA_ADMIN_USERNAME |                       | true     | The username for the admin user in Okapi                          |
 | EUREKA_ADMIN_PASSWORD |                       | true     | The password for the admin user in Okapi                          |
-| DOTENV                | .env                  | false    | Custom `.env` file location _(preferable to pass it as variable)_ |
 
 ---
 
@@ -199,7 +197,6 @@ The command will do the following actions:
 | TENANT_ID                      |               | true     | The tenant ID for the FOLIO environment                                                                                                     |
 | SYSTEM_GENERATED_PERM_MAPPINGS |               | false    | Comma-separated list of system-generated permission mappings to highlight in analysis (e.g., `folio_admin:AdminRole`)                       |
 | REF_CAPABILITIES_FILE_KEY      |               | false    | File key in storage that can be used as reference for capabilities (Recommended to pull this data for tenant with all applications enabled) |
-| DOTENV                         | .env          | false    | Custom `.env` file                                                                                                                          |
 | EUREKA_ROLE_LOAD_STRATEGY      | distributed   | true     | Approach how roles must be generated (one of: distributed, consolidated)                                                                    |
 
 ---

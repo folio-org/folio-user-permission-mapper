@@ -9,13 +9,12 @@ from folio_upm.storage.tenant_storage import TenantStorage
 from folio_upm.utils import log_factory
 from folio_upm.utils.file_utils import FileUtils
 from folio_upm.utils.json_utils import JsonUtils
-from folio_upm.utils.upm_env import Env
 from folio_upm.utils.xlsx_utils import XlsxUtils
 
 
 class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
     def __init__(self):
-        super().__init__(Env().get_bool("OVERRIDE_LOCAL_DATA", default_value=False))
+        super().__init__()
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("LocalTenantStorage initialized.")
         self._out_folder = ".temp"

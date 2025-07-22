@@ -11,10 +11,9 @@ class TenantStorage:
     _json_ext = "json"
     _json_gz_ext = "json.gz"
 
-    def __init__(self, override_reports: bool = True):
+    def __init__(self):
         self._tenant_id = Env().get_tenant_id()
         self._log = log_factory.get_logger(self.__class__.__name__)
-        self._override_reports = override_reports
 
     def save_object(self, object_name: str, object_ext: str, object_data: Any = None):
         file_key = self._get_file_key(object_name, object_ext, include_ts=True)

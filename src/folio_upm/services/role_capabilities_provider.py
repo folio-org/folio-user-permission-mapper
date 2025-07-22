@@ -6,6 +6,7 @@ from folio_upm.dto.results import AnalyzedRole, EurekaLoadResult, PermissionAnal
 from folio_upm.dto.support import CapabilityPlaceholder, ExpandedPermissionSet, RoleCapabilitiesHolder
 from folio_upm.services.capability_service import CapabilityService
 from folio_upm.utils import log_factory
+from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.upm_env import Env
 
 
@@ -20,6 +21,7 @@ class RoleCapabilitiesProvider:
         self._log = log_factory.get_logger(__class__.__name__)
         self._roles = roles
         self._ps_analysis_result = ps_analysis_result
+        self._not_found_permission_sets = OrderedSet[str]()
         self._capability_service = CapabilityService(eureka_load_result)
         self._role_capabilities = self.__collect_role_capabilities()
 
@@ -33,6 +35,11 @@ class RoleCapabilitiesProvider:
             role_capabilities_holder = self.__process_single_role(ar, migration_strategy)
             if role_capabilities_holder:
                 role_capabilities.append(role_capabilities_holder)
+
+        not_found_ps_sets = self._not_found_permission_sets.to_list()
+        if not_found_ps_sets:
+            self._log.warn("The following permission sets were not found: %s", not_found_ps_sets)
+
         return role_capabilities
 
     def __process_single_role(self, ar: AnalyzedRole, migration_strategy) -> Optional[RoleCapabilitiesHolder]:
@@ -78,7 +85,7 @@ class RoleCapabilitiesProvider:
         if analyzed_ps is not None:
             expanded_pss += self.__get_nested_capability_sets(analyzed_ps)
         else:
-            self._log.warn("Source permission not found: %s", ps_name)
+            self._not_found_permission_sets.add(ps_name)
 
         capability_placeholders = []
         for ps, ps_type in expanded_pss:
