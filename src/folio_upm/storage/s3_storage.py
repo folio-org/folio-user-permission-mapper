@@ -64,7 +64,7 @@ class S3Storage(metaclass=SingletonMeta):
                 return None
 
             latest_key = FileUtils.get_latest_file_key(matching_keys)
-            self._log.debug(f"Found {len(matching_keys)} files with prefix '{prefix}', latest: {latest_key}")
+            self._log.debug(f"Found files with prefix '{prefix}', latest: {latest_key}, files: {matching_keys}")
             return latest_key
 
         except Exception as e:

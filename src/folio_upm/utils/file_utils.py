@@ -7,7 +7,7 @@ from typing import Optional
 from folio_upm.utils import log_factory
 
 _log = log_factory.get_logger("FileUtils")
-_timestamp_pattern = r"-(\d{4}\d{2}\d{2}-\d{2}\d{2}\d{2}\\d+)"
+_timestamp_pattern = r"-(\d{8}-\d{12})"
 
 
 class FileUtils:
@@ -64,7 +64,7 @@ class FileUtils:
                 matching_keys.append(relative_key)
 
             latest_key = FileUtils.get_latest_file_key(matching_keys)
-            _log.debug(f"Found {len(matching_keys)} files with prefix '{prefix}', latest: {latest_key}")
+            _log.debug(f"Found files with prefix '{prefix}', latest: {latest_key}, files: {matching_keys}")
             return latest_key
 
         except Exception as e:

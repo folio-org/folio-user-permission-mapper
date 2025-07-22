@@ -114,7 +114,7 @@ class RoleCapabilitiesProvider:
             sub_ps_type = self._ps_analysis_result.identify_permission_type(sub_ps_name)
             sub_analyzed_ps = self._ps_analysis_result[sub_ps_type].get(sub_ps_name, None)
             if sub_analyzed_ps is None:
-                self._log.debug("Permission not found for name: %s", sub_ps_name)
+                self._not_found_permission_sets.add(sub_ps_name)
                 continue
             if sub_analyzed_ps.get_sub_permissions():
                 expanded_sub_ps = ExpandedPermissionSet(permissionName=sub_ps_name, expandedFrom=[sub_ps_name])
