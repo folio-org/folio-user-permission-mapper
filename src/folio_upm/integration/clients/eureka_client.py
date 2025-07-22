@@ -40,7 +40,9 @@ class EurekaClient(metaclass=SingletonMeta):
 
     def post_role_capability_sets(self, role_id, capability_set_ids: List[str]):
         body = {"roleId": role_id, "capabilitySetIds": capability_set_ids}
-        self._client.put_json("/roles/capability-sets", request_body=body)
+        response = self._client.post_json("/roles/capability-sets", request_body=body)
+        role_capability_sets_json = response.get("roleCapabilitySets", []) if response else []
+        return [RoleCapabilitySet(**rc) for rc in role_capability_sets_json]
 
     def update_role_capability_sets(self, role_id: str, capability_set_ids: List[str]):
         body = {"roleId": role_id, "capabilitySetIds": capability_set_ids}
