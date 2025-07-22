@@ -7,7 +7,7 @@ from typing import Optional
 from folio_upm.utils import log_factory
 
 _log = log_factory.get_logger("FileUtils")
-_timestamp_pattern = r"-(\d{8}-\d{12})"
+_timestamp_pattern = r"-(\d{4}\d{2}\d{2}-\d{2}\d{2}\d{2}\d{6})"
 
 
 class FileUtils:
