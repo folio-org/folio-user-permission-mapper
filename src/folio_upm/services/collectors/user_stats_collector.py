@@ -1,4 +1,4 @@
-from folio_upm.dto.permission_type import DEPRECATED, INVALID, MUTABLE, OKAPI
+from folio_upm.dto.permission_type import DEPRECATED, INVALID, MUTABLE, OKAPI, QUESTIONABLE, UNPROCESSED
 from folio_upm.dto.results import OkapiLoadResult, PermissionAnalysisResult, UserStatistics
 
 
@@ -37,7 +37,7 @@ class UserStatsCollector:
 
         for ps_name in user_permission.permissions:
             ps_type = self._ps_analysis_result.identify_permission_type(ps_name)
-            if ps_type not in counts:
+            if ps_type.get_name() not in counts:
                 counts[ps_type.get_name()] = 0
             if self._all_type not in counts:
                 counts[self._all_type] = 0
@@ -46,9 +46,17 @@ class UserStatsCollector:
 
         return UserStatistics(
             userId=user_permission.userId,
-            mutablePermissionSetsCount=counts.get(MUTABLE.get_name(), 0),
+            mutablePermissionSetsCount=self.get_mutable_ps_count(counts),
             invalidPermissionSetsCount=counts.get(INVALID.get_name(), 0),
             okapiPermissionSetsCount=counts.get(OKAPI.get_name(), 0),
             deprecatedPermissionSetsCount=counts.get(DEPRECATED.get_name(), 0),
             allPermissionSetsCount=counts.get(self._all_type, 0),
+        )
+
+    @staticmethod
+    def get_mutable_ps_count(counts: dict[str, int]) -> int:
+        return (
+            counts.get(MUTABLE.get_name(), 0)
+            + counts.get(QUESTIONABLE.get_name(), 0)
+            + counts.get(UNPROCESSED.get_name(), 0)
         )
