@@ -4,7 +4,7 @@ import json
 import click
 
 from folio_upm.dto.cleanup import CleanHashRole
-from folio_upm.dto.results import OkapiLoadResult, PreparedEurekaData
+from folio_upm.dto.results import OkapiLoadResult, PreparedEurekaData, EurekaLoadResult
 from folio_upm.integration.services.eureka_cleanup_service import EurekaCleanupService
 from folio_upm.integration.services.eureka_migration_service import EurekaMigrationService
 from folio_upm.services.eureka_hash_role_analyzer import EurekaHashRoleAnalyzer
@@ -171,11 +171,11 @@ def explain_permissions(name, file):
         return
 
 
-def __collect_capabilities(result_fn: str):
+def __collect_capabilities(result_fn: str) -> EurekaLoadResult:
     storage_service = TenantStorageService()
     capability_load_result = CapabilitiesLoader().load_capabilities()
     storage_service.save_object(result_fn, json_gz_ext, capability_load_result)
-    return capability_load_result
+    return EurekaLoadResult(**capability_load_result)
 
 
 if __name__ == "__main__":
