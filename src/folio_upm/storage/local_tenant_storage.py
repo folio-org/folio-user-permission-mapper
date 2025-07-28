@@ -25,8 +25,8 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
         return json_bytes_buffer and JsonUtils.from_json_gz(json_bytes_buffer)
 
     @override
-    def _find_latest_object_by_name(self, prefix: str) -> Optional[str]:
-        return FileUtils.find_latest_key_by_prefix(self._out_folder, prefix)
+    def _find_latest_object_by_name(self, prefix: str, object_ext: str) -> Optional[str]:
+        return FileUtils.find_latest_key_by_prefix(self._out_folder, prefix, object_ext)
 
     @override
     def _save_json_gz(self, file_key, object_data: dict):

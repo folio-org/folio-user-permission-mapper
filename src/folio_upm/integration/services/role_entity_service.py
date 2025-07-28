@@ -1,10 +1,10 @@
 import re
-from typing import Any, List, Union
+from typing import Any, List
 
 import requests
 
 from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import Capability, CapabilitySet, Role
+from folio_upm.dto.eureka import Role
 from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.utils import log_factory
@@ -38,9 +38,8 @@ class RoleEntityService(metaclass=SingletonMeta):
         except requests.HTTPError as err:
             return self.__handle_error_response(role, entity_ids, err)
 
-    def update(self, role: Role, entities: List[Union[Capability, CapabilitySet]]):
-        entity_ids = [entity.id for entity in entities]
-        if not entities:
+    def update(self, role: Role, entity_ids: List[str]):
+        if not entity_ids:
             self._log.info("No entities provided for role '%s': %s.", role.name, self._name)
         try:
             self._update_role_entities(role.id, entity_ids)

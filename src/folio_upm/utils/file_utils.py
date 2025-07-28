@@ -49,7 +49,7 @@ class FileUtils:
         return directory_path
 
     @staticmethod
-    def find_latest_key_by_prefix(out_folder: str, prefix: str) -> Optional[str]:
+    def find_latest_key_by_prefix(out_folder: str, prefix: str, object_ext: str) -> Optional[str]:
         try:
             search_pattern = os.path.join(out_folder, f"{prefix}*")
             matching_files = glob.glob(search_pattern)
@@ -63,6 +63,7 @@ class FileUtils:
                 relative_key = os.path.relpath(file_path, out_folder)
                 matching_keys.append(relative_key)
 
+            matching_keys = [key for key in matching_keys if key.endswith(object_ext)]
             latest_key = FileUtils.get_latest_file_key(matching_keys)
             _log.debug(f"Found files with prefix '{prefix}', latest: {latest_key}, files: {matching_keys}")
             return latest_key

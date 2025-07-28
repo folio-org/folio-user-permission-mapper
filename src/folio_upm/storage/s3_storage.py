@@ -49,7 +49,7 @@ class S3Storage(metaclass=SingletonMeta):
 
         return self.__get_object(file_key)
 
-    def find_latest_key_by_prefix(self, prefix: str) -> Optional[str]:
+    def find_latest_key_by_prefix(self, prefix: str, object_ext: str) -> Optional[str]:
         try:
             paginator = self._s3_client.get_paginator("list_objects_v2")
             page_iterator = paginator.paginate(Bucket=self._bucket, Prefix=prefix)
@@ -63,6 +63,7 @@ class S3Storage(metaclass=SingletonMeta):
                 self._log.debug(f"No files found with prefix: {prefix}")
                 return None
 
+            matching_keys = [key for key in matching_keys if key.endswith(object_ext)]
             latest_key = FileUtils.get_latest_file_key(matching_keys)
             self._log.debug(f"Found files with prefix '{prefix}', latest: {latest_key}, files: {matching_keys}")
             return latest_key

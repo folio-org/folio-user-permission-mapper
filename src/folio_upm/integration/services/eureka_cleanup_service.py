@@ -1,6 +1,6 @@
 from typing import List
 
-from folio_upm.dto.cleanup import CleanHashRole
+from folio_upm.dto.cleanup import CleanHashRole, HashRoleCleanupData
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.dto.results import EurekaCleanUpResult
 from folio_upm.integration.services.role_capability_facade import RoleCapabilityFacade
@@ -10,7 +10,7 @@ from folio_upm.utils import log_factory
 
 class EurekaCleanupService(metaclass=SingletonMeta):
 
-    def __init__(self, clean_hash_roles: List[CleanHashRole]):
+    def __init__(self, clean_hash_roles: List[HashRoleCleanupData]):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._clean_hash_roles = clean_hash_roles
         self._role_service = RoleService()

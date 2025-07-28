@@ -14,7 +14,7 @@ class EurekaClient(metaclass=SingletonMeta):
         self._client = EurekaHttpClient()
 
     def post_role(self, role: Role) -> Role:
-        response_json = self._client.post_json("/roles", role.model_dump())
+        response_json = self._client.post_json("/roles", role.model_dump(by_alias=True))
         return Role(**response_json)
 
     def delete_role(self, role_id):

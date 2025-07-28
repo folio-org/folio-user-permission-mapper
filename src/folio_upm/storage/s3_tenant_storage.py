@@ -24,8 +24,8 @@ class S3TenantStorage(TenantStorage, metaclass=SingletonMeta):
         return self.__get_s3_object(file_key, lambda body: JsonUtils.from_json_gz(body))
 
     @override
-    def _find_latest_object_by_name(self, prefix: str) -> Optional[str]:
-        return self._storage.find_latest_key_by_prefix(prefix)
+    def _find_latest_object_by_name(self, prefix: str, object_ext: str) -> Optional[str]:
+        return self._storage.find_latest_key_by_prefix(prefix, object_ext)
 
     @override
     def _save_json_gz(self, file_key, object_data: dict):

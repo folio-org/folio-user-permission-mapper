@@ -1,6 +1,6 @@
 from typing import List
 
-from folio_upm.dto.cleanup import CleanHashRole
+from folio_upm.dto.cleanup import HashRoleCleanupData
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.dto.migration import EntityMigrationResult
 from folio_upm.dto.support import RoleCapabilitiesHolder
@@ -37,7 +37,7 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
             migration_results += role_set_assign_rs
         return migration_results
 
-    def update_role_capabilities(self, clean_hash_roles: List[CleanHashRole]):
+    def update_role_capabilities(self, clean_hash_roles: List[HashRoleCleanupData]):
         cleanup_result = []
         for hr in clean_hash_roles:
             cleanup_result.append(self._rc_service.update(hr.role, hr.capabilities))

@@ -3,7 +3,7 @@ import json
 
 import click
 
-from folio_upm.dto.cleanup import CleanHashRole
+from folio_upm.dto.cleanup import HashRoleCleanupData
 from folio_upm.dto.results import OkapiLoadResult, PreparedEurekaData, EurekaLoadResult
 from folio_upm.integration.services.eureka_cleanup_service import EurekaCleanupService
 from folio_upm.integration.services.eureka_migration_service import EurekaMigrationService
@@ -24,14 +24,16 @@ from folio_upm.xlsx.ps_xlsx_report_provider import PsXlsxReportProvider
 
 xlsx_ext = "xlsx"
 json_gz_ext = "json.gz"
+
 okapi_permissions_fn = "okapi-permissions"
 eureka_capabilities_fn = "eureka-capabilities"
-eureka_capabilities_cleanup_data_fn = "capabilities-cleanup-data"
-eureka_cleanup_data_fn = "eureka-cleanup-data"
-mixed_analysis_result_fn = "analysis-result"
 
-eureka_migration_result_fn = "migration-result"
-eureka_cleanup_result_fn = "cleanup-result"
+analysis_result_fn = "analysis-result"
+migration_result_fn = "migration-report"
+
+migrated_eureka_data_fn = "migrated-eureka-data"
+hash_roles_cleanup_data_fn = "hash-roles-cleanup-data"
+hash_roles_cleanup_result_fn = "hash-roles-cleanup-report"
 
 
 _log = log_factory.get_logger("cli.py")
@@ -70,11 +72,11 @@ def generate_report():
     analysis_result = load_result_analyzer.get_results()
     workbook = PsXlsxReportProvider(analysis_result).generate_report()
 
-    result_fn = f"{mixed_analysis_result_fn}-{strategy_name}"
+    result_fn = f"{analysis_result_fn}-{strategy_name}"
     storage_service.save_object(result_fn, xlsx_ext, workbook)
 
     prepared_eureka_data = load_result_analyzer.get_prepared_eureka_data()
-    storage_service.save_object(result_fn, json_gz_ext, prepared_eureka_data.model_dump())
+    storage_service.save_object(result_fn, json_gz_ext, prepared_eureka_data.model_dump(by_alias=True))
     _log.info("Report is successfully generated for strategy: %s", strategy_name)
 
 
@@ -84,16 +86,16 @@ def run_eureka_migration():
     strategy_name = migration_strategy.get_name()
     _log.info("Running eureka migration for strategy: %s ...", strategy_name)
 
-    result_fn = f"{mixed_analysis_result_fn}-{strategy_name}"
+    result_fn = f"{analysis_result_fn}-{strategy_name}"
     storage_service = TenantStorageService()
     analysis_result_dict = storage_service.require_object(result_fn, json_gz_ext)
     analysis_result = PreparedEurekaData(**analysis_result_dict)
     migration_result = EurekaMigrationService().migrate_to_eureka(analysis_result)
     migration_result_report = MigrationResultService(migration_result).generate_report()
 
-    migration_result_fn = f"{eureka_migration_result_fn}-{strategy_name}"
-    storage_service.save_object(migration_result_fn, json_gz_ext, migration_result.model_dump())
-    storage_service.save_object(migration_result_fn, xlsx_ext, migration_result_report)
+    _migration_result_fn = f"{migration_result_fn}-{strategy_name}"
+    storage_service.save_object(_migration_result_fn, json_gz_ext, migration_result.model_dump(by_alias=True))
+    storage_service.save_object(_migration_result_fn, xlsx_ext, migration_result_report)
 
 
 @cli.command("analyze-hash-roles")
@@ -102,7 +104,7 @@ def analyze_hash_roles():
     storage_service = TenantStorageService()
     strategy_name = migration_strategy.get_name()
     _log.info("Analyzing hash-role capabilities for: %s", strategy_name)
-    file_name = f"{eureka_capabilities_cleanup_data_fn}-{strategy_name}"
+    file_name = f"{migrated_eureka_data_fn}-{strategy_name}"
     eureka_rs_loader = EurekaResultLoader(use_ref_file=False, src_file_name=file_name)
     eureka_load_rs = eureka_rs_loader.find_load_result()
     if eureka_load_rs is None:
@@ -110,12 +112,12 @@ def analyze_hash_roles():
 
     hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
     workbook = EurekaXlsxReportProvider(hash_role_analysis_result).generate_report()
-    result_fn = f"{eureka_capabilities_cleanup_data_fn}-{strategy_name}"
+    result_fn = f"{hash_roles_cleanup_data_fn}-{strategy_name}"
     storage_service.save_object(result_fn, xlsx_ext, workbook)
 
-    cleanup_data_fn = f"{eureka_cleanup_data_fn}-{strategy_name}"
-    clean_hash_roles_rs = [x.model_dump() for x in hash_role_analysis_result.cleanHashRoles]
-    storage_service.save_object(cleanup_data_fn, json_gz_ext, clean_hash_roles_rs)
+    clean_hash_roles_rs = HashRoleCleanupData.from_analysis_result(hash_role_analysis_result)
+    clean_hash_roles_list = [x.model_dump(by_alias=True) for x in clean_hash_roles_rs]
+    storage_service.save_object(result_fn, json_gz_ext, clean_hash_roles_list)
 
 
 @cli.command("cleanup-hash-roles")
@@ -126,12 +128,12 @@ def clean_hash_roles():
     _log.info("Cleaning hash roles for strategy: %s ...", strategy_name)
 
     storage_service = TenantStorageService()
-    cleanup_data = storage_service.require_object(eureka_cleanup_data_fn, json_gz_ext)
-    clean_hash_roles_data = [CleanHashRole(**x) for x in cleanup_data]
+    cleanup_data = storage_service.require_object(hash_roles_cleanup_data_fn, json_gz_ext)
+    clean_hash_roles_data = [HashRoleCleanupData(**x) for x in cleanup_data]
     cleanup_service = EurekaCleanupService(clean_hash_roles_data)
     cleanup_result = cleanup_service.perform_cleanup()
 
-    result_fn = f"{eureka_cleanup_result_fn}-{strategy_name}"
+    result_fn = f"{hash_roles_cleanup_result_fn}-{strategy_name}"
     cleanup_report = CleanupResultService(cleanup_result).generate_report()
     storage_service.save_object(result_fn, xlsx_ext, cleanup_report)
 

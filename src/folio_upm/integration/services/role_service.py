@@ -2,7 +2,7 @@ from typing import List, Set
 
 import requests
 
-from folio_upm.dto.cleanup import CleanHashRole
+from folio_upm.dto.cleanup import CleanHashRole, HashRoleCleanupData
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.dto.eureka import Role
 from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
@@ -43,7 +43,7 @@ class RoleService(metaclass=SingletonMeta):
             load_rs.append(self.__verify_and_create_role(ar, existing_role_names))
         return load_rs
 
-    def delete_roles(self, clean_hash_roles: List[CleanHashRole]) -> List[EntityMigrationResult]:
+    def delete_roles(self, clean_hash_roles: List[HashRoleCleanupData]) -> List[EntityMigrationResult]:
         roles_to_delete = [hash_role.role.id for hash_role in clean_hash_roles if self.__should_delete(hash_role)]
         self._log.info("Removing roles: %s", roles_to_delete)
         remove_rs = []
@@ -99,5 +99,5 @@ class RoleService(metaclass=SingletonMeta):
             return EntityMigrationResult.for_removed_role(role_id, status, "Failed to perform request", error)
 
     @staticmethod
-    def __should_delete(role: CleanHashRole) -> bool:
+    def __should_delete(role: HashRoleCleanupData) -> bool:
         return not role.capabilities and not role.capabilitySets

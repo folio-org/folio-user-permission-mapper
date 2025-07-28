@@ -90,7 +90,7 @@ class _Utils:
 
         return {
             "roles": [{"name": r.role.name, "description": r.role.description} for r in rs.roles.values()],
-            "roleUsers": [x.model_dump() for x in rs.roleUsers],
+            "roleUsers": [x.model_dump(by_alias=True) for x in rs.roleUsers],
             "roleCapabilities": role_capabilities,
         }
 

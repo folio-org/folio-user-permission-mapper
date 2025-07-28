@@ -28,7 +28,7 @@ class TenantStorage:
 
     def find_object(self, object_name: str, object_ext: str) -> Optional[Any]:
         object_key_prefix = self._get_file_prefix(object_name)
-        object_key = self._find_latest_object_by_name(object_key_prefix)
+        object_key = self._find_latest_object_by_name(object_key_prefix, object_ext)
         if object_key is None:
             self._log.warning("Object not found by prefix: %s", object_key_prefix)
             return None
@@ -49,7 +49,7 @@ class TenantStorage:
             self._log.error("Unsupported object type: %s, file=%s", ref_key, ref_key)
         return None
 
-    def _find_latest_object_by_name(self, prefix: str) -> Optional[str]:
+    def _find_latest_object_by_name(self, prefix: str, object_ext: str) -> Optional[str]:
         return None
 
     def _find_json(self, file_key: str):
