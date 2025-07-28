@@ -24,6 +24,7 @@ class TestDataProvider:
             pytest.param("2user-1ps.json", id="2 users share a simple role"),
             pytest.param("2user-2ps.json", id="2 users share 2 same permission sets => 2 users with 2 same roles"),
             pytest.param("3user-many-ps+shared-ps.json", id="shared ps between 3 users + individual permissions"),
+            pytest.param("simple-nesting.json", id="Simple nesting (assignments on diff levels)"),
             pytest.param("deep-nesting.json", id="Deep nesting"),
             pytest.param("mixed-role-feature-assignment.json", id="Mixed role/feature assignments"),
             pytest.param("circular-references.json", id="Circular references (A contains B contains C contains A)"),

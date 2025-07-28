@@ -28,33 +28,33 @@
   "roleUsers": [
     {
       "userId": "user_A",
-      "roles": ["PS 1", "PS 2", "PS 3", "PS 4", "PS 5", "PS 6"]
+      "roles": [ "PS 1", "PS 2", "PS 3", "PS 4", "PS 5", "PS 6" ]
     }
   ],
   "roleCapabilities": [
     {
       "roleName": "PS 1",
-      "ps": ["m1_okapi.all"]
+      "ps": [ "m1_okapi.all" ]
     },
     {
       "roleName": "PS 2",
-      "ps": ["m2_okapi.all"]
+      "ps": [ "m2_okapi.all" ]
     },
     {
       "roleName": "PS 3",
-      "ps": ["m3_okapi.all"]
+      "ps": [ "m3_okapi.all" ]
     },
     {
       "roleName": "PS 4",
-      "ps": ["m4_okapi.all"]
+      "ps": [ "m4_okapi.all" ]
     },
     {
       "roleName": "PS 5",
-      "ps": ["m5_okapi.all"]
+      "ps": [ "m5_okapi.all" ]
     },
     {
       "roleName": "PS 6",
-      "ps": ["m6_okapi.all"]
+      "ps": [ "m6_okapi.all" ]
     }
   ]
 }

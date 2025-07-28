@@ -28,7 +28,7 @@
   "roleUsers": [
     {
       "userId": "user_A",
-      "roles": ["PS 1"]
+      "roles": [ "PS 1" ]
     }
   ],
   "roleCapabilities": [

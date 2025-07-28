@@ -5,11 +5,11 @@
       "description": "PS 2 - Description"
     }
   ],
-  "roleUsers": [],
+  "roleUsers": [ ],
   "roleCapabilities": [
     {
       "roleName": "PS 2",
-      "ps": ["m1_okapi.all", "m2_okapi.all"]
+      "ps": [ "m1_okapi.all", "m2_okapi.all" ]
     }
   ]
 }

@@ -11,7 +11,7 @@
         {
           "permissionName": "m1_okapi.all",
           "displayName": "Test Module #1: All permissions",
-          "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+          "subPermissions": [ "m1_okapi_ps1", "m1_okapi_ps2" ]
         }
       ]
     },
@@ -26,7 +26,7 @@
         {
           "permissionName": "m2_okapi.all",
           "displayName": "Test Module #2: All permissions",
-          "subPermissions": ["m2_okapi_ps1"]
+          "subPermissions": [ "m2_okapi_ps1" ]
         }
       ]
     },
@@ -41,7 +41,7 @@
         {
           "permissionName": "m3_okapi.all",
           "displayName": "Test Module #3: All permissions",
-          "subPermissions": ["m3_okapi_ps1"]
+          "subPermissions": [ "m3_okapi_ps1" ]
         }
       ]
     }
@@ -54,7 +54,7 @@
     {
       "permissionName": "m1_okapi.all",
       "displayName": "Test Module #1: All permissions",
-      "subPermissions": ["m1_okapi_ps1"]
+      "subPermissions": [ "m1_okapi_ps1" ]
     },
     {
       "permissionName": "m2_okapi_ps1",
@@ -63,7 +63,7 @@
     {
       "permissionName": "m2_okapi.all",
       "displayName": "Test Module #2: All permissions",
-      "subPermissions": ["m2_okapi_ps1"]
+      "subPermissions": [ "m2_okapi_ps1" ]
     },
     {
       "permissionName": "m3_okapi_ps1",
@@ -72,27 +72,27 @@
     {
       "permissionName": "m3_okapi.all",
       "displayName": "Test Module #3: All permissions",
-      "subPermissions": ["m3_okapi_ps1"]
+      "subPermissions": [ "m3_okapi_ps1" ]
     },
     {
       "permissionName": "user_ps1.1",
       "displayName": "PS 1.1",
       "description": "PS 1.1 - Description",
-      "subPermissions": ["m1_okapi.all", "empty"],
+      "subPermissions": [ "m1_okapi.all", "empty" ],
       "mutable": true
     },
     {
       "permissionName": "empty",
       "displayName": "Empty",
       "description": "Empty PS",
-      "subPermissions": ["user_ps1.3"],
+      "subPermissions": [ "user_ps1.3" ],
       "mutable": true
     },
     {
       "permissionName": "user_ps1.3",
       "displayName": "PS 3",
       "description": "PS 3 - Description",
-      "subPermissions": ["m3_okapi.all"],
+      "subPermissions": [ "m3_okapi.all" ],
       "mutable": true
     }
   ],
@@ -104,7 +104,7 @@
     {
       "permissionName": "m1_okapi.all",
       "displayName": "Test Module #1: All permissions",
-      "subPermissions": ["m1_okapi_ps1"]
+      "subPermissions": [ "m1_okapi_ps1" ]
     },
     {
       "permissionName": "m2_okapi_ps1",
@@ -113,7 +113,7 @@
     {
       "permissionName": "m2_okapi.all",
       "displayName": "Test Module #2: All permissions",
-      "subPermissions": ["m2_okapi_ps1"]
+      "subPermissions": [ "m2_okapi_ps1" ]
     },
     {
       "permissionName": "m3_okapi_ps1",
@@ -122,27 +122,27 @@
     {
       "permissionName": "m3_okapi.all",
       "displayName": "Test Module #3: All permissions",
-      "subPermissions": ["m3_okapi_ps1"]
+      "subPermissions": [ "m3_okapi_ps1" ]
     },
     {
       "permissionName": "user_ps1.1",
       "displayName": "PS 1.1",
       "description": "PS 1.1 - Description",
-      "subPermissions": ["m1_okapi.all", "m1_okapi_ps1", "empty"],
+      "subPermissions": [ "m1_okapi.all", "m1_okapi_ps1", "empty" ],
       "mutable": true
     },
     {
       "permissionName": "empty",
       "displayName": "Empty",
       "description": "Empty PS",
-      "subPermissions": ["user_ps1.3", "m3_okapi.all", "m3_okapi_ps1"],
+      "subPermissions": [ "user_ps1.3", "m3_okapi.all", "m3_okapi_ps1" ],
       "mutable": true
     },
     {
       "permissionName": "user_ps1.3",
       "displayName": "PS 3",
       "description": "PS 3 - Description",
-      "subPermissions": ["m3_okapi.all", "m3_okapi_ps1"],
+      "subPermissions": [ "m3_okapi.all", "m3_okapi_ps1" ],
       "mutable": true
     }
   ],
@@ -150,8 +150,8 @@
     {
       "id": "up_id1",
       "userId": "user_A",
-      "permissions": ["user_ps1.1", "m2_okapi.all"]
+      "permissions": [ "user_ps1.1", "m2_okapi.all" ]
     }
   ],
-  "allPermissionUsersExpanded": []
+  "allPermissionUsersExpanded": [ ]
 }

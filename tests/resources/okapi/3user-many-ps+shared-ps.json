@@ -15,7 +15,7 @@
         {
           "permissionName": "m1_okapi.all",
           "displayName": "Test Module #1: All permissions",
-          "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+          "subPermissions": [ "m1_okapi_ps1", "m1_okapi_ps2" ]
         }
       ]
     },
@@ -34,7 +34,7 @@
         {
           "permissionName": "m2_okapi.all",
           "displayName": "Test Module #3: All permissions",
-          "subPermissions": ["m2_okapi_ps1", "m2_okapi_ps2"]
+          "subPermissions": [ "m2_okapi_ps1", "m2_okapi_ps2" ]
         }
       ]
     },
@@ -49,7 +49,7 @@
         {
           "permissionName": "m3_okapi.all",
           "displayName": "Test Module #3: All permissions",
-          "subPermissions": ["m3_okapi_ps1"]
+          "subPermissions": [ "m3_okapi_ps1" ]
         }
       ]
     },
@@ -84,7 +84,7 @@
     {
       "permissionName": "m1_okapi.all",
       "displayName": "Test Module #1: All permissions",
-      "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+      "subPermissions": [ "m1_okapi_ps1", "m1_okapi_ps2" ]
     },
     {
       "permissionName": "m2_okapi_ps1",
@@ -97,7 +97,7 @@
     {
       "permissionName": "m2_okapi.all",
       "displayName": "Test Module #3: All permissions",
-      "subPermissions": ["m2_okapi_ps1", "m2_okapi_ps2"]
+      "subPermissions": [ "m2_okapi_ps1", "m2_okapi_ps2" ]
     },
     {
       "permissionName": "m3_okapi_ps1",
@@ -106,7 +106,7 @@
     {
       "permissionName": "m3_okapi.all",
       "displayName": "Test Module #3: All permissions",
-      "subPermissions": ["m3_okapi_ps1"]
+      "subPermissions": [ "m3_okapi_ps1" ]
     },
     {
       "permissionName": "m4_okapi_ps1",
@@ -124,21 +124,21 @@
       "permissionName": "user_ps1",
       "displayName": "PS 1",
       "description": "PS 1 - Description",
-      "subPermissions": ["m1_okapi.all"],
+      "subPermissions": [ "m1_okapi.all" ],
       "mutable": true
     },
     {
       "permissionName": "user_ps2",
       "displayName": "PS 2",
       "description": "PS 2 - Description",
-      "subPermissions": ["m2_okapi.all", "user_ps2.1"],
+      "subPermissions": [ "m2_okapi.all", "user_ps2.1" ],
       "mutable": true
     },
     {
       "permissionName": "user_ps2.1",
       "displayName": "PS 2.1",
       "description": "PS 2.1 - Description",
-      "subPermissions": ["m3_okapi.all"],
+      "subPermissions": [ "m3_okapi.all" ],
       "mutable": true
     }
   ],
@@ -154,7 +154,7 @@
     {
       "permissionName": "m1_okapi.all",
       "displayName": "Test Module #1: All permissions",
-      "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+      "subPermissions": [ "m1_okapi_ps1", "m1_okapi_ps2" ]
     },
     {
       "permissionName": "m2_okapi_ps1",
@@ -167,7 +167,7 @@
     {
       "permissionName": "m2_okapi.all",
       "displayName": "Test Module #3: All permissions",
-      "subPermissions": ["m2_okapi_ps1", "m2_okapi_ps2"]
+      "subPermissions": [ "m2_okapi_ps1", "m2_okapi_ps2" ]
     },
     {
       "permissionName": "m3_okapi_ps1",
@@ -176,7 +176,7 @@
     {
       "permissionName": "m3_okapi.all",
       "displayName": "Test Module #3: All permissions",
-      "subPermissions": ["m3_okapi_ps1"]
+      "subPermissions": [ "m3_okapi_ps1" ]
     },
     {
       "permissionName": "m4_okapi_ps1",
@@ -194,7 +194,7 @@
       "permissionName": "user_ps1",
       "displayName": "PS 1",
       "description": "PS 1 - Description",
-      "subPermissions": ["m1_okapi.all", "m1_okapi_ps1", "m1_okapi_ps2"],
+      "subPermissions": [ "m1_okapi.all", "m1_okapi_ps1", "m1_okapi_ps2" ],
       "mutable": true
     },
     {
@@ -216,7 +216,7 @@
       "permissionName": "user_ps2.1",
       "displayName": "PS 2.1",
       "description": "PS 2.1 - Description",
-      "subPermissions": ["m3_okapi.all", "m3_okapi_ps1", "m3_okapi_ps2"],
+      "subPermissions": [ "m3_okapi.all", "m3_okapi_ps1", "m3_okapi_ps2" ],
       "mutable": true
     }
   ],
@@ -224,38 +224,38 @@
     {
       "id": "up_id1.1",
       "userId": "user_A",
-      "permissions": ["user_ps1"]
+      "permissions": [ "user_ps1" ]
     },
     {
       "id": "up_id1.2",
       "userId": "user_A",
-      "permissions": ["m4_okapi_ps1"]
+      "permissions": [ "m4_okapi_ps1" ]
     },
     {
       "id": "up_id2.1",
       "userId": "user_B",
-      "permissions": ["user_ps1"]
+      "permissions": [ "user_ps1" ]
     },
     {
       "id": "up_id2.2",
       "userId": "user_B",
-      "permissions": ["m4_okapi_ps2"]
+      "permissions": [ "m4_okapi_ps2" ]
     },
     {
       "id": "up_id3.1",
       "userId": "user_C",
-      "permissions": ["user_ps1"]
+      "permissions": [ "user_ps1" ]
     },
     {
       "id": "up_id3.2",
       "userId": "user_C",
-      "permissions": ["m4_okapi_ps3"]
+      "permissions": [ "m4_okapi_ps3" ]
     },
     {
       "id": "up_id3.3",
       "userId": "user_C",
-      "permissions": [ "user_ps2"]
+      "permissions": [ "user_ps2" ]
     }
   ],
-  "allPermissionUsersExpanded": []
+  "allPermissionUsersExpanded": [ ]
 }

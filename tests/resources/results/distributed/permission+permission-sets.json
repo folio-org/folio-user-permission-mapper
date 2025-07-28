@@ -16,17 +16,17 @@
   "roleUsers": [
     {
       "userId": "user_A",
-      "roles": ["PS 1.1", "Empty", "PS 3"]
+      "roles": [ "PS 1.1", "Empty", "PS 3" ]
     }
   ],
   "roleCapabilities": [
     {
       "roleName": "PS 1.1",
-      "ps": ["m1_okapi.all"]
+      "ps": [ "m1_okapi.all" ]
     },
     {
       "roleName": "PS 3",
-      "ps": ["m3_okapi.all"]
+      "ps": [ "m3_okapi.all" ]
     }
   ]
 }

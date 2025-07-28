@@ -15,12 +15,12 @@
         {
           "permissionName": "m1_okapi.all",
           "displayName": "Test: Okapi Permission Set",
-          "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+          "subPermissions": [ "m1_okapi_ps1", "m1_okapi_ps2" ]
         },
         {
           "permissionName": "ui-m1_okapi.all",
           "displayName": "Test: Okapi Permission Set",
-          "subPermissions": ["m1_okapi.all"]
+          "subPermissions": [ "m1_okapi.all" ]
         }
       ]
     }
@@ -29,70 +29,70 @@
     {
       "permissionName": "m1_okapi_ps1",
       "displayName": "Test: Okapi Permission #1",
-      "childOf": ["m1_okapi.all"]
+      "childOf": [ "m1_okapi.all" ]
     },
     {
       "permissionName": "m1_okapi_ps2",
       "displayName": "Test: Okapi Permission #2",
-      "childOf": ["m1_okapi.all"]
+      "childOf": [ "m1_okapi.all" ]
     },
     {
       "permissionName": "m1_okapi.all",
       "displayName": "Test: Okapi Permission Set",
-      "childOf": ["user_ps"],
-      "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+      "childOf": [ "user_ps" ],
+      "subPermissions": [ "m1_okapi_ps1", "m1_okapi_ps2" ]
     },
     {
       "permissionName": "user_ps",
       "displayName": "PS 1",
       "description": "PS 1: Description",
-      "grantedTo": ["up_id1"],
+      "grantedTo": [ "up_id1" ],
       "mutable": true,
-      "subPermissions": ["ui-m1_okapi.all"]
+      "subPermissions": [ "ui-m1_okapi.all" ]
     },
     {
       "permissionName": "ui-m1_okapi.all",
       "displayName": "Test: Okapi Permission Set",
-      "subPermissions": ["m1_okapi.all"]
+      "subPermissions": [ "m1_okapi.all" ]
     }
   ],
   "allPermissionsExpanded": [
     {
       "permissionName": "m1_okapi_ps1",
       "displayName": "Test: Okapi Permission #1",
-      "childOf": ["m1_okapi.all"]
+      "childOf": [ "m1_okapi.all" ]
     },
     {
       "permissionName": "m1_okapi_ps2",
       "displayName": "Test: Okapi Permission #2",
-      "childOf": ["m1_okapi.all"]
+      "childOf": [ "m1_okapi.all" ]
     },
     {
       "permissionName": "m1_okapi.all",
       "displayName": "Test: Okapi Permission Set",
-      "childOf": ["user_ps"],
-      "subPermissions": ["m1_okapi_ps1", "m1_okapi_ps2"]
+      "childOf": [ "user_ps" ],
+      "subPermissions": [ "m1_okapi_ps1", "m1_okapi_ps2" ]
     },
     {
       "permissionName": "user_ps",
       "displayName": "PS 1",
       "description": "PS 1: Description",
-      "grantedTo": ["up_id1"],
+      "grantedTo": [ "up_id1" ],
       "mutable": true,
-      "subPermissions": ["ui-m1_okapi.all", "m1_okapi.all", "m1_okapi_ps1", "m1_okapi_ps2"]
+      "subPermissions": [ "ui-m1_okapi.all", "m1_okapi.all", "m1_okapi_ps1", "m1_okapi_ps2" ]
     },
     {
       "permissionName": "ui-m1_okapi.all",
       "displayName": "Test: Okapi Permission Set",
-      "subPermissions": ["m1_okapi.all", "m1_okapi.all", "m1_okapi_ps1", "m1_okapi_ps2"]
+      "subPermissions": [ "m1_okapi.all", "m1_okapi.all", "m1_okapi_ps1", "m1_okapi_ps2" ]
     }
   ],
   "allPermissionUsers": [
     {
       "id": "up_id1",
       "userId": "user_1",
-      "permissions": ["user_ps"]
+      "permissions": [ "user_ps" ]
     }
   ],
-  "allPermissionUsersExpanded": []
+  "allPermissionUsersExpanded": [ ]
 }

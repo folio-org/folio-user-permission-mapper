@@ -8,16 +8,16 @@
   "roleUsers": [
     {
       "userId": "User_A",
-      "roles": ["PS 1"]
+      "roles": [ "PS 1" ]
     }, {
       "userId": "User_B",
-      "roles": ["PS 1"]
+      "roles": [ "PS 1" ]
     }
   ],
   "roleCapabilities": [
     {
       "roleName": "PS 1",
-      "ps": ["m1_okapi.all"]
+      "ps": [ "m1_okapi.all" ]
     }
   ]
 }

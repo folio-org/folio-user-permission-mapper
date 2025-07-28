@@ -56,39 +56,39 @@
   "roleCapabilities": [
     {
       "roleName": "PS 1.1",
-      "ps": ["m1_okapi.all"]
+      "ps": [ "m1_okapi.all" ]
     },
     {
       "roleName": "PS 1.2",
-      "ps": ["m2_okapi.all"]
+      "ps": [ "m2_okapi.all" ]
     },
     {
       "roleName": "PS 3",
-      "ps": ["m3_okapi.all"]
+      "ps": [ "m3_okapi.all" ]
     },
     {
       "roleName": "PS 2.1",
-      "ps": ["m4_okapi.all"]
+      "ps": [ "m4_okapi.all" ]
     },
     {
       "roleName": "PS 2.2",
-      "ps": ["m5_okapi.all"]
+      "ps": [ "m5_okapi.all" ]
     },
     {
       "roleName": "PS 2.3",
-      "ps": ["m6_okapi.all"]
+      "ps": [ "m6_okapi.all" ]
     },
     {
       "roleName": "PS 3.1",
-      "ps": ["m7_okapi.all"]
+      "ps": [ "m7_okapi.all" ]
     },
     {
       "roleName": "PS 3.2",
-      "ps": ["m8_okapi.all"]
+      "ps": [ "m8_okapi.all" ]
     },
     {
       "roleName": "PS 3.3",
-      "ps": ["m9_okapi.all"]
+      "ps": [ "m9_okapi.all" ]
     }
   ]
 }

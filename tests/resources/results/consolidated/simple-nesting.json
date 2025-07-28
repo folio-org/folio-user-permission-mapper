@@ -3,12 +3,7 @@
     {
       "name": "PS 1",
       "description": "PS 1 - Description"
-    },
-    {
-      "name": "PS 1.1",
-      "description": "PS 1.1 - Description"
-    },
-    {
+    }, {
       "name": "PS 2",
       "description": "PS 2 - Description"
     }
@@ -17,24 +12,16 @@
     {
       "userId": "user_A",
       "roles": [ "PS 1", "PS 2" ]
-    },
-    {
-      "userId": "user_B",
-      "roles": [ "PS 1", "PS 2" ]
     }
   ],
   "roleCapabilities": [
     {
       "roleName": "PS 1",
-      "ps": [ "m1_okapi.all", "m3_okapi.all" ]
-    },
-    {
-      "roleName": "PS 1.1",
-      "ps": [ "m3_okapi.all" ]
+      "ps": [ "m1_okapi.all", "m2_okapi.all" ]
     },
     {
       "roleName": "PS 2",
-      "ps": [ "m2_okapi.all", "m3_okapi.all" ]
+      "ps": [ "m2_okapi.all" ]
     }
   ]
 }

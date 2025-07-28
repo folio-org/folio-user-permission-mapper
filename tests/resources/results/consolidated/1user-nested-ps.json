@@ -8,13 +8,13 @@
   "roleUsers": [
     {
       "userId": "user_1",
-      "roles": ["PS 1"]
+      "roles": [ "PS 1" ]
     }
   ],
   "roleCapabilities": [
     {
       "roleName": "PS 1",
-      "ps": ["ui-m1_okapi.all", "m1_okapi.all"]
+      "ps": [ "ui-m1_okapi.all", "m1_okapi.all" ]
     }
   ]
 }
