@@ -13,7 +13,6 @@ from folio_upm.utils.service_utils import ServiceUtils
 def load_dotenv():
     print("loading dotenv from upm_env.py...")
     dotenv.load_dotenv()
-    dotenv.load_dotenv()
     dotenv.load_dotenv(os.getenv("DOTENV", ".env"), override=True)
 
 
