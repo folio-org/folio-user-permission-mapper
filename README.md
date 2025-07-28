@@ -108,17 +108,18 @@ The command will do the following actions:
 
 ### Environment Variables
 
-| Env Variable                  | Default Value         | Required | Description                                                       |
-|:------------------------------|:----------------------|:---------|:------------------------------------------------------------------|
-| AWS_ACCESS_KEY_ID             |                       | true     | AWS access key                                                    |
-| AWS_SECRET_ACCESS_KEY         |                       | true     | AWS secret key                                                    |
-| AWS_REGION                    | `us-east-1`           | false    | AWS S3 Region                                                     |
-| AWS_S3_ENDPOINT               |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used )           |
-| OKAPI_URL                     | http://localhost:9130 | true     | Okapi URL                                                         |
-| TENANT_ID                     |                       | true     | The tenant ID for the FOLIO environment                           |
-| OKAPI_ADMIN_USERNAME          |                       | true     | The username for the admin user in Okapi                          |
-| OKAPI_ADMIN_PASSWORD          |                       | true     | The password for the admin user in Okapi                          |
-| PERMISSION_IDS_PARTITION_SIZE | 50                    | true     | The max number of permissions provided in any match query         |
+| Env Variable                  | Default Value         | Required | Description                                               |
+|:------------------------------|:----------------------|:---------|:----------------------------------------------------------|
+| AWS_ACCESS_KEY_ID             |                       | true     | AWS access key                                            |
+| AWS_SECRET_ACCESS_KEY         |                       | true     | AWS secret key                                            |
+| AWS_REGION                    | `us-east-1`           | false    | AWS S3 Region                                             |
+| AWS_S3_ENDPOINT               |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used )   |
+| AWS_S3_BUCKET                 |                       | true     | S3 Bucket name (required)                                 |
+| OKAPI_URL                     | http://localhost:9130 | true     | Okapi URL                                                 |
+| TENANT_ID                     |                       | true     | The tenant ID for the FOLIO environment                   |
+| OKAPI_ADMIN_USERNAME          |                       | true     | The username for the admin user in Okapi                  |
+| OKAPI_ADMIN_PASSWORD          |                       | true     | The password for the admin user in Okapi                  |
+| PERMISSION_IDS_PARTITION_SIZE | 50                    | true     | The max number of permissions provided in any match query |
 
 ---
 
@@ -151,16 +152,17 @@ The command will do the following actions:
 
 ### Environment Variables
 
-| Env Variable          | Default Value         | Required | Description                                                       |
-|:----------------------|:----------------------|:---------|:------------------------------------------------------------------|
-| AWS_ACCESS_KEY_ID     |                       | true     | AWS access key                                                    |
-| AWS_SECRET_ACCESS_KEY |                       | true     | AWS secret key                                                    |
-| AWS_REGION            | `us-east-1`           | false    | AWS S3 Region                                                     |
-| AWS_S3_ENDPOINT       |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)            |
-| EUREKA_URL            | http://localhost:8000 | true     | Kong Gateway URL                                                  |
-| TENANT_ID             |                       | true     | The tenant ID for the FOLIO environment                           |
-| EUREKA_ADMIN_USERNAME |                       | true     | The username for the admin user in Okapi                          |
-| EUREKA_ADMIN_PASSWORD |                       | true     | The password for the admin user in Okapi                          |
+| Env Variable          | Default Value         | Required | Description                                            |
+|:----------------------|:----------------------|:---------|:-------------------------------------------------------|
+| AWS_ACCESS_KEY_ID     |                       | true     | AWS access key                                         |
+| AWS_SECRET_ACCESS_KEY |                       | true     | AWS secret key                                         |
+| AWS_REGION            | `us-east-1`           | false    | AWS S3 Region                                          |
+| AWS_S3_BUCKET         |                       | true     | S3 Bucket name (required)                              |
+| AWS_S3_ENDPOINT       |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used) |
+| EUREKA_URL            | http://localhost:8000 | true     | Kong Gateway URL                                       |
+| TENANT_ID             |                       | true     | The tenant ID for the FOLIO environment                |
+| EUREKA_ADMIN_USERNAME |                       | true     | The username for the admin user in Okapi               |
+| EUREKA_ADMIN_PASSWORD |                       | true     | The password for the admin user in Okapi               |
 
 ---
 
@@ -193,6 +195,7 @@ The command will do the following actions:
 | AWS_ACCESS_KEY_ID              |               | true     | AWS access key                                                                                                                              |
 | AWS_SECRET_ACCESS_KEY          |               | true     | AWS secret key                                                                                                                              |
 | AWS_REGION                     | `us-east-1`   | false    | AWS S3 Region                                                                                                                               |
+| AWS_S3_BUCKET                  |               | true     | S3 Bucket name (required)                                                                                                                   |
 | AWS_S3_ENDPOINT                |               | false    | Custom AWS S3 Endpoint (for example, if MinIO is used )                                                                                     |
 | TENANT_ID                      |               | true     | The tenant ID for the FOLIO environment                                                                                                     |
 | SYSTEM_GENERATED_PERM_MAPPINGS |               | false    | Comma-separated list of system-generated permission mappings to highlight in analysis (e.g., `folio_admin:AdminRole`)                       |
@@ -238,6 +241,7 @@ The command will do the following actions:
 | AWS_ACCESS_KEY_ID         |                       | true     | AWS access key                                                           |
 | AWS_SECRET_ACCESS_KEY     |                       | true     | AWS secret key                                                           |
 | AWS_REGION                | `us-east-1`           | false    | AWS S3 Region                                                            |
+| AWS_S3_BUCKET             |                       | true     | S3 Bucket name (required)                                                |
 | AWS_S3_ENDPOINT           |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)                   |
 | EUREKA_URL                | http://localhost:8000 | true     | Kong Gateway URL                                                         |
 | TENANT_ID                 |                       | true     | The tenant ID for the FOLIO environment                                  |
@@ -269,7 +273,7 @@ The command will do the following actions:
     
 #### Requires
 
-- The `run-eureka-migration`command must be run before this command.
+- The `run-eureka-migration` command must be run before this command.
 
 #### Output
 
@@ -288,6 +292,7 @@ The command will do the following actions:
 | AWS_ACCESS_KEY_ID         |                       | true     | AWS access key                                                        |
 | AWS_SECRET_ACCESS_KEY     |                       | true     | AWS secret key                                                        |
 | AWS_REGION                | `us-east-1`           | false    | AWS S3 Region                                                         |
+| AWS_S3_BUCKET             |                       | true     | S3 Bucket name (required)                                             |
 | AWS_S3_ENDPOINT           |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)                |
 | TENANT_ID                 |                       | true     | The tenant ID for the FOLIO environment                               |
 | EUREKA_URL                | http://localhost:8000 | true     | Kong Gateway URL                                                      |
@@ -295,8 +300,6 @@ The command will do the following actions:
 | EUREKA_ADMIN_PASSWORD     |                       | true     | The password for the admin user in Eureka                             |
 | EUREKA_ROLE_LOAD_STRATEGY | distributed           | true     | Approach how roles were generated (one of: distributed, consolidated) |
 
-
----
 
 ---
 
@@ -327,13 +330,13 @@ The command will do the following actions:
 | AWS_ACCESS_KEY_ID         |                       | true     | AWS access key                                                        |
 | AWS_SECRET_ACCESS_KEY     |                       | true     | AWS secret key                                                        |
 | AWS_REGION                | `us-east-1`           | false    | AWS S3 Region                                                         |
+| AWS_S3_BUCKET             |                       | true     | S3 Bucket name (required)                                             |
 | AWS_S3_ENDPOINT           |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)                |
 | TENANT_ID                 |                       | true     | The tenant ID for the FOLIO environment                               |
 | EUREKA_URL                | http://localhost:8000 | true     | Kong Gateway URL                                                      |
 | EUREKA_ADMIN_USERNAME     |                       | true     | The username for the admin user in Eureka                             |
 | EUREKA_ADMIN_PASSWORD     |                       | true     | The password for the admin user in Eureka                             |
 | EUREKA_ROLE_LOAD_STRATEGY | distributed           | true     | Approach how roles were generated (one of: distributed, consolidated) |
-
 
 ---
 
@@ -355,11 +358,13 @@ The command will do the following actions:
 
 ### Environment Variables
 
-| Env Variable          | Default Value | Required | Description    |
-|:----------------------|:--------------|:---------|:---------------|
-| AWS_ACCESS_KEY_ID     |               | true     | AWS access key |
-| AWS_SECRET_ACCESS_KEY |               | true     | AWS secret key |
-| AWS_REGION            | `us-east-1`   | false    | AWS S3 Region  |
+| Env Variable          | Default Value | Required | Description                                            |
+|:----------------------|:--------------|:---------|:-------------------------------------------------------|
+| AWS_ACCESS_KEY_ID     |               | true     | AWS access key                                         |
+| AWS_SECRET_ACCESS_KEY |               | true     | AWS secret key                                         |
+| AWS_REGION            | `us-east-1`   | false    | AWS S3 Region                                          |
+| AWS_S3_BUCKET         |               | true     | S3 Bucket name (required)                              |
+| AWS_S3_ENDPOINT       |               | false    | Custom AWS S3 Endpoint (for example, if MinIO is used) |
 
 ---
 
