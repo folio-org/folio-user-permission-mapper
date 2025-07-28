@@ -106,7 +106,7 @@ def analyze_hash_roles():
     eureka_rs_loader = EurekaResultLoader(use_ref_file=False, src_file_name=file_name)
     eureka_load_rs = eureka_rs_loader.find_load_result()
     if eureka_load_rs is None:
-        __collect_capabilities(file_name)
+        eureka_load_rs = __collect_capabilities(file_name)
 
     hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
     workbook = EurekaXlsxReportProvider(hash_role_analysis_result).generate_report()
@@ -175,6 +175,7 @@ def __collect_capabilities(result_fn: str):
     storage_service = TenantStorageService()
     capability_load_result = CapabilitiesLoader().load_capabilities()
     storage_service.save_object(result_fn, json_gz_ext, capability_load_result)
+    return capability_load_result
 
 
 if __name__ == "__main__":

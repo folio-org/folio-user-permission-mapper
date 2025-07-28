@@ -19,16 +19,16 @@ from folio_upm.utils.ordered_set import OrderedSet
 class EurekaHashRoleAnalyzer:
 
     def __init__(self, eureka_load_result: EurekaLoadResult):
-        self._lr = eureka_load_result
         self._log = log_factory.get_logger(self.__class__.__name__)
+        self._lr = eureka_load_result
         self._roles_by_id = self.__get_roles_by_id()
         self._hash_role_ids = self._get_hash_role_ids()
         self._capabilities_by_id = {cap.id: cap for cap in self._lr.capabilities}
         self._capability_sets_by_id = {cs.id: cs for cs in self._lr.capabilitySets}
-        self._rc = self.get_as_dict(self._lr.roleCapabilities, lambda v: v.roleId, lambda v: v.capabilityId)
-        self._rcs = self.get_as_dict(self._lr.roleCapabilitySets, lambda v: v.roleId, lambda v: v.capabilitySetId)
-        self._user_roles = self.get_as_dict(self._lr.roleUsers, lambda v: v.userId, lambda v: v.roleId)
-        self._role_users = self.get_as_dict(self._lr.roleUsers, lambda v: v.roleId, lambda v: v.userId)
+        self._rc = self.__get_as_dict(self._lr.roleCapabilities, lambda v: v.roleId, lambda v: v.capabilityId)
+        self._rcs = self.__get_as_dict(self._lr.roleCapabilitySets, lambda v: v.roleId, lambda v: v.capabilitySetId)
+        self._user_roles = self.__get_as_dict(self._lr.roleUsers, lambda v: v.userId, lambda v: v.roleId)
+        self._role_users = self.__get_as_dict(self._lr.roleUsers, lambda v: v.roleId, lambda v: v.userId)
         self._users_capabilities = self.__get_users_capabilities()
         self._result = self.__analyze_eureka_resources()
 
@@ -37,16 +37,6 @@ class EurekaHashRoleAnalyzer:
 
     def __get_roles_by_id(self) -> Dict[str, Role]:
         return {role.id: role for role in self._lr.roles}
-
-    @staticmethod
-    def get_as_dict(iterable_obj, key_extractor, value_extractor) -> Dict[str, List[str]]:
-        result_dict = {}
-        for value in iterable_obj:
-            key = key_extractor(value)
-            if key not in result_dict:
-                result_dict[key] = OrderedSet()
-            result_dict[key].add(value_extractor(value))
-        return {x: y.to_list() for x, y in result_dict.items()}
 
     def __analyze_eureka_resources(self) -> HashRolesAnalysisResult:
         return HashRolesAnalysisResult(
@@ -128,7 +118,7 @@ class EurekaHashRoleAnalyzer:
     def _get_hash_role_ids(self) -> OrderedSet[str]:
         hash_role_ids = OrderedSet()
         for role in self._lr.roles:
-            if self.is_sha1_hash(role.name):
+            if self.__is_sha1_hash(role.name):
                 hash_role_ids.add(role.id)
 
         return hash_role_ids
@@ -207,5 +197,15 @@ class EurekaHashRoleAnalyzer:
         return all_role_capability_ids.to_list(), role_capability_set_ids.to_list()
 
     @staticmethod
-    def is_sha1_hash(s: str) -> bool:
+    def __is_sha1_hash(s: str) -> bool:
         return bool(re.fullmatch(r"[a-fA-F0-9]{40}", s))
+
+    @staticmethod
+    def __get_as_dict(iterable_obj, key_extractor, value_extractor) -> Dict[str, List[str]]:
+        result_dict = {}
+        for value in iterable_obj:
+            key = key_extractor(value)
+            if key not in result_dict:
+                result_dict[key] = OrderedSet()
+            result_dict[key].add(value_extractor(value))
+        return {x: y.to_list() for x, y in result_dict.items()}
