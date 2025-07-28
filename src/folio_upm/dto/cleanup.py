@@ -65,7 +65,6 @@ class HashRoleCleanupData(BaseModel):
     capabilities: List[str]
     capabilitySets: List[str]
 
-
     @staticmethod
     def from_analysis_result(data: HashRolesAnalysisResult) -> List["HashRoleCleanupData"]:
         return [HashRoleCleanupData.from_clean_hash_role(x) for x in data.cleanHashRoles]
@@ -74,6 +73,6 @@ class HashRoleCleanupData(BaseModel):
     def from_clean_hash_role(clean_hash_role: CleanHashRole) -> "HashRoleCleanupData":
         return HashRoleCleanupData(
             role=clean_hash_role.role,
-            capabilities=[cap.name for cap in clean_hash_role.capabilities],
-            capabilitySets=[cs.name for cs in clean_hash_role.capabilitySets]
+            capabilities=[cap.id for cap in clean_hash_role.capabilities],
+            capabilitySets=[cs.id for cs in clean_hash_role.capabilitySets],
         )

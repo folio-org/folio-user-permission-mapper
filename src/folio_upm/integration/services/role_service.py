@@ -2,7 +2,7 @@ from typing import List, Set
 
 import requests
 
-from folio_upm.dto.cleanup import CleanHashRole, HashRoleCleanupData
+from folio_upm.dto.cleanup import HashRoleCleanupData
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.dto.eureka import Role
 from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr

@@ -4,7 +4,7 @@ import json
 import click
 
 from folio_upm.dto.cleanup import HashRoleCleanupData
-from folio_upm.dto.results import OkapiLoadResult, PreparedEurekaData, EurekaLoadResult
+from folio_upm.dto.results import EurekaLoadResult, OkapiLoadResult, PreparedEurekaData
 from folio_upm.integration.services.eureka_cleanup_service import EurekaCleanupService
 from folio_upm.integration.services.eureka_migration_service import EurekaMigrationService
 from folio_upm.services.eureka_hash_role_analyzer import EurekaHashRoleAnalyzer
