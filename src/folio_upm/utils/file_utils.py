@@ -15,7 +15,7 @@ class FileUtils:
     @staticmethod
     def read_binary_data(file_key) -> BytesIO | None:
         if not os.path.exists(file_key):
-            _log.warn("File '%s' not found", file_key)
+            _log.warning("File '%s' not found", file_key)
             return None
 
         with open(file_key, "rb") as f:

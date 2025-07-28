@@ -79,5 +79,5 @@ class PagedDataLoader:
         try:
             return self._loader_func(self._query, self._batch_limit, last_offset)
         except Exception as e:
-            self._log.warn("Failed to load page for '%s': %s", self._resource, e)
+            self._log.warning("Failed to load page for '%s': %s", self._resource, e)
             return []

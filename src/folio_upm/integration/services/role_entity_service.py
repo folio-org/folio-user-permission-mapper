@@ -67,7 +67,7 @@ class RoleEntityService(metaclass=SingletonMeta):
             self._log.info("Handling existing entities in role-%s for role '%s'", self._name, role_name)
             return self.__handle_existing_entities_response(role, entity_ids, err)
         msg_template = "Failed to create role-%s for role '%s': %s, responseBody: %s"
-        self._log.warn(msg_template, self._name, role_name, err, err.response.text)
+        self._log.warning(msg_template, self._name, role_name, err, err.response.text)
         return self.__create_error_result(role, entity_ids, err)
 
     def __handle_existing_entities_response(self, role, entity_ids, err):
@@ -81,7 +81,7 @@ class RoleEntityService(metaclass=SingletonMeta):
             if unassigned_ids:
                 return assigned_ids_result + self.__assign_entity_ids_to_role(role, unassigned_ids)
             return assigned_ids_result
-        self._log.warn("Failed to extract existing entity IDs from response: %s", response_text)
+        self._log.warning("Failed to extract existing entity IDs from response: %s", response_text)
         return self.__create_error_result(role, entity_ids, err)
 
     def __find_unassigned_entities(self, entity_ids: List[str], assigned_entities_resp) -> List[str]:

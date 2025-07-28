@@ -67,7 +67,7 @@ class RoleUsersService(metaclass=SingletonMeta):
             self._log.info("Handling existing user-role relations for user '%s'", user_id)
             return self.__handle_existing_roles_response(user_id, role_ids, roles_by_id, err)
         msg_template = "Failed to create user-roles for user '%s': %s, responseBody: %s"
-        self._log.warn(msg_template, user_id, err, err.response.text)
+        self._log.warning(msg_template, user_id, err, err.response.text)
         return self.__create_err_result(user_id, role_ids, roles_by_id, err)
 
     def __handle_existing_roles_response(self, user_id, role_ids, roles_by_id, err):
@@ -81,7 +81,7 @@ class RoleUsersService(metaclass=SingletonMeta):
             if unassigned_ids:
                 return assigned_ids_result + self.__assign_role_users(user_id, unassigned_ids, roles_by_id)
             return assigned_ids_result
-        self._log.warn("Failed to extract existing entity IDs from response: %s", response_text)
+        self._log.warning("Failed to extract existing entity IDs from response: %s", response_text)
         return self.__create_err_result(user_id, role_ids, roles_by_id, err)
 
     @staticmethod

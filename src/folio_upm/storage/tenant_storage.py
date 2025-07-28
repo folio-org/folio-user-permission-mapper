@@ -30,7 +30,7 @@ class TenantStorage:
         object_key_prefix = self._get_file_prefix(object_name)
         object_key = self._find_latest_object_by_name(object_key_prefix)
         if object_key is None:
-            self._log.warn("Object not found by prefix: %s", object_key_prefix)
+            self._log.warning("Object not found by prefix: %s", object_key_prefix)
             return None
         if object_ext == "json.gz":
             return self._get_json_gz(object_key)

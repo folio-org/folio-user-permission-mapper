@@ -38,7 +38,7 @@ class RoleCapabilitiesProvider:
 
         not_found_ps_sets = self._not_found_permission_sets.to_list()
         if not_found_ps_sets:
-            self._log.warn("The following permission sets were not found: %s", not_found_ps_sets)
+            self._log.warning("The following permission sets were not found: %s", not_found_ps_sets)
 
         return role_capabilities
 

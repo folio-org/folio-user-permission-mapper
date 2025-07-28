@@ -40,6 +40,6 @@ class EurekaResultLoader:
         self._log.info("Loading reference capabilities from: '%s' ...", ref_capabilities_file_path)
         ref_eureka_load_result_dict = self._tenant_storage_service.find_object_by_key(ref_capabilities_file_path)
         if ref_eureka_load_result_dict is None:
-            self._log.warn("Reference capabilities file not found: '%s'", ref_capabilities_file_path)
+            self._log.warning("Reference capabilities file not found: '%s'", ref_capabilities_file_path)
             return None
         return EurekaLoadResult(**ref_eureka_load_result_dict)

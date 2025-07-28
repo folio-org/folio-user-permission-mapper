@@ -51,5 +51,5 @@ class S3TenantStorage(TenantStorage, metaclass=SingletonMeta):
                 return mapper_func(object_body)
             finally:
                 object_body.close()
-        self._log.warn("Object is not found in S3 bucket: '%s'", file_key)
+        self._log.warning("Object is not found in S3 bucket: '%s'", file_key)
         return None

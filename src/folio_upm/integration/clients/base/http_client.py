@@ -21,7 +21,7 @@ class HttpClient:
         response = requests.get(url, params=params, headers=headers, timeout=self._timeout)
 
         if response.status_code == 404 and handle_404:
-            self._log.warn(f"Status if 404 for request: GET {path}")
+            self._log.warning(f"Status if 404 for request: GET {path}")
             return None
 
         response.raise_for_status()

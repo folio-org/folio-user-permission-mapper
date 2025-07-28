@@ -27,7 +27,7 @@ class RoleService(metaclass=SingletonMeta):
             found_roles = self._client.find_roles_by_query(query)
             return IterableUtils.first(found_roles)
         except HttpReqErr as e:
-            self._log.warn("Failed to find role by name '%s': %s", role_name, e)
+            self._log.warning("Failed to find role by name '%s': %s", role_name, e)
             return None
 
     def find_roles_by_names(self, role_names: List[str]) -> List[Role]:
@@ -65,7 +65,7 @@ class RoleService(metaclass=SingletonMeta):
         if role_name not in existing_role_names:
             return self.__create_role_safe(role)
         else:
-            self._log.warn("Role '%s' already exists, skipping creation.", role_name)
+            self._log.warning("Role '%s' already exists, skipping creation.", role_name)
             return EntityMigrationResult.for_role(role, "skipped", "already exists")
 
     def __create_role_safe(self, role):
@@ -82,7 +82,7 @@ class RoleService(metaclass=SingletonMeta):
             status = "skipped" if resp.status_code == 409 else "error"
             if status == "skipped":
                 self._log.info("Role '%s' already exists in 'mod-roles-keycloak'.", role_name)
-            self._log.warn("Failed to create role '%s': %s, responseBody: %s", role_name, e, e.response.text)
+            self._log.warning("Failed to create role '%s': %s, responseBody: %s", role_name, e, e.response.text)
             return EntityMigrationResult.for_role(role, status, "Failed to perform request", error)
 
     def __delete_role_safe(self, role_id: str) -> EntityMigrationResult:
@@ -95,7 +95,7 @@ class RoleService(metaclass=SingletonMeta):
             resp = e.response
             error = HttpReqErr(message=str(e), status=resp.status_code, responseBody=resp.text)
             status = "not_found" if resp.status_code == 404 else "error"
-            self._log.warn("Failed to remove role '%s': %s, responseBody: %s", role_id, e, e.response.text)
+            self._log.warning("Failed to remove role '%s': %s, responseBody: %s", role_id, e, e.response.text)
             return EntityMigrationResult.for_removed_role(role_id, status, "Failed to perform request", error)
 
     @staticmethod
