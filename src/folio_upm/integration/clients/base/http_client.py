@@ -51,7 +51,11 @@ class HttpClient:
         response.raise_for_status()
 
     def delete(self, path: str) -> None:
-        response = requests.post(path, headers=self.__get_headers(), timeout=self._timeout)
+        response = requests.delete(
+            self.__prepare_url(path),
+            headers=self.__get_headers(),
+            timeout=self._timeout,
+        )
         response.raise_for_status()
 
     def __prepare_url(self, path: str) -> str:
