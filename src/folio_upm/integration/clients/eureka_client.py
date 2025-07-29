@@ -43,7 +43,7 @@ class EurekaClient(metaclass=SingletonMeta):
         return [RoleCapabilitySet(**rc) for rc in role_capability_sets_json]
 
     def update_role_capability_sets(self, role_id: str, capability_set_ids: List[str]):
-        body = {"roleId": role_id, "capabilitySetIds": capability_set_ids}
+        body = {"capabilitySetIds": capability_set_ids}
         self._client.put_json(f"/roles/{role_id}/capability-sets", request_body=body)
 
     def find_roles_by_query(self, cql_query: str) -> List[Role]:

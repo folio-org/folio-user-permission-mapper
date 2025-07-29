@@ -41,7 +41,7 @@ class RoleEntityService(metaclass=SingletonMeta):
     def update(self, role: Role, entity_ids: List[str]):
         try:
             self._update_role_entities(role.id, entity_ids)
-            return self._create_update_result(role.id, entity_ids)
+            return self._create_update_result(role, entity_ids)
         except requests.HTTPError as err:
             msg_template = "Failed to update role-%s for role '%s': %s, responseBody: %s"
             self._log.warning(msg_template, self._name, role.name, err, err.response.text)
@@ -104,20 +104,20 @@ class RoleEntityService(metaclass=SingletonMeta):
     def _assign_entities_to_role(self, role_id, entity_ids) -> List[Any]:
         pass
 
-    def _create_success_result(self, role, entity_id) -> EntityMigrationResult:
+    def _create_success_result(self, role: Role, entity_id: List[str]) -> EntityMigrationResult:
         pass
 
-    def _create_update_result(self, role, entity_ids) -> EntityMigrationResult:
+    def _create_update_result(self, role: Role, entity_ids: List[str]) -> EntityMigrationResult:
         pass
 
-    def _create_skipped_result(self, role, entity_id) -> EntityMigrationResult:
+    def _create_skipped_result(self, role: Role, entity_id: List[str]) -> EntityMigrationResult:
         pass
 
-    def _create_error_result(self, role, entity_id, error) -> EntityMigrationResult:
+    def _create_error_result(self, role: Role, entity_id: str, error) -> EntityMigrationResult:
         pass
 
-    def _update_role_entities(self, role_id, entity_ids) -> None:
+    def _update_role_entities(self, role_id: str, entity_ids: List[str]) -> None:
         pass
 
-    def _create_error_update_result(self, role, entity_ids, error) -> EntityMigrationResult:
+    def _create_error_update_result(self, role: Role, entity_ids: List[str], error) -> EntityMigrationResult:
         pass
