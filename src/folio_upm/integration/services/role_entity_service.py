@@ -95,11 +95,6 @@ class RoleEntityService(metaclass=SingletonMeta):
         error = HttpReqErr(message=str(err), status=resp.status_code, responseBody=resp.text)
         return [self._create_error_result(role, entity_id, error) for entity_id in entity_ids]
 
-    def __create_error_result2(self, err):
-        resp = err.response
-        return
-
-
     def _get_result_entity_id(self, entity) -> str:
         pass
 
