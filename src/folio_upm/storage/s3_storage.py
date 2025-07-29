@@ -69,7 +69,7 @@ class S3Storage(metaclass=SingletonMeta):
             return latest_key
 
         except Exception as e:
-            self._log.error("Error finding latest file with prefix '%s'", prefix, e)
+            self._log.error("Error finding latest file with prefix '%s': %s", prefix, e)
             return None
 
     def __get_object(self, file_key):
