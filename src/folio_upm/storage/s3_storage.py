@@ -79,7 +79,7 @@ class S3Storage(metaclass=SingletonMeta):
             return response["Body"]
         except Exception as e:
             self._log.warning("Error reading file '%s' from bucket '%s'", file_key, bucket_name, e)
-            raise ValueError("Failed to read JSON file from S3: " f"bucker={bucket_name}, path={file_key}, error={e}")
+            raise ValueError("Failed to read JSON file from S3: " f"bucket={bucket_name}, path={file_key}, error={e}")
 
     def __init_client(self) -> S3Client:
         region = Env().require_env("AWS_REGION", default_value="us-east-1")
