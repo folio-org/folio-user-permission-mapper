@@ -45,10 +45,11 @@ class RoleService(metaclass=SingletonMeta):
 
     def delete_roles(self, clean_hash_roles: List[HashRoleCleanupData]) -> List[EntityMigrationResult]:
         roles_to_delete = [hash_role.role.id for hash_role in clean_hash_roles if self.__should_delete(hash_role)]
-        self._log.info("Removing roles: %s", roles_to_delete)
+        self._log.debug("Removing roles: %s ...", roles_to_delete)
         remove_rs = []
         for role_id in roles_to_delete:
             remove_rs.append(self.__delete_role_safe(role_id))
+        self._log.info("Roles removed successfully: %s", roles_to_delete)
         return remove_rs
 
     def __find_existing_roles(self, analyzed_roles):

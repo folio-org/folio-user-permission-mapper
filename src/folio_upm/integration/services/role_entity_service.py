@@ -40,7 +40,9 @@ class RoleEntityService(metaclass=SingletonMeta):
 
     def update(self, role: Role, entity_ids: List[str]):
         try:
+            self._log.debug("Updating role-%s: '%s' with: %s", self._name, role.name, entity_ids)
             self._update_role_entities(role.id, entity_ids)
+            self._log.debug("Successfully updated role-'%s': '%s' with: %s", self._name, role.name, entity_ids)
             return self._create_update_result(role, entity_ids)
         except requests.HTTPError as err:
             msg_template = "Failed to update role-%s for role '%s': %s, responseBody: %s"
@@ -51,6 +53,7 @@ class RoleEntityService(metaclass=SingletonMeta):
 
     def __assign_entity_ids_to_role(self, role, entity_ids):
         role_id = role.id
+        self._log.debug("Assigning role-%s: '%s' with: %s", self._name, role.name, entity_ids)
         assigned_resources = self._assign_entities_to_role(role_id, entity_ids)
         unassigned_ids = self.__find_unassigned_entities(entity_ids, assigned_resources)
         success_results = [self._create_success_result(role, entity_id) for entity_id in entity_ids]
@@ -58,6 +61,7 @@ class RoleEntityService(metaclass=SingletonMeta):
             self._log.warning("Unassigned %s entities for role '%s': %s", self._name, role.name, unassigned_ids)
             unassigned_ids_result = [self._create_skipped_result(role, i) for i in unassigned_ids]
             return unassigned_ids_result + success_results
+        self._log.debug("Successfully assigned role-'%s': '%s' with: %s", self._name, role.name, entity_ids)
         return success_results
 
     def __handle_error_response(self, role, entity_ids, err):
@@ -95,13 +99,13 @@ class RoleEntityService(metaclass=SingletonMeta):
         error = HttpReqErr(message=str(err), status=resp.status_code, responseBody=resp.text)
         return [self._create_error_result(role, entity_id, error) for entity_id in entity_ids]
 
-    def _get_result_entity_id(self, entity) -> str:
+    def _get_result_entity_id(self, entity_id: str) -> str:
         pass
 
-    def _load_entities_by_ps_names(self, query) -> List[Any]:
+    def _load_entities_by_ps_names(self, query: str) -> List[Any]:
         pass
 
-    def _assign_entities_to_role(self, role_id, entity_ids) -> List[Any]:
+    def _assign_entities_to_role(self, role_id: str, entity_ids: List[str]) -> List[Any]:
         pass
 
     def _create_success_result(self, role: Role, entity_id: List[str]) -> EntityMigrationResult:
@@ -110,7 +114,7 @@ class RoleEntityService(metaclass=SingletonMeta):
     def _create_update_result(self, role: Role, entity_ids: List[str]) -> EntityMigrationResult:
         pass
 
-    def _create_skipped_result(self, role: Role, entity_id: List[str]) -> EntityMigrationResult:
+    def _create_skipped_result(self, role: Role, entity_id: str) -> EntityMigrationResult:
         pass
 
     def _create_error_result(self, role: Role, entity_id: str, error) -> EntityMigrationResult:

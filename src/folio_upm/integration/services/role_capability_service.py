@@ -19,8 +19,8 @@ class RoleCapabilityService(RoleEntityService, metaclass=SingletonMeta):
         return self._client.find_capabilities(query)
 
     @override
-    def _get_result_entity_id(self, entity: RoleCapability):
-        return entity.capabilityId
+    def _get_result_entity_id(self, entity_id: RoleCapability):
+        return entity_id.capabilityId
 
     @override
     def _assign_entities_to_role(self, role_id, capability_ids) -> List[RoleCapability]:
