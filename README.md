@@ -386,6 +386,7 @@ You can use a `.env` file to manage these variables.
 | LOG_LEVEL              | INFO          | false    | Log level (one of: INFO, DEBUG, WARN, ERROR, CRITICAL)                 |
 | ENABLED_STORAGES       | s3            | false    | Enabled storage for data loading and report output (one of: local, s3) |
 | ENABLE_REPORT_COLORING | false         | false    | Boolean value, defines if row colors will be applied for xlsx reports  |
+| ACCESS_TOKEN_TTL       | 60            | false    | TTL for access token refresh                                           |
 
 ### Development
 
