@@ -47,7 +47,8 @@ class RoleEntityService(metaclass=SingletonMeta):
         except requests.HTTPError as err:
             msg_template = "Failed to update role-%s for role '%s': %s, responseBody: %s"
             self._log.warning(msg_template, self._name, role.name, err, err.response.text)
-            error_rs = self.__create_error_result(role, entity_ids, err)
+            resp = err.response
+            error_rs = HttpReqErr(message=str(err), status=resp.status_code, responseBody=resp.text)
             return self._create_error_update_result(role, entity_ids, error_rs)
 
     def __assign_entity_ids_to_role(self, role, entity_ids):
@@ -95,6 +96,11 @@ class RoleEntityService(metaclass=SingletonMeta):
         resp = err.response
         error = HttpReqErr(message=str(err), status=resp.status_code, responseBody=resp.text)
         return [self._create_error_result(role, entity_id, error) for entity_id in entity_ids]
+
+    def __create_error_result2(self, err):
+        resp = err.response
+        return
+
 
     def _get_result_entity_id(self, entity) -> str:
         pass
