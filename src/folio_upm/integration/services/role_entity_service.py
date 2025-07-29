@@ -39,8 +39,6 @@ class RoleEntityService(metaclass=SingletonMeta):
             return self.__handle_error_response(role, entity_ids, err)
 
     def update(self, role: Role, entity_ids: List[str]):
-        if not entity_ids:
-            self._log.info("No entities provided for role '%s': %s.", role.name, self._name)
         try:
             self._update_role_entities(role.id, entity_ids)
             return self._create_update_result(role.id, entity_ids)
