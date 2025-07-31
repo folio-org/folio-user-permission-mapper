@@ -82,7 +82,7 @@ class EntityMigrationResult(BaseModel):
     def for_role_users(role, user_id: str, status: str, reason=None, error=None):
         return EntityMigrationResult(
             status=status,
-            entityName="role-capability-set",
+            entityName="role-user",
             entityId=f"Role: '{role.name}' -> {role.id}\nUser: {user_id}",
             reason=reason,
             error=error,
