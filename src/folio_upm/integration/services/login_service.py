@@ -18,12 +18,12 @@ class LoginService(metaclass=SingletonMeta):
 
     @cached(cache=TTLCache(maxsize=10, ttl=os.getenv("ACCESS_TOKEN_TTL", 60)))
     def get_okapi_token(self):
-        username = os.getenv("OKAPI_ADMIN_USERNAME")
-        password = os.getenv("OKAPI_ADMIN_PASSWORD")
+        username = Env().require_env("OKAPI_ADMIN_USERNAME", log_result=False)
+        password = Env().require_env("OKAPI_ADMIN_PASSWORD", log_result=False)
         return self._login_client.login_as_admin(Env().get_okapi_url(), username, password)
 
     @cached(cache=TTLCache(maxsize=10, ttl=os.getenv("ACCESS_TOKEN_TTL", 60)))
     def get_eureka_token(self):
-        username = os.getenv("EUREKA_ADMIN_USERNAME")
-        password = os.getenv("EUREKA_ADMIN_PASSWORD")
+        username = Env().require_env("EUREKA_ADMIN_USERNAME", log_result=False)
+        password = Env().require_env("EUREKA_ADMIN_PASSWORD", log_result=False)
         return self._login_client.login_as_admin(Env().get_eureka_url(), username, password)

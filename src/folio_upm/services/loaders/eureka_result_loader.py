@@ -32,7 +32,7 @@ class EurekaResultLoader:
         if not self._use_ref_file:
             return None
 
-        ref_capabilities_file_path = Env().get_env("REF_CAPABILITIES_FILE_KEY")
+        ref_capabilities_file_path = Env().getenv_cached("REF_CAPABILITIES_FILE_KEY")
         if not ref_capabilities_file_path:
             self._log.info("Reference capabilities file path is not set, returning empty value...")
             return None

@@ -22,7 +22,7 @@ class SystemRolesProvider(metaclass=SingletonMeta):
         self._log.debug("Defined system-generated roles: %s", self._system_roles_dict)
 
     def __get_system_roles_mappings(self):
-        system_generated_roles = Env().get_env("SYSTEM_GENERATED_PERM_MAPPINGS")
+        system_generated_roles = Env().getenv_cached("SYSTEM_GENERATED_PERM_MAPPINGS")
         if not system_generated_roles:
             self._log.warning("No system-generated roles found in environment variables.")
             return dict[str, str]()

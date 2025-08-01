@@ -82,8 +82,8 @@ class S3Storage(metaclass=SingletonMeta):
             raise ValueError("Failed to read JSON file from S3: " f"bucket={bucket_name}, path={file_key}, error={e}")
 
     def __init_client(self) -> S3Client:
-        region = Env().require_env("AWS_REGION", default_value="us-east-1")
-        endpoint = Env().get_env("AWS_S3_ENDPOINT")
+        region = Env().getenv("AWS_REGION", default_value="us-east-1")
+        endpoint = Env().getenv("AWS_S3_ENDPOINT")
         if endpoint:
             self._log.info(f"Initializing S3 client [awsRegion={region}, endpoint={endpoint}]...")
             return boto3.client("s3", region_name=region, endpoint_url=endpoint)

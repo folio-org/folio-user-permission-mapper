@@ -45,6 +45,11 @@ def cli():
     pass
 
 
+@cli.command("test")
+def test():
+    _log.info("Tenant ID: %s", Env().require_env_cached("TEST"))
+
+
 @cli.command("collect-permissions")
 def collect_permissions():
     storage_service = TenantStorageService()
@@ -184,5 +189,7 @@ if __name__ == "__main__":
     try:
         cli()
     except Exception as e:
-        _log.error(e, exc_info=True)
-        _log.error("Command execution finished with error: %s", e)
+        if Env().get_bool("LOG_ERROR_STACKTRACE", False):
+            _log.error(e, exc_info=True)
+        else:
+            _log.error(e)

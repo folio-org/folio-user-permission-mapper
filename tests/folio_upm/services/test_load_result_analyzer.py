@@ -42,8 +42,8 @@ class TestDistributedLoadResultAnalyzer:
         os.environ["TENANT_ID"] = "test_tenant"
         yield
         del os.environ["TENANT_ID"]
-        Env().get_env.cache_clear()
-        Env().require_env.cache_clear()
+        Env().getenv_cached.cache_clear()
+        Env().require_env_cached.cache_clear()
 
     @pytest.mark.parametrize("filename", TestDataProvider.get_data())
     def test_consolidated_strategy(self, filename):
