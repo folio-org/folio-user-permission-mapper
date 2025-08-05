@@ -106,6 +106,7 @@ def analyze_hash_roles(force_reload: bool):
     strategy_name = migration_strategy.get_name()
     _log.info("Analyzing hash-role capabilities for: %s", strategy_name)
     file_name = f"{migrated_eureka_data_fn}-{strategy_name}"
+
     if force_reload:
         eureka_load_rs = __collect_capabilities(file_name)
     else:

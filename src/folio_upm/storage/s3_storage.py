@@ -28,7 +28,10 @@ class S3Storage(metaclass=SingletonMeta):
             self._log.warning("Object exists in S3 bucket '%s': %s, overriding it", bucket, path)
             if not override:
                 raise FileExistsError(f"File already exists in S3 bucket '{bucket}': {path}")
-        self._s3_client.upload_fileobj(file_obj, Bucket=bucket, Key=path)
+        try:
+            self._s3_client.upload_fileobj(file_obj, Bucket=bucket, Key=path)
+        except ClientError as e:
+            self._log.error("Failed to upload file to S3 bucket '%s' -> '%s': %s", bucket, path, e)
 
     def check_file_exists(self, file):
         try:
@@ -37,7 +40,9 @@ class S3Storage(metaclass=SingletonMeta):
         except ClientError as e:
             if e.response["Error"]["Code"] == "404":
                 return False
-            raise
+            else:
+                self._log.error("Failed to check if file exists in S3: %s %s", file, e)
+                return False
 
     def read_json_object(self, file_key) -> dict:
         file_content = self.__get_object(file_key).read().decode("utf-8")
