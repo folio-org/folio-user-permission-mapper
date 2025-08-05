@@ -70,6 +70,7 @@ class EurekaHashRoleAnalyzer:
             hash_role_ids = [role_id for role_id in role_ids if role_id in self._hash_role_ids]
             user_stats = EurekaUserStats(
                 userId=user_id,
+                toBeSkipped=False,
                 totalRoles=len(role_ids),
                 hashRoles=len(hash_role_ids),
                 allCapabilities=len(user_capabilities.allCapabilities),

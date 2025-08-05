@@ -28,6 +28,7 @@ class EurekaRoleCapability(BaseModel):
 class EurekaUserStats(BaseModel):
     userId: str
     hashRoles: int
+    toBeSkipped: bool = False
     totalRoles: int
     allCapabilities: int
     allCapabilitySets: int

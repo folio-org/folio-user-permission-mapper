@@ -12,7 +12,20 @@ class CapabilitiesLoader(metaclass=SingletonMeta):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._eureka_client = EurekaClient()
 
-    def load_capabilities(self) -> Dict[str, any]:
+    def load_capabilities(self, return_dummy: bool = False) -> Dict[str, any]:
+        if return_dummy:
+            self._log.info("Returning dummy capabilities data.")
+            return {
+                "roles": [],
+                "capabilities": [],
+                "capabilitySets": [],
+                "roleUsers": [],
+                "roleCapabilities": [],
+                "userCapabilities": [],
+                "roleCapabilitySets": [],
+                "userCapabilitySets": [],
+            }
+
         self._log.info("Starting eureka data loading...")
         cql_all_query = "cql.allRecords=1"
         roles = self.__load_data_by_query("roles", "/roles", cql_all_query)
