@@ -15,7 +15,7 @@ class PartitionedDataLoader:
         query_builder=Callable[[List[Any]], str],
         partition_size: Optional[int] = None,
     ):
-        _partition_size = partition_size or int(Env().getenv_cached("DEFAULT_API_CHUNK_SIZE", default_value=50))
+        _partition_size = partition_size or int(Env().getenv_cached("QUERY_CHUNK_SIZE", default_value=50))
         self._resource = resource
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._partitioned_data = IterableUtils.partition(data, _partition_size)

@@ -1,5 +1,7 @@
-from folio_upm.dto.permission_type import DEPRECATED, INVALID, MUTABLE, OKAPI, QUESTIONABLE, UNPROCESSED
-from folio_upm.dto.results import OkapiLoadResult, PermissionAnalysisResult, UserStatistics
+from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.stats.permission_user_stats import PermissionUserStats
+from folio_upm.model.types.permission_type import DEPRECATED, INVALID, MUTABLE, OKAPI, QUESTIONABLE, UNPROCESSED
 
 
 class UserStatsCollector:
@@ -44,7 +46,7 @@ class UserStatsCollector:
             counts[ps_type.get_name()] += 1
             counts[self._all_type] += 1
 
-        return UserStatistics(
+        return PermissionUserStats(
             userId=user_permission.userId,
             mutablePermissionSetsCount=self.get_mutable_ps_count(counts),
             invalidPermissionSetsCount=counts.get(INVALID.get_name(), 0),

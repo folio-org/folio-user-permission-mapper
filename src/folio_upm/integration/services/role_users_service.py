@@ -3,11 +3,13 @@ from typing import List
 
 import requests
 
-from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka import Role, UserRoles
-from folio_upm.dto.migration import EntityMigrationResult, HttpReqErr
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.integration.services.role_service import RoleService
+from folio_upm.model.cls_support import SingletonMeta
+from folio_upm.model.eureka.role import Role
+from folio_upm.model.eureka.user_roles import UserRoles
+from folio_upm.model.report.detailed_http_error import DetailedHttpError
+from folio_upm.model.report.http_request_result import HttpRequestResult
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
 
@@ -20,13 +22,13 @@ class RoleUsersService(metaclass=SingletonMeta):
         self._client = EurekaClient()
         self._roles_service = RoleService()
 
-    def assign_users(self, user_roles: List[UserRoles]) -> List[EntityMigrationResult]:
+    def assign_users(self, user_roles: List[UserRoles]) -> List[HttpRequestResult]:
         migration_result = []
         for ur in user_roles:
             migration_result += self.__assign(ur)
         return migration_result
 
-    def __assign(self, ur: UserRoles) -> List[EntityMigrationResult]:
+    def __assign(self, ur: UserRoles) -> List[HttpRequestResult]:
         user_id = ur.userId
         requested_role_names = ur.roles
         if not requested_role_names:
@@ -40,7 +42,7 @@ class RoleUsersService(metaclass=SingletonMeta):
         roles_by_ids = self.__collect_roles_by_id(found_roles)
         if unmatched_roles:
             self._log.warning("Roles not found by name, skipping user assignment: %s", unmatched_roles)
-            return [EntityMigrationResult.role_not_found_result(r) for r in unmatched_roles]
+            return [HttpRequestResult.role_not_found_result(r) for r in unmatched_roles]
         try:
             return self.__assign_role_users(user_id, role_ids, roles_by_ids)
         except requests.HTTPError as err:
@@ -92,30 +94,30 @@ class RoleUsersService(metaclass=SingletonMeta):
 
     @staticmethod
     def __create_unmatched_result(rch, permission_name):
-        return EntityMigrationResult(
+        return HttpRequestResult(
             status="not_matched",
-            entityName="role-capability(set)",
-            entityId=f"Role: {rch.roleName} -> {rch.roleId}\nPS: {permission_name}",
+            srcEntityName="role-capability(set)",
+            srcEntityId=f"Role: {rch.roleName} -> {rch.roleId}\nPS: {permission_name}",
             reason=f"Failed to find capability or capability set by PS name: {permission_name}",
         )
 
     @staticmethod
     def __create_err_result(user_id, role_ids, roles_by_id, err):
         response = err.response
-        error = HttpReqErr(message=str(err), status=response.status_code, responseBody=response.text)
+        error = DetailedHttpError(message=str(err), status=response.status_code, responseBody=response.text)
         return [RoleUsersService.__create_error_migration_result(user_id, roles_by_id.get(r), error) for r in role_ids]
 
     @staticmethod
-    def __create_success_result(user_id, role) -> EntityMigrationResult:
-        return EntityMigrationResult.for_role_users(role, user_id, "success")
+    def __create_success_result(user_id, role) -> HttpRequestResult:
+        return HttpRequestResult.for_role_users(role, user_id, "success")
 
     @staticmethod
-    def __create_error_migration_result(user_id, role, error) -> EntityMigrationResult:
-        return EntityMigrationResult.for_role_users(role, user_id, "error", "Failed to perform request", error)
+    def __create_error_migration_result(user_id, role, error) -> HttpRequestResult:
+        return HttpRequestResult.for_role_users(role, user_id, "error", "Failed to perform request", error)
 
     @staticmethod
-    def _create_skipped_result(user_id, role) -> EntityMigrationResult:
-        return EntityMigrationResult.for_role_users(role, user_id, "skipped", "already exists")
+    def _create_skipped_result(user_id, role) -> HttpRequestResult:
+        return HttpRequestResult.for_role_users(role, user_id, "skipped", "already exists")
 
     @staticmethod
     def __get_role_names(roles: List[Role]) -> List[str]:

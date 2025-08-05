@@ -4,11 +4,11 @@ from typing import List
 
 import jwt
 
-from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 from folio_upm.utils.json_utils import JsonUtils
-from folio_upm.utils.utils import Utils
 from folio_upm.utils.upm_env import Env
+from folio_upm.utils.utils import Utils
 
 
 class RoleLengthVerifier(metaclass=SingletonMeta):
@@ -19,16 +19,14 @@ class RoleLengthVerifier(metaclass=SingletonMeta):
         env_max_jwt_length = Env().getenv("MAX_JWT_LENGTH", str(default_max_length))
         self._max_jwt_length = Utils.safe_cast(env_max_jwt_length, int, default_max_length)
 
-    def is_valid_amount_of_roles(self, roles: List[str]) -> bool:
+    def has_invalid_amount_of_roles(self, roles: List[str]) -> bool:
         sample_key = self.read_private_key()
         sample_payload = self.read_sample_payload()
         sample_payload["realm_access"] = {"roles": roles}
         token = jwt.encode(sample_payload, key=sample_key, algorithm="RS256")
-        self._log.info(f"token: {len(token)}")
-        self._log.info(f"expected: {self._max_jwt_length}")
-        return len(token) < self._max_jwt_length
+        return len(token) > self._max_jwt_length
 
-    @cache
+    @cache  # noqa: B019
     def read_private_key(self):
         key_name = "test_private_key.pem"
         key_path = f"../../resources/role-length-test-data/{key_name}"
@@ -37,7 +35,7 @@ class RoleLengthVerifier(metaclass=SingletonMeta):
         with open(full_path, "rb") as f:
             return f.read()
 
-    @cache
+    @cache  # noqa: B019
     def read_sample_payload(self):
         file_name = "sample-payload.json"
         full_path = f"../../resources/role-length-test-data/{file_name}"

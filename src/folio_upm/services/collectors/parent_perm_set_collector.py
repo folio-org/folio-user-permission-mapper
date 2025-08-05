@@ -1,9 +1,11 @@
 from typing import List
 
-from folio_upm.dto.permission_type import PermissionType
-from folio_upm.dto.results import AnalyzedParentPermSets, OkapiLoadResult, PermissionAnalysisResult
-from folio_upm.dto.source_type import FLAT_PS
-from folio_upm.dto.support import AnalyzedPermissionSet
+from folio_upm.model.analysis.analyzed_parent_permission_set import AnalyzedParentPermSets
+from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
+from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.types.permission_type import PermissionType
+from folio_upm.model.types.source_type import FLAT_PS
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.utils import Utils

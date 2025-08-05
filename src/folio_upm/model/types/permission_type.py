@@ -3,6 +3,7 @@ from typing import Optional
 
 
 class PermissionType(Enum):
+
     MUTABLE = ("mutable", "user-created")
     INVALID = ("invalid", None)
     DEPRECATED = ("deprecated", None)
@@ -38,11 +39,11 @@ UNKNOWN = PermissionType.UNKNOWN
 
 SUPPORTED_PS_TYPES = list[PermissionType](
     [
-        PermissionType.MUTABLE,
-        PermissionType.INVALID,
-        PermissionType.DEPRECATED,
-        PermissionType.QUESTIONABLE,
-        PermissionType.UNPROCESSED,
-        PermissionType.OKAPI,
+        MUTABLE,
+        INVALID,
+        DEPRECATED,
+        QUESTIONABLE,
+        UNPROCESSED,
+        OKAPI,
     ]
 )

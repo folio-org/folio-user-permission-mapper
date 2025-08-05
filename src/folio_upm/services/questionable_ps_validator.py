@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
-from folio_upm.dto.source_type import FLAT_PS
-from folio_upm.dto.support import AnalyzedPermissionSet
+from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
+from folio_upm.model.types.source_type import FLAT_PS
 
 
 class QuestionablePermissionValidator:

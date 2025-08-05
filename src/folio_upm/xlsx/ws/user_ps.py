@@ -3,8 +3,8 @@ from typing import List, Optional, override
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
-from folio_upm.dto.permission_type import INVALID, MUTABLE, PermissionType
-from folio_upm.dto.results import AnalyzedUserPermissionSet
+from folio_upm.model.analysis.analyzed_user_permission_setresults import AnalyzedUserPermissionSet
+from folio_upm.model.types.permission_type import INVALID, MUTABLE, PermissionType
 from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 

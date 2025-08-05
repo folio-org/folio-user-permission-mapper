@@ -4,8 +4,8 @@ from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
-from folio_upm.dto.permission_type import DEPRECATED, INVALID, MUTABLE, QUESTIONABLE, UNPROCESSED
-from folio_upm.dto.support import RoleCapabilitiesHolder
+from folio_upm.model.analysis.analyzed_role_capabilities import AnalyzedRoleCapabilities
+from folio_upm.model.types.permission_type import DEPRECATED, INVALID, MUTABLE, QUESTIONABLE, UNPROCESSED
 from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
@@ -40,7 +40,7 @@ class RolesCapabilitiesWorksheet(AbstractWorksheet):
         Column[RoleCapabilityRow](w=22, n="Capability Type", f=lambda x: x.capabilityType),
     ]
 
-    def __init__(self, ws: Worksheet, data: Dict[str, RoleCapabilitiesHolder]):
+    def __init__(self, ws: Worksheet, data: Dict[str, AnalyzedRoleCapabilities]):
         super().__init__(ws, self._title, data, self._columns)
 
         self._red_types = [INVALID, MUTABLE]

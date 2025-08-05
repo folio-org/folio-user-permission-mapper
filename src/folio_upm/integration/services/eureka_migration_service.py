@@ -1,8 +1,9 @@
-from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.results import EurekaMigrationResult, PreparedEurekaData
 from folio_upm.integration.services.role_capability_facade import RoleCapabilityFacade
 from folio_upm.integration.services.role_service import RoleService
 from folio_upm.integration.services.role_users_service import RoleUsersService
+from folio_upm.model.cls_support import SingletonMeta
+from folio_upm.model.report.eureka_migration_report import EurekaMigrationReport
+from folio_upm.model.result.eureka_migration_data import EurekaMigrationData
 from folio_upm.utils import log_factory
 
 
@@ -14,9 +15,9 @@ class EurekaMigrationService(metaclass=SingletonMeta):
         self._role_users_service = RoleUsersService()
         self._role_capability_facade = RoleCapabilityFacade()
 
-    def migrate_to_eureka(self, eureka_data: PreparedEurekaData) -> EurekaMigrationResult:
+    def migrate_to_eureka(self, eureka_data: EurekaMigrationData) -> EurekaMigrationReport:
         self._log.info("Eureka migration started...")
-        return EurekaMigrationResult(
+        return EurekaMigrationReport(
             roles=self._role_service.create_roles(eureka_data.roles),
             roleCapabilities=self._role_capability_facade.assign_role_capabilities(eureka_data.roleCapabilities),
             roleUsers=self._role_users_service.assign_users(eureka_data.roleUsers),

@@ -1,16 +1,15 @@
 import re
 from typing import Dict, List
 
-from folio_upm.dto.cleanup import (
-    CleanHashRole,
-    EurekaRoleCapability,
-    EurekaRoleStats,
-    EurekaUserStats,
-    HashRolesAnalysisResult,
-    UserCapabilities,
-)
-from folio_upm.dto.eureka import Role, UserRoles
-from folio_upm.dto.results import EurekaLoadResult
+from folio_upm.model.cleanup.full_hash_role_cleanup_record import FullHashRoleCleanupRecord
+from folio_upm.model.cleanup.user_capabilities import UserCapabilities
+from folio_upm.model.eureka.eureka_role_capability import FullRoleCapabilityOrSet
+from folio_upm.model.eureka.role import Role
+from folio_upm.model.eureka.user_roles import UserRoles
+from folio_upm.model.load.eureka_load_result import EurekaLoadResult
+from folio_upm.model.result.hash_roles_analysis_result import HashRolesAnalysisResult
+from folio_upm.model.stats.eureka_role_stats import EurekaRoleStats
+from folio_upm.model.stats.eureka_user_stats import EurekaUserStats
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
@@ -44,7 +43,7 @@ class EurekaHashRoleAnalyzer:
             userStats=self.__get_user_stats(),
             userRoles=self.__get_user_roles_for_ws(),
             roleCapabilities=self.__get_role_capabilities_for_ws(),
-            cleanHashRoles=self.__get_remaining_hash_role_capabilities(),
+            hashRoleCleanupRecords=self.__get_remaining_hash_role_capabilities(),
         )
 
     def __get_role_stats(self):
@@ -70,7 +69,6 @@ class EurekaHashRoleAnalyzer:
             hash_role_ids = [role_id for role_id in role_ids if role_id in self._hash_role_ids]
             user_stats = EurekaUserStats(
                 userId=user_id,
-                toBeSkipped=False,
                 totalRoles=len(role_ids),
                 hashRoles=len(hash_role_ids),
                 allCapabilities=len(user_capabilities.allCapabilities),
@@ -131,21 +129,12 @@ class EurekaHashRoleAnalyzer:
             result += [self.__generate_capability(role, "capability-set", x) for x in self._rcs.get(role.id, [])]
         return result
 
-    def __generate_capability(self, role, c_type, capabilityOrSetId: str) -> EurekaRoleCapability:
+    def __generate_capability(self, role, c_type, capabilityOrSetId: str) -> FullRoleCapabilityOrSet:
         if c_type == "capability":
             capabilityOrSet = self._capabilities_by_id.get(capabilityOrSetId)
         else:
             capabilityOrSet = self._capability_sets_by_id.get(capabilityOrSetId)
-        return EurekaRoleCapability(
-            roleId=role.id,
-            roleName=role.name,
-            capabilityId=capabilityOrSet.id,
-            c_type=c_type,
-            name=capabilityOrSet.name,
-            action=capabilityOrSet.action,
-            resource=capabilityOrSet.resource,
-            capabilityType=capabilityOrSet.capabilityType,
-        )
+        return FullRoleCapabilityOrSet(role=role, capabilityOrSet=capabilityOrSet)
 
     def __get_user_roles_for_ws(self) -> List[UserRoles]:
         user_roles = []
@@ -155,7 +144,7 @@ class EurekaHashRoleAnalyzer:
             user_roles.append(UserRoles(userId=user_id, roles=role_names))
         return user_roles
 
-    def __get_remaining_hash_role_capabilities(self) -> List[CleanHashRole]:
+    def __get_remaining_hash_role_capabilities(self) -> List[FullHashRoleCleanupRecord]:
         result = []
         for role_id, users_ids in self._role_users.items():
             if role_id not in self._hash_role_ids:
@@ -177,7 +166,7 @@ class EurekaHashRoleAnalyzer:
             remaining_set_ids = hash_role_set_ids - shared_set_ids
             remaining_capability_ids = hash_role_capability_ids - shared_capability_ids
 
-            cleaned_hash_role = CleanHashRole(
+            cleaned_hash_role = FullHashRoleCleanupRecord(
                 role=self._roles_by_id[role_id],
                 capabilities=[self._capabilities_by_id[x] for x in remaining_capability_ids],
                 capabilitySets=[self._capability_sets_by_id[x] for x in remaining_set_ids],

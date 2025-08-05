@@ -1,6 +1,6 @@
 from typing import Optional
 
-from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 from folio_upm.utils.upm_env import Env
 

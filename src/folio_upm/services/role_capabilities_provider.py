@@ -1,9 +1,13 @@
 from typing import Dict, List, Optional
 
-from folio_upm.dto.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
-from folio_upm.dto.permission_type import MUTABLE
-from folio_upm.dto.results import AnalyzedRole, EurekaLoadResult, PermissionAnalysisResult
-from folio_upm.dto.support import CapabilityPlaceholder, ExpandedPermissionSet, RoleCapabilitiesHolder
+from folio_upm.model.analysis.analyzed_capability import AnalyzedCapability
+from folio_upm.model.analysis.analyzed_role import AnalyzedRole
+from folio_upm.model.analysis.analyzed_role_capabilities import AnalyzedRoleCapabilities
+from folio_upm.model.load.eureka_load_result import EurekaLoadResult
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.support.expanded_permission_set import ExpandedPermissionSet
+from folio_upm.model.types.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
+from folio_upm.model.types.permission_type import MUTABLE
 from folio_upm.services.capability_service import CapabilityService
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
@@ -25,12 +29,12 @@ class RoleCapabilitiesProvider:
         self._capability_service = CapabilityService(eureka_load_result)
         self._role_capabilities = self.__collect_role_capabilities()
 
-    def get_role_capabilities(self) -> List[RoleCapabilitiesHolder]:
+    def get_role_capabilities(self) -> List[AnalyzedRoleCapabilities]:
         return self._role_capabilities
 
-    def __collect_role_capabilities(self) -> List[RoleCapabilitiesHolder]:
+    def __collect_role_capabilities(self) -> List[AnalyzedRoleCapabilities]:
         migration_strategy = Env().get_migration_strategy()
-        role_capabilities = list[RoleCapabilitiesHolder]()
+        role_capabilities = list[AnalyzedRoleCapabilities]()
         for ar in self._roles.values():
             role_capabilities_holder = self.__process_single_role(ar, migration_strategy)
             if role_capabilities_holder:
@@ -42,10 +46,10 @@ class RoleCapabilitiesProvider:
 
         return role_capabilities
 
-    def __process_single_role(self, ar: AnalyzedRole, migration_strategy) -> Optional[RoleCapabilitiesHolder]:
+    def __process_single_role(self, ar: AnalyzedRole, migration_strategy) -> Optional[AnalyzedRoleCapabilities]:
         if ar.systemGenerated:
             return None
-        capabilities_dict = dict[str, CapabilityPlaceholder]()
+        capabilities_dict = dict[str, AnalyzedCapability]()
         role_permissions = ar.permissionSets
         for expanded_ps in role_permissions:
             capabilities = self.__create_role_capability(expanded_ps, migration_strategy)
@@ -53,16 +57,16 @@ class RoleCapabilitiesProvider:
                 if capability.permissionName not in capabilities_dict:
                     capabilities_dict[capability.permissionName] = capability
         capabilities = list(capabilities_dict.values())
-        return RoleCapabilitiesHolder(roleName=ar.role.name, capabilities=capabilities)
+        return AnalyzedRoleCapabilities(roleName=ar.role.name, capabilities=capabilities)
 
-    def __create_role_capability(self, expanded_ps, strategy: EurekaLoadStrategy) -> List[CapabilityPlaceholder]:
+    def __create_role_capability(self, expanded_ps, strategy: EurekaLoadStrategy) -> List[AnalyzedCapability]:
         if strategy == CONSOLIDATED:
             return self.__get_consolidated_capabilities(expanded_ps)
         if strategy == DISTRIBUTED:
             return self.__get_distributed_capabilities(expanded_ps)
         return []
 
-    def __get_distributed_capabilities(self, expanded_ps) -> List[CapabilityPlaceholder]:
+    def __get_distributed_capabilities(self, expanded_ps) -> List[AnalyzedCapability]:
         if len(expanded_ps.expandedFrom) == 0:
             ps_name = expanded_ps.permissionName
             permission_type = self._ps_analysis_result.identify_permission_type(ps_name)
@@ -70,14 +74,14 @@ class RoleCapabilitiesProvider:
                 return self.__convert_to_capability_placeholders(expanded_ps, permission_type)
         return []
 
-    def __get_consolidated_capabilities(self, expanded_ps) -> List[CapabilityPlaceholder]:
+    def __get_consolidated_capabilities(self, expanded_ps) -> List[AnalyzedCapability]:
         ps_name = expanded_ps.permissionName
         permission_type = self._ps_analysis_result.identify_permission_type(ps_name)
         if permission_type != MUTABLE:
             return self.__convert_to_capability_placeholders(expanded_ps, permission_type)
         return []
 
-    def __convert_to_capability_placeholders(self, expanded_ps, ps_type) -> List[CapabilityPlaceholder]:
+    def __convert_to_capability_placeholders(self, expanded_ps, ps_type) -> List[AnalyzedCapability]:
         ps_name = expanded_ps.permissionName
         analyzed_ps = self._ps_analysis_result[ps_type].get(ps_name, None)
         expanded_pss = [(expanded_ps, ps_type)]
@@ -92,11 +96,11 @@ class RoleCapabilitiesProvider:
             capability_placeholders.append(self.__create_capability_placeholder(ps, ps_type))
         return capability_placeholders
 
-    def __create_capability_placeholder(self, expanded_ps, permission_type):
+    def __create_capability_placeholder(self, expanded_ps, permission_type) -> AnalyzedCapability:
         permission_name = expanded_ps.permissionName
         analyzed_ps = self._ps_analysis_result[permission_type].get(permission_name, None)
         capability_or_set, resolved_type = self._capability_service.find_by_ps_name(permission_name)
-        return CapabilityPlaceholder(
+        return AnalyzedCapability(
             resolvedType=resolved_type,
             permissionName=permission_name,
             permissionType=permission_type.get_name(),

@@ -3,10 +3,12 @@ from typing import List, Set
 
 from blib2to3.pytree import Optional
 
-from folio_upm.dto.permission_type import PermissionType
-from folio_upm.dto.results import EurekaLoadResult, PermissionAnalysisResult, PsStatistics
-from folio_upm.dto.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
-from folio_upm.dto.support import AnalyzedPermissionSet
+from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
+from folio_upm.model.load.eureka_load_result import EurekaLoadResult
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.stats.permission_set_stats import PermissionSetStats
+from folio_upm.model.types.permission_type import PermissionType
+from folio_upm.model.types.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
 from folio_upm.services.capability_service import CapabilityService
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.utils import Utils
@@ -46,8 +48,8 @@ class PermSetStatisticsCollector:
                 result.append(self.__get_stats_for_analyzed_ps(ap, ps_type))
         return result
 
-    def __get_stats_for_analyzed_ps(self, ap: AnalyzedPermissionSet, ps_type: PermissionType) -> PsStatistics:
-        return PsStatistics(
+    def __get_stats_for_analyzed_ps(self, ap: AnalyzedPermissionSet, ps_type: PermissionType) -> PermissionSetStats:
+        return PermissionSetStats(
             name=ap.permissionName,
             displayNames=list(OrderedSet[str]([x.val.displayName for x in ap.sourcePermSets if x.val.displayName])),
             permissionType=ps_type.get_name(),

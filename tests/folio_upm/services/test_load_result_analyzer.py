@@ -2,8 +2,10 @@ import os
 
 import pytest
 
-from folio_upm.dto.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
-from folio_upm.dto.results import AnalysisResult, EurekaLoadResult, OkapiLoadResult
+from folio_upm.model.load.eureka_load_result import EurekaLoadResult
+from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.result.okapi_analysis_result import OkapiAnalysisResult
+from folio_upm.model.types.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
 from folio_upm.utils import log_factory
 from folio_upm.utils.file_utils import FileUtils
@@ -85,12 +87,12 @@ class Assert:
 class _Utils:
 
     @staticmethod
-    def to_comparable_json(rs: AnalysisResult) -> dict:
+    def to_comparable_json(rs: OkapiAnalysisResult) -> dict:
         role_capabilities = _Utils.__get_role_capabilities(rs)
 
         return {
             "roles": [{"name": r.role.name, "description": r.role.description} for r in rs.roles.values()],
-            "roleUsers": [x.model_dump(by_alias=True) for x in rs.roleUsers],
+            "userRoles": [x.model_dump(by_alias=True) for x in rs.userRoles],
             "roleCapabilities": role_capabilities,
         }
 

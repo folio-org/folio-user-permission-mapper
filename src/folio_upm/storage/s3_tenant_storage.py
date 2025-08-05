@@ -3,7 +3,7 @@ from typing import Any, Callable, Optional
 from openpyxl.workbook import Workbook
 from typing_extensions import override
 
-from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.storage.s3_storage import S3Storage
 from folio_upm.storage.tenant_storage import TenantStorage
 from folio_upm.utils import log_factory

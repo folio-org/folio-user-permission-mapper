@@ -4,7 +4,7 @@ from typing import Optional
 from openpyxl.workbook import Workbook
 from typing_extensions import override
 
-from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.storage.tenant_storage import TenantStorage
 from folio_upm.utils import log_factory
 from folio_upm.utils.file_utils import FileUtils

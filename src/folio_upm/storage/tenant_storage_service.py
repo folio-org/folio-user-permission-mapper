@@ -1,6 +1,6 @@
 from typing import Any
 
-from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.storage.local_tenant_storage import LocalTenantStorage
 from folio_upm.storage.s3_tenant_storage import S3TenantStorage
 from folio_upm.storage.tenant_storage import TenantStorage

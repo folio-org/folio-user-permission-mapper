@@ -5,7 +5,7 @@ import boto3
 from botocore.exceptions import ClientError
 from mypy_boto3_s3 import S3Client
 
-from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 from folio_upm.utils.file_utils import FileUtils
 from folio_upm.utils.json_utils import JsonUtils

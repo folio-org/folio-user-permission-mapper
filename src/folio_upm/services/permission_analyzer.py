@@ -1,10 +1,12 @@
 from logging import INFO, WARN
 from typing import List
 
-from folio_upm.dto.okapi import PermissionSet
-from folio_upm.dto.results import OkapiLoadResult, PermissionAnalysisResult
-from folio_upm.dto.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
-from folio_upm.dto.support import AnalyzedPermissionSet, SourcedPermissionSet
+from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
+from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.okapi.permission_set import PermissionSet
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.support.sourced_permission_set import SourcedPermissionSet
+from folio_upm.model.types.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
 from folio_upm.services.questionable_ps_validator import QuestionablePermissionValidator
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet

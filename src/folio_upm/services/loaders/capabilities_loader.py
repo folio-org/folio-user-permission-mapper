@@ -1,7 +1,7 @@
-from typing import Dict, Any, List
+from typing import Dict
 
-from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integration.clients.eureka_client import EurekaClient
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 from folio_upm.utils.loading_utils import PagedDataLoader
 
@@ -41,4 +41,4 @@ class CapabilitiesLoader(metaclass=SingletonMeta):
         return PagedDataLoader(resource, self.__load_resource_page(resource, path), query).load()
 
     def __load_resource_page(self, resource: str, path: str):
-        return lambda query, limit, offset: self._eureka_client.load_page(resource, path, query, limit, offset)
+        return lambda query, limit, offset: self._eureka_client.load_page_by_query(resource, path, query, limit, offset)

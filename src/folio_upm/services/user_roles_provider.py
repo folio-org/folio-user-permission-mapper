@@ -1,9 +1,11 @@
 from typing import Dict, List
 
-from folio_upm.dto.eureka import UserRoles
-from folio_upm.dto.eureka_load_strategy import CONSOLIDATED
-from folio_upm.dto.results import AnalyzedRole, PermissionAnalysisResult
+from folio_upm.model.analysis.analyzed_role import AnalyzedRole
+from folio_upm.model.analysis.analyzed_user_roles import AnalyzedUserRoles
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.types.eureka_load_strategy import CONSOLIDATED
 from folio_upm.utils.ordered_set import OrderedSet
+from folio_upm.utils.roles_verifier import RoleLengthVerifier
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
 from folio_upm.utils.upm_env import Env
 
@@ -16,10 +18,10 @@ class UserRolesProvider:
         self._roles_by_ps_name = self.__collect_roles_by_src_ps_name()
         self._user_roles = self.__collect_user_roles()
 
-    def get_user_roles(self) -> List[UserRoles]:
+    def get_user_roles(self) -> List[AnalyzedUserRoles]:
         return self._user_roles
 
-    def __collect_user_roles(self) -> List[UserRoles]:
+    def __collect_user_roles(self) -> List[AnalyzedUserRoles]:
         strategy = Env().get_migration_strategy()
         user_roles = self.__get_user_roles()
         if strategy == CONSOLIDATED:
@@ -35,18 +37,31 @@ class UserRolesProvider:
                 user_roles[user].add(ar.role.name)
         return user_roles
 
-    def __get_distributed_user_roles(self, user_roles: Dict[str, OrderedSet[str]]) -> List[UserRoles]:
+    def __get_distributed_user_roles(self, user_roles: Dict[str, OrderedSet[str]]) -> List[AnalyzedUserRoles]:
         distributed_user_roles = []
         for user_id, role_names in user_roles.items():
             new_role_names = self.__get_distributed_role_names(role_names)
-            distributed_user_roles.append(UserRoles(userId=user_id, roles=new_role_names.to_list()))
+            role_names = new_role_names.to_list()
+            user_roles = AnalyzedUserRoles(
+                userId=user_id,
+                roleNames=role_names,
+                skipRoleAssignment=self.__skip_user_role_assignment(role_names),
+            )
+
+            distributed_user_roles.append(user_roles)
         return distributed_user_roles
 
-    def __get_consolidated_user_roles(self, user_roles: Dict[str, OrderedSet[str]]) -> List[UserRoles]:
+    def __get_consolidated_user_roles(self, user_roles: Dict[str, OrderedSet[str]]) -> List[AnalyzedUserRoles]:
         consolidated_user_roles = []
         for user_id, role_names in user_roles.items():
             new_role_names = self.__get_consolidated_role_names(role_names)
-            consolidated_user_roles.append(UserRoles(userId=user_id, roles=new_role_names.to_list()))
+            role_names = new_role_names.to_list()
+            user_roles = AnalyzedUserRoles(
+                userId=user_id,
+                roleNames=role_names,
+                skipRoleAssignment=self.__skip_user_role_assignment(role_names),
+            )
+            consolidated_user_roles.append(user_roles)
         return consolidated_user_roles
 
     def __get_distributed_role_names(self, role_names):
@@ -96,4 +111,11 @@ class UserRolesProvider:
         for parent_ps_name in parent_ps_names:
             if parent_ps_name in all_role_names:
                 return True
+        return False
+
+    @staticmethod
+    def __skip_user_role_assignment(role_names: List[str]) -> bool:
+        skip_users_enabled = Env().get_bool_cached("SKIP_USERS_WITH_TOO_MANY_ROLES", default_value=True)
+        if skip_users_enabled:
+            return RoleLengthVerifier().has_invalid_amount_of_roles(role_names)
         return False

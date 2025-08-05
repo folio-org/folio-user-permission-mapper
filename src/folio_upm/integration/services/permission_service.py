@@ -1,5 +1,5 @@
-from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integration.clients.permissions_client import PermissionsClient
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 from folio_upm.utils.cql_query_utils import CqlQueryUtils
 from folio_upm.utils.loading_utils import PagedDataLoader, PartitionedDataLoader

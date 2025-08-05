@@ -1,18 +1,18 @@
 from typing import Dict
 
-from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integration.services.okapi_service import OkapiService
 from folio_upm.integration.services.permission_service import PermissionService
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 
 
-class PermissionLoader(metaclass=SingletonMeta):
+class OkapiDataLoader(metaclass=SingletonMeta):
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._permission_service = PermissionService()
         self._okapi_service = OkapiService()
 
-    def load_permission_data(self) -> Dict[str, any]:
+    def load_okapi_data(self) -> Dict[str, any]:
         self._log.info("Permission loading started...")
         all_records_query = "cql.allRecords=1"
         pass

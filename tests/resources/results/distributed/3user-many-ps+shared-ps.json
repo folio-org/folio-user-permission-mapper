@@ -13,18 +13,21 @@
       "description": "PS 2.1 - Description"
     }
   ],
-  "roleUsers": [
+  "userRoles": [
     {
       "userId": "user_A",
-      "roles": [ "PS 1" ]
+      "skipRoleAssignment": false,
+      "roleNames": [ "PS 1" ]
     },
     {
       "userId": "user_B",
-      "roles": [ "PS 1" ]
+      "skipRoleAssignment": false,
+      "roleNames": [ "PS 1" ]
     },
     {
       "userId": "user_C",
-      "roles": [ "PS 1", "PS 2", "PS 2.1" ]
+      "skipRoleAssignment": false,
+      "roleNames": [ "PS 1", "PS 2", "PS 2.1" ]
     }
   ],
   "roleCapabilities": [

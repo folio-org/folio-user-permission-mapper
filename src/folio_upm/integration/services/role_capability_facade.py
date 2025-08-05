@@ -1,12 +1,14 @@
 from typing import List
 
-from folio_upm.dto.cleanup import HashRoleCleanupData
-from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.migration import EntityMigrationResult
-from folio_upm.dto.support import RoleCapabilitiesHolder
 from folio_upm.integration.services.role_capability_service import RoleCapabilityService
 from folio_upm.integration.services.role_capability_set_service import RoleCapabilitySetService
 from folio_upm.integration.services.role_service import RoleService
+from folio_upm.model.analysis.analyzed_role_capabilities import AnalyzedRoleCapabilities
+from folio_upm.model.cleanup.hash_role_cleanup_record import HashRoleCleanupRecord
+from folio_upm.model.cls_support import SingletonMeta
+from folio_upm.model.eureka.capability import Capability
+from folio_upm.model.eureka.capability_set import CapabilitySet
+from folio_upm.model.report.http_request_result import HttpRequestResult
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
 
@@ -20,14 +22,14 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         self._rc_service = RoleCapabilityService()
         self._rcs_service = RoleCapabilitySetService()
 
-    def assign_role_capabilities(self, role_capabilities: List[RoleCapabilitiesHolder]):
+    def assign_role_capabilities(self, role_capabilities: List[AnalyzedRoleCapabilities]):
         migration_results = []
         for rch in role_capabilities:
             role_name = rch.roleName
             role_by_name = self._role_service.find_role_by_name(role_name)
             if role_by_name is None:
                 self._log.warning("Role '%s' not found by name, skipping capability assignment...", role_name)
-                migration_results.append(EntityMigrationResult.role_not_found_result(role_name))
+                migration_results.append(HttpRequestResult.role_not_found_result(role_name))
                 continue
             capability_sets, capabilities, issues = self.__find_by_permission_names(rch)
             migration_results += [self.__create_unmatched_result(role_by_name, i) for i in issues]
@@ -37,15 +39,18 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
             migration_results += role_set_assign_rs
         return migration_results
 
-    def update_role_capabilities(self, clean_hash_roles: List[HashRoleCleanupData]):
+    def update_role_capabilities(self, hash_role_cleanup_records: List[HashRoleCleanupRecord]):
         cleanup_result = []
-        for hr in clean_hash_roles:
+        self._log.info("Total cleanup records: %s", len(hash_role_cleanup_records))
+        for hr in hash_role_cleanup_records:
             cleanup_result.append(self._rc_service.update(hr.role, hr.capabilities))
             cleanup_result.append(self._rcs_service.update(hr.role, hr.capabilitySets))
         return cleanup_result
 
-    def __find_by_permission_names(self, rch: RoleCapabilitiesHolder):
-        unmatched_ps_names = OrderedSet[str]([x.permissionName for x in rch.capabilities])
+    def __find_by_permission_names(
+        self, arc: AnalyzedRoleCapabilities
+    ) -> (List[CapabilitySet], List[Capability], List[str]):
+        unmatched_ps_names = OrderedSet[str]([x.permissionName for x in arc.capabilities])
         capability_sets = self._rcs_service.find_by_ps_names(unmatched_ps_names.to_list())
         unmatched_ps_names.remove_all([cs.permission for cs in capability_sets])
 
@@ -53,14 +58,16 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         unmatched_ps_names.remove_all([c.permission for c in capabilities])
         unmatched_names = unmatched_ps_names.to_list()
         if unmatched_names:
-            self._log.warning("Unmatched permission names found for role '%s': %s", rch.roleName, unmatched_names)
+            self._log.warning("Unmatched permission names found for role '%s': %s", arc.roleName, unmatched_names)
         return capability_sets, capabilities, unmatched_names
 
     @staticmethod
     def __create_unmatched_result(role, permission_name):
-        return EntityMigrationResult(
+        return HttpRequestResult(
             status="not_matched",
-            entityName="capability or capability-set",
-            entityId=f"Role: {role.name} -> {role.id}\nPS: {permission_name}",
-            reason=f"Failed to find capability or capability set by PS name: {permission_name}",
+            srcEntityName="role",
+            srcEntityId=role.id,
+            tarEntityName="capability | capability-set",
+            tarEntityId=permission_name,
+            reason="Failed to find capability or capability set by name",
         )

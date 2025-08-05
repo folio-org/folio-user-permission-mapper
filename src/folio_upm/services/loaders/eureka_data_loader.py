@@ -1,12 +1,12 @@
 from typing import Optional
 
-from folio_upm.dto.results import EurekaLoadResult
+from folio_upm.model.load.eureka_load_result import EurekaLoadResult
 from folio_upm.storage.tenant_storage_service import TenantStorageService
 from folio_upm.utils import log_factory
 from folio_upm.utils.upm_env import Env
 
 
-class EurekaResultLoader:
+class EurekaDataLoader:
 
     def __init__(self, use_ref_file: bool = True, src_file_name: str = "eureka-capabilities"):
         self._log = log_factory.get_logger(self.__class__.__name__)
@@ -26,7 +26,6 @@ class EurekaResultLoader:
     def __load_eureka_capabilities(self) -> Optional[EurekaLoadResult]:
         eureka_load_result_dict = self._tenant_storage_service.find_object(self._src_file_name, "json.gz")
         if eureka_load_result_dict is not None:
-            self._log.info("Tenant-related eureka capabilities found in storage.")
             return EurekaLoadResult(**eureka_load_result_dict)
 
         if not self._use_ref_file:

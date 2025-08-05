@@ -3,9 +3,9 @@ from typing import List, Optional, override
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
-from folio_upm.dto.cleanup import EurekaUserStats
-from folio_upm.dto.permission_type import DEPRECATED, QUESTIONABLE, UNPROCESSED
-from folio_upm.dto.results import PsStatistics
+from folio_upm.model.stats.eureka_user_stats import EurekaUserStats
+from folio_upm.model.stats.permission_set_stats import PermissionSetStats
+from folio_upm.model.types.permission_type import DEPRECATED, QUESTIONABLE, UNPROCESSED
 from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
@@ -16,7 +16,6 @@ class EurekaUserStatsWorksheet(AbstractWorksheet):
 
     _columns = [
         Column[EurekaUserStats](w=40, n="User Id", f=lambda x: x.userId),
-        Column[EurekaUserStats](w=20, n="Skip role assignment", f=lambda x: x.toBeSkipped),
         Column[EurekaUserStats](w=20, n="# Roles", f=lambda x: x.totalRoles),
         Column[EurekaUserStats](w=20, n="# Hash-Roles", f=lambda x: x.hashRoles),
         Column[EurekaUserStats](w=25, n="# Role Capabilities", f=lambda x: x.roleCapabilities),
@@ -32,5 +31,5 @@ class EurekaUserStatsWorksheet(AbstractWorksheet):
         self._yellow_types = [x.get_name() for x in [DEPRECATED, QUESTIONABLE, UNPROCESSED]]
 
     @override
-    def _get_row_fill_color(self, ps_stats: PsStatistics) -> Optional[PatternFill]:
+    def _get_row_fill_color(self, ps_stats: PermissionSetStats) -> Optional[PatternFill]:
         return ws_constants.almost_white_fill

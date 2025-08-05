@@ -1,4 +1,6 @@
-from folio_upm.dto.results import AnalyzedUserPermissionSet, OkapiLoadResult, PermissionAnalysisResult
+from folio_upm.model.analysis.analyzed_user_permission_setresults import AnalyzedUserPermissionSet
+from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
 
 
 class UserPermSetCollector:

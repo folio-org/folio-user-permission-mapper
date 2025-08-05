@@ -1,10 +1,10 @@
 import networkx as nx
 
-from folio_upm.dto.results import AnalysisResult
+from folio_upm.model.result.okapi_analysis_result import OkapiAnalysisResult
 from folio_upm.utils.upm_env import Env
 
 
-def generate_graph(analysis_result: AnalysisResult, ts=None, store: bool = False) -> nx.DiGraph:
+def generate_graph(analysis_result: OkapiAnalysisResult, ts=None, store: bool = False) -> nx.DiGraph:
     graph = nx.DiGraph()
     user_permission_sets = analysis_result.usersPermissionSets
     uq_user_ids = set()

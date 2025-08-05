@@ -1,15 +1,18 @@
 from typing import Dict, List
 
-from folio_upm.dto.eureka import Role
-from folio_upm.dto.permission_type import MUTABLE
-from folio_upm.dto.results import AnalyzedRole, OkapiLoadResult, PermissionAnalysisResult
-from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet
+from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
+from folio_upm.model.analysis.analyzed_role import AnalyzedRole
+from folio_upm.model.eureka.role import Role
+from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.support.expanded_permission_set import ExpandedPermissionSet
+from folio_upm.model.types.permission_type import MUTABLE
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.utils import Utils
 from folio_upm.utils.sub_ps_helper import SubPermissionsHelper
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
+from folio_upm.utils.utils import Utils
 
 
 class RolesProvider:

@@ -2,7 +2,7 @@ import random
 import string
 from typing import Optional
 
-from folio_upm.dto.okapi import PermissionSet
+from folio_upm.model.okapi.permission_set import PermissionSet
 
 
 class Utils:

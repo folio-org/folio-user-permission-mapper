@@ -13,14 +13,16 @@
       "description": "PS 2 - Description"
     }
   ],
-  "roleUsers": [
+  "userRoles": [
     {
       "userId": "user_A",
-      "roles": [ "PS 1", "PS 2" ]
+      "skipRoleAssignment": false,
+      "roleNames": [ "PS 1", "PS 2" ]
     },
     {
       "userId": "user_B",
-      "roles": [ "PS 1", "PS 2" ]
+      "skipRoleAssignment": false,
+      "roleNames": [ "PS 1", "PS 2" ]
     }
   ],
   "roleCapabilities": [

@@ -3,7 +3,7 @@ from typing import Dict, Optional, override
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
-from folio_upm.dto.results import AnalyzedRole
+from folio_upm.model.analysis.analyzed_role import AnalyzedRole
 from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 

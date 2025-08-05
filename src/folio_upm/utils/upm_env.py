@@ -4,8 +4,8 @@ from typing import Optional
 
 import dotenv
 
-from folio_upm.dto.cls_support import SingletonMeta
-from folio_upm.dto.eureka_load_strategy import EurekaLoadStrategy
+from folio_upm.model.cls_support import SingletonMeta
+from folio_upm.model.types.eureka_load_strategy import EurekaLoadStrategy
 from folio_upm.utils import log_factory
 from folio_upm.utils.utils import Utils
 

@@ -1,49 +1,15 @@
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, List, Optional
 
 from pydantic import BaseModel
 
-from folio_upm.dto.okapi import PermissionSet
-from folio_upm.dto.permission_type import PermissionType
-from folio_upm.dto.source_type import SourceType
+from folio_upm.model.okapi.permission_set import PermissionSet
+from folio_upm.model.support.sourced_permission_set import SourcedPermissionSet
+from folio_upm.model.types.source_type import SourceType
 from folio_upm.utils.ordered_set import OrderedSet
 
 
-class UserPermsHolder(BaseModel):
-    mutablePermissions: List[str] = []
-    systemPermissions: List[Tuple[str, bool, bool]] = []
-
-
-class CapabilityPlaceholder(BaseModel):
-    resolvedType: str
-    permissionName: str
-    permissionType: Optional[str]
-    displayName: Optional[str] = None
-    expandedFrom: List[str] = []
-    name: Optional[str] = None
-    resource: Optional[str] = None
-    action: Optional[str] = None
-    capabilityType: Optional[str] = None
-
-    def get_permission_type_name(self) -> str:
-        return PermissionType.from_string(self.permissionType).get_visible_name()
-
-
-class RoleCapabilitiesHolder(BaseModel):
-    roleName: str
-    capabilities: List[CapabilityPlaceholder]
-
-
-class SourcedPermissionSet(BaseModel):
-    src: SourceType
-    val: PermissionSet
-
-
-class ExpandedPermissionSet(BaseModel):
-    permissionName: str
-    expandedFrom: List[str] = []
-
-
 class AnalyzedPermissionSet(BaseModel):
+
     note: Optional[str] = None
     reasons: List[str] = []
     permissionName: str = None

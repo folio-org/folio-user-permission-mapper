@@ -1,8 +1,9 @@
 from typing import List, Set, Tuple
 
-from folio_upm.dto.permission_type import MUTABLE
-from folio_upm.dto.results import PermissionAnalysisResult
-from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet
+from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.support.expanded_permission_set import ExpandedPermissionSet
+from folio_upm.model.types.permission_type import MUTABLE
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.utils import Utils

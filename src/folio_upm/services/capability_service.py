@@ -1,7 +1,8 @@
 from typing import Tuple
 
-from folio_upm.dto.eureka import Capability, CapabilitySet
-from folio_upm.dto.results import EurekaLoadResult
+from folio_upm.model.eureka.capability import Capability
+from folio_upm.model.eureka.capability_set import CapabilitySet
+from folio_upm.model.load.eureka_load_result import EurekaLoadResult
 from folio_upm.utils.common_utils import IterableUtils
 
 

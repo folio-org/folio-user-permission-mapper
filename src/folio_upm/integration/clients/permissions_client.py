@@ -1,5 +1,5 @@
-from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integration.clients.base.okapi_http_client import OkapiHttpClient
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 
 

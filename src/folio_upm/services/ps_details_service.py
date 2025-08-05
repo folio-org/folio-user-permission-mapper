@@ -2,8 +2,8 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
-from folio_upm.dto.okapi import PermissionSet
-from folio_upm.dto.results import OkapiLoadResult
+from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.okapi.permission_set import PermissionSet
 from folio_upm.utils.ordered_set import OrderedSet
 
 

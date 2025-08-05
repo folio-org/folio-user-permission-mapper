@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 
 class PermissionSet(BaseModel):
+
     id: Optional[str] = None
     permissionName: str
     subPermissions: List[str] = []
@@ -16,10 +17,3 @@ class PermissionSet(BaseModel):
     childOf: List[str] = []
     grantedTo: List[str] = []
     assignedUserIds: List[str] = []
-
-
-class ModuleDescriptor(BaseModel):
-    id: str
-    name: str = None
-    description: str = None
-    permissionSets: List[PermissionSet] = []
