@@ -1,13 +1,14 @@
 import re
-from typing import List
+from typing import List, Dict, Iterable
 
 import requests
 
+from folio_upm.integration.clients.eureka.user_roles_client import UserRolesClient
 from folio_upm.integration.clients.eureka_client import EurekaClient
 from folio_upm.integration.services.role_service import RoleService
+from folio_upm.model.analysis.analyzed_user_roles import AnalyzedUserRoles
 from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.model.eureka.role import Role
-from folio_upm.model.eureka.user_roles import UserRoles
 from folio_upm.model.report.detailed_http_error import DetailedHttpError
 from folio_upm.model.report.http_request_result import HttpRequestResult
 from folio_upm.utils import log_factory
@@ -21,19 +22,28 @@ class RoleUsersService(metaclass=SingletonMeta):
         self._log.info("RoleService initialized.")
         self._client = EurekaClient()
         self._roles_service = RoleService()
+        self._role_user_service = UserRolesClient()
 
-    def assign_users(self, user_roles: List[UserRoles]) -> List[HttpRequestResult]:
+    def assign_users(self, user_roles: List[AnalyzedUserRoles]) -> List[HttpRequestResult]:
         migration_result = []
         for ur in user_roles:
             migration_result += self.__assign(ur)
         return migration_result
 
-    def __assign(self, ur: UserRoles) -> List[HttpRequestResult]:
+    def __assign(self, ur: AnalyzedUserRoles) -> List[HttpRequestResult]:
         user_id = ur.userId
         requested_role_names = ur.roles
         if not requested_role_names:
             self._log.warning(f"No roles provided for user: user={user_id}")
             return []
+
+        if ur.skipRoleAssignment:
+            self._log.info(f"Skipping role assignment for user: {user_id}")
+            _result = []
+            for role_name in ur.roleNames:
+                role_placeholder = Role(name=role_name, id=None)
+                _result.append(self._create_skipped_result(user_id, role_placeholder, "Too many roles"))
+            return _result
 
         found_roles = self._roles_service.find_roles_by_names(requested_role_names)
         found_role_names = self.__get_role_names(found_roles)
@@ -48,9 +58,9 @@ class RoleUsersService(metaclass=SingletonMeta):
         except requests.HTTPError as err:
             return self.__handle_error_response(user_id, role_ids, roles_by_ids, err)
 
-    def __assign_role_users(self, user_id: str, role_ids: list[str], roles_dict: dict[str, Role]) -> List:
+    def __assign_role_users(self, user_id: str, role_ids: List[str], roles_dict: dict[str, Role]) -> List:
         self._log.debug("Assigning user to roles '%s': %s", user_id, role_ids)
-        created_ur = self._client.post_user_roles(user_id, role_ids)
+        created_ur = self._role_user_service.post_user_roles(user_id, role_ids)
         success_results = [self.__create_success_result(ur.userId, roles_dict.get(ur.roleId)) for ur in created_ur]
 
         unassigned_ids = self.__find_unassigned_role_ids(roles_dict, created_ur)
@@ -62,7 +72,9 @@ class RoleUsersService(metaclass=SingletonMeta):
         self._log.info("User assigned to roles '%s': %s", user_id, role_ids)
         return success_results
 
-    def __handle_error_response(self, user_id, role_ids, roles_by_id: dict[str, Role], err):
+    def __handle_error_response(
+        self, user_id: str, role_ids: List[str], roles_by_id: Dict[str, Role], err: requests.HTTPError
+    ) -> List[HttpRequestResult]:
         resp = err.response
         response_text = resp.text or ""
         if resp.status_code == 400 and "Relations between user and roles already exists" in response_text:
@@ -70,21 +82,23 @@ class RoleUsersService(metaclass=SingletonMeta):
             return self.__handle_existing_roles_response(user_id, role_ids, roles_by_id, err)
         msg_template = "Failed to create user-roles for user '%s': %s, responseBody: %s"
         self._log.warning(msg_template, user_id, err, err.response.text)
-        return self.__create_err_result(user_id, role_ids, roles_by_id, err)
+        return self.__create_error_results(user_id, role_ids, roles_by_id, err)
 
-    def __handle_existing_roles_response(self, user_id, role_ids, roles_by_id, err):
+    def __handle_existing_roles_response(
+        self, user_id: str, role_ids: List[str], roles_by_id: Dict[str, Role], err: requests.HTTPError
+    ) -> List[HttpRequestResult]:
         response_text = err.response.text or ""
         pattern = r"roles: \[([a-f0-9\- ,]+)]"
         match = re.search(pattern, response_text)
         if match:
             assigned_role_ids = [cap.strip() for cap in match.group(1).split(",")]
-            unassigned_ids = OrderedSet(role_ids).remove_all(assigned_role_ids).to_list()
+            unassigned_ids = OrderedSet[str](role_ids).remove_all(assigned_role_ids).to_list()
             assigned_ids_result = [self._create_skipped_result(user_id, roles_by_id.get(i)) for i in assigned_role_ids]
             if unassigned_ids:
                 return assigned_ids_result + self.__assign_role_users(user_id, unassigned_ids, roles_by_id)
             return assigned_ids_result
         self._log.warning("Failed to extract existing entity IDs from response: %s", response_text)
-        return self.__create_err_result(user_id, role_ids, roles_by_id, err)
+        return self.__create_error_results(user_id, role_ids, roles_by_id, err)
 
     @staticmethod
     def __find_unassigned_role_ids(expected_role_ids, user_roles) -> List[str]:
@@ -102,22 +116,24 @@ class RoleUsersService(metaclass=SingletonMeta):
         )
 
     @staticmethod
-    def __create_err_result(user_id, role_ids, roles_by_id, err):
+    def __create_error_result(user_id, role: Role, error: DetailedHttpError) -> HttpRequestResult:
+        return HttpRequestResult.for_user_role(role, user_id, "error", "Failed to perform request", error)
+
+    @staticmethod
+    def __create_error_results(
+        user_id: str, role_ids: List[str], roles_by_id: Dict[str, Role], err: requests.HTTPError
+    ) -> List[HttpRequestResult]:
         response = err.response
         error = DetailedHttpError(message=str(err), status=response.status_code, responseBody=response.text)
-        return [RoleUsersService.__create_error_migration_result(user_id, roles_by_id.get(r), error) for r in role_ids]
+        return [RoleUsersService.__create_error_result(user_id, roles_by_id.get(r), error) for r in role_ids]
 
     @staticmethod
-    def __create_success_result(user_id, role) -> HttpRequestResult:
-        return HttpRequestResult.for_role_users(role, user_id, "success")
+    def __create_success_result(user_id: str, role: Role) -> HttpRequestResult:
+        return HttpRequestResult.for_user_role(role, user_id, "success")
 
     @staticmethod
-    def __create_error_migration_result(user_id, role, error) -> HttpRequestResult:
-        return HttpRequestResult.for_role_users(role, user_id, "error", "Failed to perform request", error)
-
-    @staticmethod
-    def _create_skipped_result(user_id, role) -> HttpRequestResult:
-        return HttpRequestResult.for_role_users(role, user_id, "skipped", "already exists")
+    def _create_skipped_result(user_id, role: Role, reason: str = "already exists") -> HttpRequestResult:
+        return HttpRequestResult.for_user_role(role, user_id, "skipped", reason)
 
     @staticmethod
     def __get_role_names(roles: List[Role]) -> List[str]:
@@ -130,5 +146,3 @@ class RoleUsersService(metaclass=SingletonMeta):
             if role.id not in roles_by_ids:
                 roles_by_ids[role.id] = role
         return roles_by_ids
-
-    # Relations between user and roles already exists
