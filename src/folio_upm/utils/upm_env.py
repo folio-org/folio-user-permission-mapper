@@ -7,7 +7,7 @@ import dotenv
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.dto.eureka_load_strategy import EurekaLoadStrategy
 from folio_upm.utils import log_factory
-from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.utils.utils import Utils
 
 
 def load_dotenv():
@@ -45,9 +45,9 @@ class Env(metaclass=SingletonMeta):
     def get_http_client_timeout(self):
         return int(self.require_env_cached("HTTP_CLIENT_TIMEOUT", default_value="60", log_result=False))
 
-    def get_bool(self, env_variable_name: str, default_value: bool = False) -> bool:
+    def get_bool_cached(self, env_variable_name: str, default_value: bool = False) -> bool:
         str_var = self.getenv_cached(env_variable_name, str(default_value))
-        return ServiceUtils.parse_bool(str_var, default_value)
+        return Utils.parse_bool(str_var, default_value)
 
     def get_migration_strategy(self) -> EurekaLoadStrategy:
         resolved_strategy_name = self.getenv_cached("EUREKA_ROLE_LOAD_STRATEGY", default_value="distributed")

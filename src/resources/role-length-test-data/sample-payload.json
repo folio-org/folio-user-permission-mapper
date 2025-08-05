@@ -1,0 +1,30 @@
+{
+  "exp": 1754400575,
+  "iat": 1754399975,
+  "jti": "13c72057-a9c8-4dad-bdeb-e9ea6f7d951a",
+  "iss": "https://keycloak-test.sample.org/realms/sample-realm",
+  "aud": "account",
+  "sub": "folio",
+  "typ": "Bearer",
+  "azp": "sample-realm-application",
+  "sid": "7d48133c-18e4-452d-90f9-97e1936fdb24",
+  "acr": "1",
+  "allowed-origins": [ "/*" ],
+  "resource_access": {
+    "account": {
+      "roles": [
+        "manage-account",
+        "manage-account-links",
+        "view-profile"
+      ]
+    }
+  },
+  "scope": "email profile",
+  "email_verified": true,
+  "user_id": "c957fc40-ae5d-4866-a144-c8b5baf888e5",
+  "name": "sample-username",
+  "preferred_username": "folio",
+  "given_name": "admin",
+  "family_name": "folio",
+  "email": "sample-usernameg@sample.org"
+}

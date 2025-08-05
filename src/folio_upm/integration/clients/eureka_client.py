@@ -47,7 +47,6 @@ class EurekaClient(metaclass=SingletonMeta):
         self._client.put_json(f"/roles/{role_id}/capability-sets", request_body=body)
 
     def find_roles_by_query(self, cql_query: str) -> List[Role]:
-        self._log.debug("Retrieving roles by query: query=%s", cql_query)
         response = self._client.get_json("/roles", params={"query": cql_query, "limit": 500})
         return [Role(**role_dict) for role_dict in response.get("roles", [])]
 

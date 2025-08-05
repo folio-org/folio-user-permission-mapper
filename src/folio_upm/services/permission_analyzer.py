@@ -8,7 +8,7 @@ from folio_upm.dto.support import AnalyzedPermissionSet, SourcedPermissionSet
 from folio_upm.services.questionable_ps_validator import QuestionablePermissionValidator
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.utils.utils import Utils
 
 
 class PermissionAnalyzer:
@@ -49,7 +49,7 @@ class PermissionAnalyzer:
         self._system_perms_count[src_type] = 0
         for ps in permissions:
             self._analyzed_permissions += 1
-            if ServiceUtils.is_system_permission(ps.permissionName):
+            if Utils.is_system_permission(ps.permissionName):
                 self._system_perms_count[src_type] += 1
                 self._system_permission_names.add(ps.permissionName)
             else:

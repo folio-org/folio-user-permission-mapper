@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Any, List
 
 from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integration.clients.eureka_client import EurekaClient

@@ -63,7 +63,7 @@ class TestDistributedLoadResultAnalyzer:
         analyzer = LoadResultAnalyzer(okapi_load_rs, None)
         actual = analyzer.get_results()
         expected_file_key = f"../../resources/results/{strategy.get_name()}/{filename}"
-        expected_dict = JsonUtils.read_file(_Utils.get_file_key(expected_file_key))
+        expected_dict = JsonUtils.read_string(_Utils.get_file_key(expected_file_key))
         Assert.compare_json_str(expected_dict, _Utils.to_comparable_json(actual))
 
 
@@ -96,7 +96,7 @@ class _Utils:
 
     @staticmethod
     def eureka_load_result(filename) -> EurekaLoadResult:
-        json_dict = JsonUtils.read_file(filename)
+        json_dict = JsonUtils.read_string(filename)
         return EurekaLoadResult(**json_dict)
 
     @staticmethod
@@ -109,7 +109,7 @@ class _Utils:
         full_file_path = _Utils.get_file_key(filename)
         if not FileUtils.exists(full_file_path):
             pytest.fail(f"Failed to find required file: {filename}")
-        json_dict = JsonUtils.read_file(full_file_path)
+        json_dict = JsonUtils.read_string(full_file_path)
         return json_dict
 
     @staticmethod

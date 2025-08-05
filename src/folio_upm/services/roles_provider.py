@@ -7,7 +7,7 @@ from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet
 from folio_upm.utils import log_factory
 from folio_upm.utils.common_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.utils.utils import Utils
 from folio_upm.utils.sub_ps_helper import SubPermissionsHelper
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
 
@@ -84,7 +84,7 @@ class RolesProvider:
         for permission_name in ap.get_sub_permissions():
             if permission_name in exp_list:
                 continue
-            if ServiceUtils.is_system_permission(permission_name):
+            if Utils.is_system_permission(permission_name):
                 continue
             ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
             expanded_from = IterableUtils.last(exp_list)

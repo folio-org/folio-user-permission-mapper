@@ -49,7 +49,7 @@ class AbstractWorksheet:
 
     def _fill_rows(self):
         for value in self._get_iterable_data():
-            colors_enabled = Env().get_bool("ENABLE_REPORT_COLORING", default_value=False)
+            colors_enabled = Env().get_bool_cached("ENABLE_REPORT_COLORING", default_value=False)
             fill = self._get_row_fill_color(value) if colors_enabled else ws_constants.almost_white_fill
             self._add_row(self._map_value(value), fill=fill)
 

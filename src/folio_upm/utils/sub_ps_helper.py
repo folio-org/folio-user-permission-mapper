@@ -5,7 +5,7 @@ from folio_upm.dto.results import PermissionAnalysisResult
 from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.utils.utils import Utils
 
 
 class SubPermissionsHelper:
@@ -61,7 +61,7 @@ class SubPermissionsHelper:
         source_ps_name = ap.permissionName
 
         for permission_name in ap.get_sub_permissions():
-            if source_ps_name == permission_name or ServiceUtils.is_system_permission(permission_name):
+            if source_ps_name == permission_name or Utils.is_system_permission(permission_name):
                 continue
 
             self.__add_parent(permission_name, root_ps_name)

@@ -1,15 +1,30 @@
+import random
+import string
 from typing import Optional
 
 from folio_upm.dto.okapi import PermissionSet
 
 
-class ServiceUtils:
+class Utils:
 
     @staticmethod
     def bool_to_char(value: bool | None) -> chr:
         if value is None:
             return chr(0x003F)
         return chr(0x2705) if value else chr(0x2BBD)
+
+    @staticmethod
+    def safe_cast(val, to_type, default=None):
+        try:
+            return to_type(val)
+        except (ValueError, TypeError):
+            return default
+
+    @staticmethod
+    def random_string(length):
+        characters = string.ascii_letters + string.digits
+        random_string = "".join(random.choices(characters, k=length))
+        return random_string
 
     @staticmethod
     def parse_bool(value: str, default_val: bool) -> bool:

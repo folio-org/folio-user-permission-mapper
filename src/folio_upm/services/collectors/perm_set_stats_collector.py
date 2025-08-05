@@ -9,7 +9,7 @@ from folio_upm.dto.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
 from folio_upm.dto.support import AnalyzedPermissionSet
 from folio_upm.services.capability_service import CapabilityService
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.utils.utils import Utils
 
 
 class PermSetStatisticsCollector:
@@ -65,7 +65,7 @@ class PermSetStatisticsCollector:
     def __get_uq_module_ids(ap: AnalyzedPermissionSet) -> List[str]:
         module_ids = OrderedSet()
         for x in ap.sourcePermSets:
-            module_id = ServiceUtils.get_module_id(x.val)
+            module_id = Utils.get_module_id(x.val)
             if module_id:
                 module_ids.add(module_id)
         return module_ids.to_list()

@@ -45,11 +45,6 @@ def cli():
     pass
 
 
-@cli.command("test")
-def test():
-    _log.info("Tenant ID: %s", Env().require_env_cached("TEST"))
-
-
 @cli.command("collect-permissions")
 def collect_permissions():
     storage_service = TenantStorageService()
@@ -104,16 +99,20 @@ def run_eureka_migration():
 
 
 @cli.command("analyze-hash-roles")
-def analyze_hash_roles():
+@click.option("--force-reload", is_flag=True, default=False, help="Force reloading of eureka capabilities.")
+def analyze_hash_roles(force_reload: bool):
     migration_strategy = Env().get_migration_strategy()
     storage_service = TenantStorageService()
     strategy_name = migration_strategy.get_name()
     _log.info("Analyzing hash-role capabilities for: %s", strategy_name)
     file_name = f"{migrated_eureka_data_fn}-{strategy_name}"
-    eureka_rs_loader = EurekaResultLoader(use_ref_file=False, src_file_name=file_name)
-    eureka_load_rs = eureka_rs_loader.find_load_result()
-    if eureka_load_rs is None:
+    if force_reload:
         eureka_load_rs = __collect_capabilities(file_name)
+    else:
+        eureka_rs_loader = EurekaResultLoader(use_ref_file=False, src_file_name=file_name)
+        eureka_load_rs = eureka_rs_loader.find_load_result()
+        if eureka_load_rs is None:
+            eureka_load_rs = __collect_capabilities(file_name)
 
     hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
     workbook = EurekaXlsxReportProvider(hash_role_analysis_result).generate_report()
@@ -189,7 +188,7 @@ if __name__ == "__main__":
     try:
         cli()
     except Exception as e:
-        if Env().get_bool("LOG_ERROR_STACKTRACE", False):
+        if Env().get_bool_cached("LOG_ERROR_STACKTRACE", False):
             _log.error(e, exc_info=True)
         else:
             _log.error(e)

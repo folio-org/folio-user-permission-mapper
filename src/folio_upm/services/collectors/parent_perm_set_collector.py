@@ -6,7 +6,7 @@ from folio_upm.dto.source_type import FLAT_PS
 from folio_upm.dto.support import AnalyzedPermissionSet
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.utils.utils import Utils
 
 
 class ParentPermSetCollector:
@@ -40,7 +40,7 @@ class ParentPermSetCollector:
             if source_perm_set.src == FLAT_PS:
                 continue
             for parent_ps in source_perm_set.val.childOf:
-                if ServiceUtils.is_system_permission(parent_ps):
+                if Utils.is_system_permission(parent_ps):
                     self._skipped_service_permissions.add(parent_ps)
                     continue
                 parent_ps_type = self._ps_analysis_result.identify_permission_type(parent_ps)
