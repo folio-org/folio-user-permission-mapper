@@ -180,7 +180,7 @@ def explain_permissions(name, file):
 
 def __collect_capabilities(result_fn: str) -> EurekaLoadResult:
     storage_service = TenantStorageService()
-    capability_load_result = CapabilitiesLoader().load_capabilities(return_dummy=True)
+    capability_load_result = CapabilitiesLoader().load_capabilities()
     storage_service.save_object(result_fn, json_gz_ext, capability_load_result)
     return EurekaLoadResult(**capability_load_result)
 
