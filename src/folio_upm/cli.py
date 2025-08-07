@@ -112,7 +112,7 @@ def generate_migration_report():
     raw_migration_report = storage_service.require_object(_migration_result_fn, json_gz_ext)
     migration_report = EurekaMigrationReport(**raw_migration_report)
     migration_xlsx_report = MigrationProcessReportProvider(migration_report).generate()
-    storage_service.save_object(_migration_result_fn, json_gz_ext, migration_xlsx_report)
+    storage_service.save_object(_migration_result_fn, xlsx_ext, migration_xlsx_report)
     _log.info("Migration report successfully generated for strategy: %s", strategy_name)
 
 
