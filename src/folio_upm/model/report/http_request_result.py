@@ -43,7 +43,7 @@ class HttpRequestResult(BaseModel):
         return HttpRequestResult(
             status="not_matched",
             srcEntityName="role",
-            srcEntityId=f"{role_name}",
+            srcEntityDisplayName=f"{role_name}",
             reason="Failed to find by name",
         )
 

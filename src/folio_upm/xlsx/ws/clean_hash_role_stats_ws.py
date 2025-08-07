@@ -17,7 +17,3 @@ class CleanHashRoleStatsWorksheet(AbstractWorksheet):
 
     def __init__(self, ws: Worksheet, data: List[FullHashRoleCleanupRecord]):
         super().__init__(ws, self._title, data, self._columns)
-
-    @override
-    def _get_iterable_data(self):
-        return [(user_roles.userId, role_name) for user_roles in self._data for role_name in user_roles.roles]
