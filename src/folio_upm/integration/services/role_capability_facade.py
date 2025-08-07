@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from folio_upm.integration.services.role_capability_service import RoleCapabilityService
 from folio_upm.integration.services.role_capability_set_service import RoleCapabilitySetService
@@ -24,6 +24,9 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
 
     def assign_role_capabilities(self, role_capabilities: List[AnalyzedRoleCapabilities]):
         migration_results = []
+        role_capabilities_counter = 1
+        total_role_capabilities = len(role_capabilities)
+        self._log.info("Total role capabilities to assign: %s", total_role_capabilities)
         for rch in role_capabilities:
             role_name = rch.roleName
             role_by_name = self._role_service.find_role_by_name(role_name)
@@ -37,6 +40,10 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
             role_set_assign_rs = self._rcs_service.assign_to_role(role_by_name, capability_sets)
             migration_results += role_capability_assign_rs
             migration_results += role_set_assign_rs
+            self._log.info("Role capabilities processed: %s/%s", role_capabilities_counter, total_role_capabilities)
+            role_capabilities_counter += 1
+
+        self._log.info("Role capabilities assigned: %s", total_role_capabilities)
         return migration_results
 
     def update_role_capabilities(self, hash_role_cleanup_records: List[HashRoleCleanupRecord]):
@@ -49,7 +56,7 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
 
     def __find_by_permission_names(
         self, arc: AnalyzedRoleCapabilities
-    ) -> (List[CapabilitySet], List[Capability], List[str]):
+    ) -> Tuple[List[CapabilitySet], List[Capability], List[str]]:
         unmatched_ps_names = OrderedSet[str]([x.permissionName for x in arc.capabilities])
         capability_sets = self._rcs_service.find_by_ps_names(unmatched_ps_names.to_list())
         unmatched_ps_names.remove_all([cs.permission for cs in capability_sets])

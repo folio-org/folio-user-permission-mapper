@@ -26,8 +26,14 @@ class RoleUsersService(metaclass=SingletonMeta):
 
     def assign_users(self, user_roles: List[AnalyzedUserRoles]) -> List[HttpRequestResult]:
         migration_result = []
+        total_user_roles = len(user_roles)
+        self._log.info("Total user roles to assign: %s", total_user_roles)
+        user_roles_counter = 1
         for ur in user_roles:
             migration_result += self.__assign(ur)
+            self._log.info("User roles processed: %s/%s", user_roles_counter, total_user_roles)
+            user_roles_counter += 1
+        self._log.info("User roles to assigned: %s", user_roles_counter)
         return migration_result
 
     def __assign(self, ur: AnalyzedUserRoles) -> List[HttpRequestResult]:

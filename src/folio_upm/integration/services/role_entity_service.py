@@ -37,7 +37,7 @@ class RoleEntityService(metaclass=SingletonMeta):
         self._role_entity_client = role_entity_client
         self._client = EurekaClient()
 
-    def find_by_ps_names(self, permission_names: List[str]) -> Union[List[Capability], List[CapabilitySet]]:
+    def find_by_ps_names(self, permission_names: List[str]) -> List[Capability] | List[CapabilitySet]:
         """
         Find entities (Capabilities or CapabilitySets) by permission names.
 
@@ -119,7 +119,7 @@ class RoleEntityService(metaclass=SingletonMeta):
         match = re.search(pattern, response_text)
         if match:
             assigned_ids = [cap.strip() for cap in match.group(1).split(",")]
-            unassigned_ids = OrderedSet(entity_ids).remove_all(assigned_ids).to_list()
+            unassigned_ids = OrderedSet[str](entity_ids).remove_all(assigned_ids).to_list()
             assigned_ids_result = [self._create_skipped_result(role, i) for i in assigned_ids]
             if unassigned_ids:
                 return assigned_ids_result + self.__assign_entity_ids_to_role(role, unassigned_ids)
