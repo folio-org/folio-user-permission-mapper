@@ -32,7 +32,7 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
             role_by_name = self._role_service.find_role_by_name(role_name)
             if role_by_name is None:
                 self._log.warning("Role '%s' not found by name, skipping capability assignment...", role_name)
-                migration_results.append(HttpRequestResult.role_not_found_result(role_name))
+                migration_results.append(HttpRequestResult.role_capability_not_found_result(role_name))
                 continue
             capability_sets, capabilities, issues = self.__find_by_permission_names(rch)
             migration_results += [self.__create_unmatched_result(role_by_name, i) for i in issues]

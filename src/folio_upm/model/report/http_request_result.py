@@ -19,17 +19,18 @@ class HttpRequestResult(BaseModel):
     error: Optional[DetailedHttpError] = None
 
     @staticmethod
-    def for_role(role, status, reason=None, error=None):
+    def for_role(role, status, reason=None, error=None) -> "HttpRequestResult":
         return HttpRequestResult(
             status=status,
             srcEntityName="role",
-            srcEntityId=role.name,
+            srcEntityId=role.id,
+            srcEntityDisplayName=role.name,
             reason=reason,
             error=error,
         )
 
     @staticmethod
-    def for_removed_role(role_id: str, status: str, reason=None, error=None):
+    def for_removed_role(role_id: str, status: str, reason=None, error=None) -> "HttpRequestResult":
         return HttpRequestResult(
             status=status,
             srcEntityName="role",
@@ -39,23 +40,35 @@ class HttpRequestResult(BaseModel):
         )
 
     @staticmethod
-    def role_not_found_result(role_name: str):
+    def user_role_not_found_result(user_id: str, role_name: str) -> "HttpRequestResult":
         return HttpRequestResult(
-            status="not_matched",
-            srcEntityName="role",
-            srcEntityDisplayName=f"{role_name}",
-            reason="Failed to find by name",
+            status="not_found",
+            srcEntityName="user",
+            srcEntityId=user_id,
+            tarEntityName="role",
+            tarEntityDisplayName=role_name,
+            reason="Role not found",
         )
 
     @staticmethod
-    def for_user_role(role: Role, user_id: str, status: str, reason=None, error=None):
+    def role_capability_not_found_result(role_name: str) -> "HttpRequestResult":
+        return HttpRequestResult(
+            status="not_found",
+            srcEntityName="role",
+            srcEntityDisplayName=f"{role_name}",
+            tarEntityName="capability | capability-set",
+            reason="Role not found by name",
+        )
+
+    @staticmethod
+    def for_user_role(role: Role, user_id: str, status: str, reason=None, error=None) -> "HttpRequestResult":
         return HttpRequestResult(
             status=status,
-            srcEntityName="role-user",
-            srcEntityId=role.id,
-            srcEntityDisplayName=role.name,
-            tarEntityName="user",
-            tarEntityId=user_id,
+            srcEntityName="user",
+            srcEntityId=user_id,
+            tarEntityName="role",
+            tarEntityId=role.id,
+            tarEntityDisplayName=role.name,
             reason=reason,
             error=error,
         )

@@ -57,8 +57,8 @@ class RoleUsersService(metaclass=SingletonMeta):
         role_ids = [r.id for r in found_roles if r]
         roles_by_ids = self.__collect_roles_by_id(found_roles)
         if unmatched_roles:
-            self._log.warning("Roles not found by name, skipping user assignment: %s", unmatched_roles)
-            return [HttpRequestResult.role_not_found_result(r) for r in unmatched_roles]
+            self._log.warning("Roles not found by name, skipping user assignment %s -> %s", user_id, unmatched_roles)
+            return [HttpRequestResult.user_role_not_found_result(user_id, r) for r in unmatched_roles]
         try:
             return self.__assign_role_users(user_id, role_ids, roles_by_ids)
         except requests.HTTPError as err:
