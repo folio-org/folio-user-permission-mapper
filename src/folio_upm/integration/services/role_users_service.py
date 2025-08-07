@@ -38,22 +38,22 @@ class RoleUsersService(metaclass=SingletonMeta):
 
     def __assign(self, ur: AnalyzedUserRoles) -> List[HttpRequestResult]:
         user_id = ur.userId
-        requested_role_names = ur.roles
-        if not requested_role_names:
+        role_names = ur.roleNames
+        if not role_names:
             self._log.warning(f"No roles provided for user: user={user_id}")
             return []
 
         if ur.skipRoleAssignment:
             self._log.info(f"Skipping role assignment for user: {user_id}")
             _result = []
-            for role_name in ur.roleNames:
+            for role_name in role_names:
                 role_placeholder = Role(name=role_name, id=None)
                 _result.append(self._create_skipped_result(user_id, role_placeholder, "Too many roles"))
             return _result
 
-        found_roles = self._roles_service.find_roles_by_names(requested_role_names)
+        found_roles = self._roles_service.find_roles_by_names(role_names)
         found_role_names = self.__get_role_names(found_roles)
-        unmatched_roles = OrderedSet[str](requested_role_names).remove_all(found_role_names).to_list()
+        unmatched_roles = OrderedSet[str](role_names).remove_all(found_role_names).to_list()
         role_ids = [r.id for r in found_roles if r]
         roles_by_ids = self.__collect_roles_by_id(found_roles)
         if unmatched_roles:
