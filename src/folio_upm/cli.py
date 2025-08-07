@@ -103,7 +103,7 @@ def run_eureka_migration():
     _log.info("Eureka migration successfully finished for strategy: %s", strategy_name)
 
 
-@cli.command("generate-eureka-migration-report")
+@cli.command("generate-migration-report")
 def generate_migration_report():
     _log.info("Generating migration report ...")
     strategy_name = Env().get_migration_strategy().get_name()
