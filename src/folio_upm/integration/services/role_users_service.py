@@ -24,26 +24,26 @@ class RoleUsersService(metaclass=SingletonMeta):
         self._roles_service = RoleService()
         self._role_user_service = UserRolesClient()
 
-    def assign_users(self, user_roles: List[AnalyzedUserRoles]) -> List[HttpRequestResult]:
+    def assign_users(self, analyzed_user_role_records: List[AnalyzedUserRoles]) -> List[HttpRequestResult]:
         migration_result = []
-        total_user_roles = len(user_roles)
+        total_user_roles = len(analyzed_user_role_records)
         self._log.info("Total user roles to assign: %s", total_user_roles)
         user_roles_counter = 1
-        for ur in user_roles:
+        for ur in analyzed_user_role_records:
             migration_result += self.__assign(ur)
             self._log.info("User roles processed: %s/%s", user_roles_counter, total_user_roles)
             user_roles_counter += 1
         self._log.info("User roles to assigned: %s", user_roles_counter)
         return migration_result
 
-    def __assign(self, ur: AnalyzedUserRoles) -> List[HttpRequestResult]:
-        user_id = ur.userId
-        role_names = ur.roleNames
+    def __assign(self, analyzed_user_roles: AnalyzedUserRoles) -> List[HttpRequestResult]:
+        user_id = analyzed_user_roles.userId
+        role_names = analyzed_user_roles.roleNames
         if not role_names:
             self._log.warning(f"No roles provided for user: user={user_id}")
             return []
 
-        if ur.skipRoleAssignment:
+        if analyzed_user_roles.skipRoleAssignment:
             self._log.info(f"Skipping role assignment for user: {user_id}")
             _result = []
             for role_name in role_names:
