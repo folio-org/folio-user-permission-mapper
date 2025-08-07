@@ -3,7 +3,6 @@ from typing import List, override
 from openpyxl.worksheet.worksheet import Worksheet
 
 from folio_upm.model.cleanup.full_hash_role_cleanup_record import FullHashRoleCleanupRecord
-from folio_upm.model.eureka.user_roles import UserRoles
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
 
 

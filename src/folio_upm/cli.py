@@ -8,6 +8,8 @@ from folio_upm.integration.services.eureka_migration_service import EurekaMigrat
 from folio_upm.model.cleanup.hash_role_cleanup_record import HashRoleCleanupRecord
 from folio_upm.model.load.eureka_load_result import EurekaLoadResult
 from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.report.eureka_migration_report import EurekaMigrationReport
+from folio_upm.model.report.hash_roles_cleanup_report import HashRolesCleanupReport
 from folio_upm.model.result.eureka_migration_data import EurekaMigrationData
 from folio_upm.services.eureka_hash_role_analyzer import EurekaHashRoleAnalyzer
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
@@ -104,14 +106,14 @@ def run_eureka_migration():
 @cli.command("generate-eureka-migration-report")
 def generate_migration_report():
     _log.info("Generating migration report ...")
-    migration_strategy = Env().get_migration_strategy().get_name()
+    strategy_name = Env().get_migration_strategy().get_name()
     storage_service = TenantStorageService()
     _migration_result_fn = f"{migration_result_fn}-{strategy_name}"
     raw_migration_report = storage_service.require_object(_migration_result_fn, json_gz_ext)
-    migration_report = EurekaMigrationData(**raw_migration_report)
-    migration_xlsx_report = MigrationProcessReportProvider(raw_migration_report).generate()
+    migration_report = EurekaMigrationReport(**raw_migration_report)
+    migration_xlsx_report = MigrationProcessReportProvider(migration_report).generate()
     storage_service.save_object(_migration_result_fn, json_gz_ext, migration_xlsx_report)
-    _log.info("Migration report successfully generated for strategy: %s", migration_strategy)
+    _log.info("Migration report successfully generated for strategy: %s", strategy_name)
 
 
 @cli.command("analyze-hash-roles")
@@ -119,7 +121,6 @@ def generate_migration_report():
 def analyze_hash_roles(force_reload: bool):
     strategy_name = Env().get_migration_strategy().get_name()
     storage_service = TenantStorageService()
-    strategy_name = migration_strategy.get_name()
     _log.info("Analyzing hash-role capabilities for: %s", strategy_name)
     _migrated_eureka_data_fn = f"{eureka_migrated_data_fn}-{strategy_name}"
 
@@ -164,14 +165,14 @@ def clean_hash_roles():
 @cli.command("generate-cleanup-report")
 def generate_cleanup_report():
     _log.info("Generating cleanup report...")
-    migration_strategy = Env().get_migration_strategy().get_name()
+    strategy_name = Env().get_migration_strategy().get_name()
     storage_service = TenantStorageService()
     cleanup_report_fm = f"{hash_roles_cleanup_report_fn}-{strategy_name}"
     raw_cleanup_report = storage_service.require_object(cleanup_report_fm, json_gz_ext)
     cleanup_report = HashRolesCleanupReport(**raw_cleanup_report)
     migration_xlsx_report = CleanupProcessReportProvider(cleanup_report).generate()
     storage_service.save_object(cleanup_report_fm, json_gz_ext, migration_xlsx_report)
-    _log.info("Cleanup report successfully generated for strategy: %s", migration_strategy)
+    _log.info("Cleanup report successfully generated for strategy: %s", strategy_name)
 
 
 @cli.command("download-json")

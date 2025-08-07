@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Iterable
+from typing import Dict, List
 
 import requests
 
