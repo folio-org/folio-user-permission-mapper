@@ -33,7 +33,7 @@ class RoleService(metaclass=SingletonMeta):
 
     def find_roles_by_names(self, role_names: List[str]) -> List[Role]:
         qb = CqlQueryUtils.any_match_by_name
-        loader = self._role_client.find_roles_by_query
+        loader = self._role_client.find_by_query
         return PartitionedDataLoader("roles", role_names, loader, qb).load()
 
     def create_roles(self, analyzed_roles: List[AnalyzedRole]):
