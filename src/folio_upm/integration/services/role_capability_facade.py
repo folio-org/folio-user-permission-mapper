@@ -48,10 +48,14 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
 
     def update_role_capabilities(self, hash_role_cleanup_records: List[HashRoleCleanupRecord]):
         cleanup_result = []
-        self._log.info("Total cleanup records: %s", len(hash_role_cleanup_records))
+        total_records = len(hash_role_cleanup_records)
+        records_counter = 1
+        self._log.info("Total cleanup records: %s", total_records)
         for hr in hash_role_cleanup_records:
             cleanup_result.append(self._rc_service.update(hr.role, hr.capabilities))
             cleanup_result.append(self._rcs_service.update(hr.role, hr.capabilitySets))
+            self._log.info("Role cleanup processed: %s/%s", records_counter, total_records)
+        self._log.info("Role capabilities updated: %s", records_counter)
         return cleanup_result
 
     def __find_by_permission_names(
