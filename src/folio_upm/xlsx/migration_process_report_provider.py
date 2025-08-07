@@ -1,9 +1,9 @@
 from folio_upm.model.report.eureka_migration_report import EurekaMigrationReport
-from folio_upm.xlsx.abstract_result_service import AbstractResultService, WsDef
+from folio_upm.xlsx.abstract_result_service import AbstractReportProvider, WsDef
 from folio_upm.xlsx.ws.migration_result_ws import MigrationReportWorksheet
 
 
-class MigrationResultService(AbstractResultService):
+class MigrationProcessReportProvider(AbstractReportProvider):
 
     _ws_defs = [
         WsDef(MigrationReportWorksheet, lambda d: d.roles, "Roles"),

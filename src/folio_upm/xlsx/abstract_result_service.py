@@ -14,7 +14,7 @@ class WsDef:
         self.title = title
 
 
-class AbstractResultService:
+class AbstractReportProvider:
     def __init__(self, data, worksheet_defs):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("Initializing XlsxReportGenerator...")
@@ -22,7 +22,7 @@ class AbstractResultService:
         self._worksheet_defs = worksheet_defs
         self._wb = self.__generate_workbook()
 
-    def generate_report(self) -> Workbook:
+    def generate(self) -> Workbook:
         return self._wb
 
     def __generate_workbook(self):
