@@ -13,7 +13,7 @@ class UserRoleStatsWorksheet(AbstractWorksheet):
     _title = "UserRoleStats-Eureka"
     _columns = [
         Column[AnalyzedUserRoles](w=40, n="User Id", f=lambda x: x.userId),
-        Column[AnalyzedUserRoles](w=20, n="Skip Role Assignment", f=lambda x: x.skipRoleAssignment),
+        Column[AnalyzedUserRoles](w=30, n="Skip Role Assignment", f=lambda x: x.skipRoleAssignment),
         Column[AnalyzedUserRoles](w=20, n="# Roles", f=lambda x: len(x.roleNames or [])),
     ]
 
