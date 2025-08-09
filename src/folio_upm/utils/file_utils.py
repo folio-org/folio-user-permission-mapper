@@ -2,6 +2,7 @@ import glob
 import os
 import re
 from io import BytesIO
+from pathlib import Path
 from typing import Optional
 
 from folio_upm.utils import log_factory
@@ -37,7 +38,7 @@ class FileUtils:
             _log.debug("Data saved to file '%s'", file_key)
 
     @staticmethod
-    def exists(file_key) -> bool:
+    def exists(file_key: Path) -> bool:
         _log.debug("Checking if file exists: '%s'", file_key)
         return os.path.exists(file_key)
 

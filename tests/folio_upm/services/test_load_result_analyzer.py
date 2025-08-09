@@ -1,8 +1,8 @@
 import os
+from pathlib import Path
 
 import pytest
 
-from folio_upm.model.load.eureka_load_result import EurekaLoadResult
 from folio_upm.model.load.okapi_load_result import OkapiLoadResult
 from folio_upm.model.result.okapi_analysis_result import OkapiAnalysisResult
 from folio_upm.model.types.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
@@ -12,7 +12,6 @@ from folio_upm.utils.file_utils import FileUtils
 from folio_upm.utils.json_utils import JsonUtils
 from folio_upm.utils.upm_env import Env
 
-_dir_name = os.path.dirname(__file__)
 _log = log_factory.get_logger("TestDistributedLoadResultAnalyzer")
 
 
@@ -34,11 +33,16 @@ class TestDataProvider:
             pytest.param("empty-ps-in-middle.json", id="Empty permission sets"),
             pytest.param("permission+permission-sets.json", id="Permission set + permissions"),
             pytest.param("0users-permission-set.json", id="Permission set without user"),
-            pytest.param("1user-1ps-extra-permissions.json", id="Permission set without user"),
+            pytest.param("1user-1ps-extra-view-permissions.json", id="Single role (extra view permissions)"),
+            pytest.param("1user-1ps-extra-edit-permissions.json", id="Single role (extra edit permissions)"),
         ]
 
 
 class TestLoadResultAnalyzer:
+
+    @pytest.fixture(autouse=True, scope="class")
+    def setup_clss(self, clear_singletons) -> None:
+        pass
 
     @pytest.fixture(autouse=True)
     def set_environment_variables(self):
@@ -50,7 +54,8 @@ class TestLoadResultAnalyzer:
 
     @pytest.fixture(autouse=True)
     def set_extra_ps_set_location(self):
-        os.environ["LOCAL_MOD_ROLES_KC_FILE_LOCATION"] = "test_tenant"
+        extra_ps_dir = _Utils.get_path_related_to_curr_dir(Path("../../resources/extra_ps"))
+        os.environ["LOCAL_MOD_ROLES_KC_FILE_LOCATION"] = str(extra_ps_dir.resolve())
         yield
         del os.environ["LOCAL_MOD_ROLES_KC_FILE_LOCATION"]
         Env().getenv_cached.cache_clear()
@@ -70,12 +75,13 @@ class TestLoadResultAnalyzer:
 
     @staticmethod
     def perform_test(filename: str, strategy: EurekaLoadStrategy):
-        okapi_load_rs = _Utils.okapi_load_result(f"../../resources/okapi/{filename}")
+        relative_path = Path(f"../../resources/okapi/{filename}")
+        okapi_load_rs = OkapiLoadResult(**_Utils.read_file(relative_path))
         analyzer = LoadResultAnalyzer(okapi_load_rs, None)
         actual = analyzer.get_results()
-        expected_file_key = f"../../resources/results/{strategy.get_name()}/{filename}"
-        expected_dict = JsonUtils().read_string_safe(_Utils.get_file_key(expected_file_key))
-        Assert.compare_json_str(expected_dict, _Utils.to_comparable_json(actual))
+        expected_file_key = Path(f"../../resources/results/{strategy.get_name()}/{filename}")
+        expected_dict = JsonUtils().read_string_safe(_Utils.get_path_related_to_curr_dir(expected_file_key))
+        Assert.compare_json_str(_Utils.to_comparable_json(actual), expected_dict)
 
 
 class Assert:
@@ -106,26 +112,17 @@ class _Utils:
         }
 
     @staticmethod
-    def eureka_load_result(filename) -> EurekaLoadResult:
-        json_dict = JsonUtils.read_string_safe(filename)
-        return EurekaLoadResult(**json_dict)
-
-    @staticmethod
-    def okapi_load_result(filename) -> OkapiLoadResult:
-        json_dict = _Utils.read_file(filename)
-        return OkapiLoadResult(**json_dict)
-
-    @staticmethod
-    def read_file(filename):
-        full_file_path = _Utils.get_file_key(filename)
+    def read_file(filename: Path):
+        full_file_path = _Utils.get_path_related_to_curr_dir(filename)
         if not FileUtils.exists(full_file_path):
             pytest.fail(f"Failed to find required file: {filename}")
         json_dict = JsonUtils().read_string_safe(full_file_path)
         return json_dict
 
     @staticmethod
-    def get_file_key(filename: str) -> str:
-        return str(os.path.join(_dir_name, filename))
+    def get_path_related_to_curr_dir(filename: Path) -> Path:
+        _current_dir = Path(os.path.dirname(__file__))
+        return _current_dir / filename
 
     @staticmethod
     def __get_role_capabilities(rs):

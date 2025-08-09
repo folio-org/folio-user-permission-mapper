@@ -59,11 +59,6 @@ class LoadResultAnalyzer:
         Returns:
             OkapiAnalysisResult: Complete analysis result containing all processed data
                 including statistics, mappings, and role information.
-
-        Example:
-            >>> analyzer = LoadResultAnalyzer(okapi_result, eureka_result)
-            >>> results = analyzer.get_results()
-            >>> print(f"Users analyzed: {len(results.userStatistics)}")
         """
         return self._result
 
@@ -77,11 +72,6 @@ class LoadResultAnalyzer:
         Returns:
             EurekaMigrationData: Migration-ready data containing roles as a list,
                 user role assignments, and role capability mappings.
-
-        Example:
-            >>> analyzer = LoadResultAnalyzer(okapi_result, eureka_result)
-            >>> migration_data = analyzer.get_eureka_migration_data()
-            >>> print(f"Roles to migrate: {len(migration_data.roles)}")
         """
         return EurekaMigrationData(
             roles=list(self._result.roles.values()),

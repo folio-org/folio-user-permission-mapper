@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Any
+from typing import Any, Dict
 
 import requests
 
@@ -33,5 +33,5 @@ class GithubFileClient:
                 return {}
             return response_json
         except (requests.RequestException, json.JSONDecodeError) as e:
-            self._log.error(f"Error loading file (empty object will be used) from %s: %s", url, e)
+            self._log.error("Error loading file (empty object will be used) from %s: %s", url, e)
             return {}

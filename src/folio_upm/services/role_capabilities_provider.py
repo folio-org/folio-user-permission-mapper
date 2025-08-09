@@ -6,10 +6,10 @@ from folio_upm.model.analysis.analyzed_role_capabilities import AnalyzedRoleCapa
 from folio_upm.model.load.eureka_load_result import EurekaLoadResult
 from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
 from folio_upm.model.support.expanded_permission_set import ExpandedPermissionSet
-from folio_upm.model.types.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
+from folio_upm.model.types.eureka_load_strategy import EurekaLoadStrategy
 from folio_upm.model.types.permission_type import MUTABLE, PermissionType
-from folio_upm.services.extra_permissions_service import ExtraPermissionsService
 from folio_upm.services.capability_service import CapabilityService
+from folio_upm.services.extra_permissions_service import ExtraPermissionsService
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.upm_env import Env
@@ -60,11 +60,18 @@ class RoleCapabilitiesProvider:
                 else:
                     self._log.warning("The capability by name already exists: %s", capability.permissionName)
         capabilities = list(capabilities_by_ps_name.values())
-        additional_ps_names = ExtraPermissionsService().find_extra_ps_names(capabilities)
-        return AnalyzedRoleCapabilities(roleName=ar.role.name, capabilities=capabilities)
+        extra_ps_names = ExtraPermissionsService().find_extra_ps_names(capabilities)
+        for extra_ps_name in extra_ps_names:
+            if extra_ps_name in capabilities_by_ps_name:
+                continue
+            permission_type = self._ps_analysis_result.identify_permission_type(extra_ps_name)
+            expanded_ps = ExpandedPermissionSet(permissionName=extra_ps_name, expandedFrom=[])
+            placeholder = self.__create_capability_placeholder(expanded_ps, permission_type)
+            capabilities_by_ps_name[extra_ps_name] = placeholder
+        return AnalyzedRoleCapabilities(roleName=ar.role.name, capabilities=list(capabilities_by_ps_name.values()))
 
     def __create_role_capability(self, expanded_ps, strategy: EurekaLoadStrategy) -> List[AnalyzedCapability]:
-        if strategy == CONSOLIDATED:
+        if strategy == EurekaLoadStrategy.CONSOLIDATED:
             return self.__get_consolidated_capabilities(expanded_ps)
         return self.__get_distributed_capabilities(expanded_ps)
 

@@ -1,4 +1,5 @@
-from typing import Dict, List, Any
+from pathlib import Path
+from typing import Any, Dict, List
 
 from folio_upm.integration.clients.github.github_file_client import GithubFileClient
 from folio_upm.model.cls_support import SingletonMeta
@@ -13,6 +14,7 @@ class ExtraPermissionSetDataProvider(metaclass=SingletonMeta):
 
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
+        self._log.debug("Initializing ExtraPermissionSetDataProvider")
         self._github_client = GithubFileClient()
         self._default_branch = "master"
         self._default_github_base_url = "https://raw.githubusercontent.com"
@@ -30,11 +32,17 @@ class ExtraPermissionSetDataProvider(metaclass=SingletonMeta):
         Returns:
             ExtraPermissionSetData: An object containing the remapped permissions and capabilities data.
         """
+
         local_mod_roles_kc_file_Location = Env().getenv("LOCAL_MOD_ROLES_KC_FILE_LOCATION")
         if local_mod_roles_kc_file_Location:
-            self._log("Using local mod-roles-keycloak files from: %s", local_mod_roles_kc_file_Location)
-            return self.__read_local_data(local_mod_roles_kc_file_Location)
+            self._log.debug("Loading extra permission set data from filesystem...")
+            self._log.debug("Using local mod-roles-keycloak files from: %s", local_mod_roles_kc_file_Location)
+            extra_ps_names_dir_path = Path(local_mod_roles_kc_file_Location)
+            result_object = self.__read_local_data(extra_ps_names_dir_path)
+            self._log.info("Extra permission set data loaded from local path: %s", extra_ps_names_dir_path)
+            return result_object
 
+        self._log.debug("Loading extra permission set data from GitHub...")
         github_base_url = self.__get_github_base_url()
         mod_roles_kc_branch = self.__get_mod_roles_kc_branch()
         folio_repository = "folio-org/mod-roles-keycloak/"
@@ -42,17 +50,17 @@ class ExtraPermissionSetDataProvider(metaclass=SingletonMeta):
         base_url = f"{github_base_url}/{folio_repository}/refs/heads/{mod_roles_kc_branch}/{folder}"
         ps_ref_data = self._github_client.load_object_safe(f"{base_url}/permissions/{self._permission_ref_data_fn}")
         cs_ref_data = self._github_client.load_object_safe(f"{base_url}/capabilities/{self._capability_ref_data_fn}")
-        return self.__create_result_object(ps_ref_data, cs_ref_data)
+        result_object = self.__create_result_object(ps_ref_data, cs_ref_data)
+        self._log.info("Extra permission set data loaded from github: %s", base_url)
+        return result_object
 
-    def __read_local_data(self, remapping_file_path: str) -> ExtraPermissionSetData:
-        permission_ref_data = JsonUtils().read_string_safe(f"{remapping_file_path}/{self._permission_ref_data_fn}")
-        capability_ref_data = JsonUtils().read_string_safe(f"{remapping_file_path}/{self._capability_ref_data_fn}")
+    def __read_local_data(self, extra_ps_names_dir_path: Path) -> ExtraPermissionSetData:
+        permission_ref_data = JsonUtils().read_string_safe(extra_ps_names_dir_path / self._permission_ref_data_fn)
+        capability_ref_data = JsonUtils().read_string_safe(extra_ps_names_dir_path / self._capability_ref_data_fn)
         return self.__create_result_object(permission_ref_data, capability_ref_data)
 
     @staticmethod
-    def __create_result_object(
-        ps_data: Dict[str, List[str]], cs_data: Dict[str, List[str]]
-    ) -> ExtraPermissionSetData:
+    def __create_result_object(ps_data: Dict[str, List[str]], cs_data: Dict[str, List[str]]) -> ExtraPermissionSetData:
         """
         Create a result object from the given data.
 

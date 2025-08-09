@@ -24,8 +24,8 @@
       "name": "Permissions Module",
       "permissionSets": [
         {
-          "permissionName": "m1_okapi_ps1",
-          "displayName": "Test: Okapi Permission #1"
+          "permissionName": "perms.users.get",
+          "displayName": "mod-permissions: Get user-permissions"
         }
       ]
     }
@@ -53,7 +53,7 @@
       "description": "PS 1: Description",
       "grantedTo": [ "up_id1" ],
       "mutable": true,
-      "subPermissions": [ "m1_okapi.all" ]
+      "subPermissions": [ "m1_okapi.all", "perms.users.get" ]
     }
   ],
   "allPermissionsExpanded": [
@@ -79,7 +79,7 @@
       "description": "PS 1: Description",
       "grantedTo": [ "up_id1" ],
       "mutable": true,
-      "subPermissions": [ "m1_okapi.all", "m1_okapi_ps1", "m1_okapi_ps2" ]
+      "subPermissions": [ "m1_okapi.all", "m1_okapi_ps1", "m1_okapi_ps2", "perms.users.get" ]
     }
   ],
   "allPermissionUsers": [

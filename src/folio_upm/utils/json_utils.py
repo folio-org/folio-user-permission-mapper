@@ -1,6 +1,7 @@
 import gzip
 import io
 import json
+from pathlib import Path
 from typing import Any
 
 from folio_upm.model.cls_support import SingletonMeta
@@ -12,12 +13,13 @@ class JsonUtils(metaclass=SingletonMeta):
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
 
-    def read_string_safe(self, file_path: str) -> Any:
+    def read_string_safe(self, object_key: Path) -> Any:
+        self._log.debug("Reading JSON from file: %s", object_key)
         try:
-            with open(file_path, "r") as file:
+            with open(object_key, "r") as file:
                 return json.load(file)
         except Exception as e:
-            self._log.error("Failed to read JSON file '%s': %s", file_path, e)
+            self._log.error("Failed to read JSON file '%s': %s", object_key, e)
             return None
 
     @staticmethod
@@ -62,7 +64,7 @@ class JsonUtils(metaclass=SingletonMeta):
 
     @staticmethod
     def delete_none(_dict):
-        """Delete None values recursively from all of the dictionaries, tuples, lists, sets"""
+        """Delete None values recursively from all the dictionaries, tuples, lists, sets"""
         cloned_value = JsonUtils.clone_dict(_dict)
         if isinstance(cloned_value, dict):
             for key, value in list(cloned_value.items()):

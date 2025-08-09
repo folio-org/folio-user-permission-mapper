@@ -1,5 +1,6 @@
 import os
 from functools import cache
+from pathlib import Path
 from typing import List
 
 import jwt
@@ -14,6 +15,7 @@ from folio_upm.utils.utils import Utils
 class RoleLengthVerifier(metaclass=SingletonMeta):
 
     def __init__(self):
+        self._curr_dir = Path(os.path.dirname(__file__))
         self._log = log_factory.get_logger(self.__class__.__name__)
         default_max_length = 4000
         env_max_jwt_length = Env().getenv("MAX_JWT_LENGTH", str(default_max_length))
@@ -30,16 +32,14 @@ class RoleLengthVerifier(metaclass=SingletonMeta):
     @cache  # noqa: B019
     def read_private_key(self):
         key_name = "test_private_key.pem"
-        key_path = f"../../resources/role-length-test-data/{key_name}"
-        curr_dir = os.path.dirname(os.path.realpath(__file__))
-        full_path = os.path.join(curr_dir, key_path)
-        with open(full_path, "rb") as f:
+        key_path = Path(f"../../resources/role-length-test-data/{key_name}")
+        full_file_path = self._curr_dir / key_path
+        self._log.debug("Reading test private key: %s", full_file_path)
+        with open(full_file_path, "rb") as f:
             return f.read()
 
     @cache  # noqa: B019
     def read_sample_payload(self):
         file_name = "sample-payload.json"
-        full_path = f"../../resources/role-length-test-data/{file_name}"
-        curr_dir = os.path.dirname(os.path.realpath(__file__))
-        file_path = os.path.join(curr_dir, full_path)
+        file_path = self._curr_dir / Path(f"../../resources/role-length-test-data/{file_name}")
         return JsonUtils().read_string_safe(file_path)

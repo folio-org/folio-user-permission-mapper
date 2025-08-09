@@ -15,7 +15,7 @@ class ExtraPermissionsService(metaclass=SingletonMeta):
         self._github_file_service = ExtraPermissionSetDataProvider()
         self._remapping_data = self._github_file_service.load_extra_permission_set_data()
         self._extra_ps_names_to_view = self._remapping_data.viewCapabilities
-        self._extra_ps_names_to_edit = self.__get_view_capabilities()
+        self._extra_ps_names_to_edit = self.__get_edit_capabilities()
 
     def find_extra_ps_names(self, analyzed_capabilities: List[AnalyzedCapability]) -> List[str]:
         """
@@ -38,7 +38,7 @@ class ExtraPermissionsService(metaclass=SingletonMeta):
     def __had_view_permissions(self, ps_names: List[str]) -> bool:
         return any(ps_name in self._remapping_data.viewPermissions for ps_name in ps_names)
 
-    def __get_view_capabilities(self) -> List[str]:
+    def __get_edit_capabilities(self) -> List[str]:
         return (
             OrderedSet[str](self._remapping_data.editCapabilities)
             .add_all(self._remapping_data.viewCapabilities)
