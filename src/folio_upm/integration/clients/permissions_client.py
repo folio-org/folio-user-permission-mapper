@@ -19,6 +19,10 @@ class PermissionsClient(metaclass=SingletonMeta):
         }
 
         response = self._client.get_json("/perms/permissions", params=query_params)
+        if not isinstance(response, dict):
+            error_msg_template = "Invalid response type for permissions (%s, %s, %s): %s"
+            self._log.error(error_msg_template, cql_query, limit, offset, str(response))
+            return []
         permissions = response.get("permissions", [])
         self._log.info(f"Page loaded successfully: {len(permissions)} permission(s) found.")
         return permissions
@@ -26,4 +30,8 @@ class PermissionsClient(metaclass=SingletonMeta):
     def load_user_permissions_by_ids(self, ids_cql_query):
         query_params = {"query": ids_cql_query, "limit": 500}
         response_json = self._client.get_json("/perms/users", params=query_params)
+        if not isinstance(response_json, dict):
+            error_msg_template = "Invalid response type for permissions query(%s): %s"
+            self._log.error(error_msg_template, ids_cql_query)
+            return []
         return response_json.get("permissionUsers", [])

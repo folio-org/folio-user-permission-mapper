@@ -12,12 +12,15 @@ class AnalyzedPermissionSet(BaseModel):
 
     note: Optional[str] = None
     reasons: List[str] = []
-    permissionName: str = None
+    permissionName: str
     sourcePermSets: List[SourcedPermissionSet] = []
 
-    def get_first_value(self, value_extractor: Callable[[PermissionSet], str]) -> Optional[str]:
-        extracted_values = [value_extractor(i.val) for i in self.sourcePermSets]
-        return extracted_values[0] if len(extracted_values) > 1 else None
+    def get_first_value(self, value_extractor: Callable[[PermissionSet], Optional[str]]) -> Optional[str]:
+        for source_perm_set in self.sourcePermSets:
+            value = value_extractor(source_perm_set.val)
+            if value is not None:
+                return value
+        return None
 
     def get_parent_permission_names(self) -> OrderedSet[str]:
         parent_permissions = OrderedSet[str]()
@@ -38,3 +41,9 @@ class AnalyzedPermissionSet(BaseModel):
     def get_uq_display_names_str(self) -> str:
         names = OrderedSet[str]([x.val.displayName for x in self.sourcePermSets if x.val.displayName]).to_list()
         return "\n".join(sorted(names))
+
+    def set_note(self, note: str) -> None:
+        if note:
+            self.note = note
+        else:
+            self.note = None

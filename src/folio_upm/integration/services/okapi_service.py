@@ -14,6 +14,9 @@ class OkapiService(metaclass=SingletonMeta):
         module_descriptors = self._client.read_module_descriptors()
         result = []
         for descriptor in module_descriptors:
+            if not isinstance(descriptor, dict):
+                self._log.error(f"Invalid descriptor type: {type(descriptor)}. Expected dict.")
+                continue
             permission_sets = descriptor.get("permissionSets", [])
             module_id = descriptor.get("id")
             if not permission_sets:

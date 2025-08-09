@@ -1299,6 +1299,24 @@ docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
 tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
+name = "pyrefly"
+version = "0.27.2"
+description = "A fast Python type checker written in Rust"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pyrefly-0.27.2-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:d1033c915133c48cccca4c0e3bc118c54f1b5a4ba10f2f45834a918ebc304137"},
+    {file = "pyrefly-0.27.2-py3-none-macosx_11_0_arm64.whl", hash = "sha256:6b1b976a50070469a9c0d8901f39d20e89f632c52420b5954bca90f01119ff9f"},
+    {file = "pyrefly-0.27.2-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:60e256327c112f2ad979e1edb5a10ed1b28603fa07685be4f81a85db7a361950"},
+    {file = "pyrefly-0.27.2-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:41d8affa1d4b061105c3ac8381ca5dfe1fd27aa2d7db390af0d78acabea0ea9e"},
+    {file = "pyrefly-0.27.2-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fb6fb1e0eeca7517ce7b3c85c7a08dd38bdd6d969c53bf349a8293de6da40ffd"},
+    {file = "pyrefly-0.27.2-py3-none-win32.whl", hash = "sha256:7df61ac9828e98996fe291db9186249ae5004c7ad4a818f558f7be84f465af1e"},
+    {file = "pyrefly-0.27.2-py3-none-win_amd64.whl", hash = "sha256:83b15d1712d53cc1c6b6732fe8539c6051e3e6fff5541af28f4b39cd80dc19aa"},
+    {file = "pyrefly-0.27.2-py3-none-win_arm64.whl", hash = "sha256:a83e94a6c474b9065ea7c6793fb420c57875b1da1120ba407764740ee23f319c"},
+    {file = "pyrefly-0.27.2.tar.gz", hash = "sha256:f214b522b581eac965fccfd0fbe106b929c46a9a3b2703738d07dd7fd2d55f1c"},
+]
+
+[[package]]
 name = "pytest"
 version = "8.4.1"
 description = "pytest: simple powerful testing with Python"
@@ -1430,6 +1448,17 @@ files = [
 ]
 
 [[package]]
+name = "types-openpyxl"
+version = "3.1.5.20250602"
+description = "Typing stubs for openpyxl"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "types_openpyxl-3.1.5.20250602-py3-none-any.whl", hash = "sha256:1f82211e086902318f6a14b5d8d865102362fda7cb82f3d63ac4dff47a1f164b"},
+    {file = "types_openpyxl-3.1.5.20250602.tar.gz", hash = "sha256:d19831482022fc933780d6e9d6990464c18c2ec5f14786fea862f72c876980b5"},
+]
+
+[[package]]
 name = "types-s3transfer"
 version = "0.13.0"
 description = "Type annotations and code completion for s3transfer"
@@ -1485,4 +1514,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "494bcc95e28a57e21fe0032ae1950898f62175d637832be393f9900ae62d04e7"
+content-hash = "28b11dd87ffaa04d7452e66c7a45510c4d074bcc5d00545be07bea5cc5fac083"

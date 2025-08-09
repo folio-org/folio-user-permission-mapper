@@ -1,35 +1,26 @@
-from typing import List, Optional, override
+from typing import List
 
-from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
 from folio_upm.model.stats.eureka_user_stats import EurekaUserStats
-from folio_upm.model.stats.permission_set_stats import PermissionSetStats
-from folio_upm.model.types.permission_type import DEPRECATED, QUESTIONABLE, UNPROCESSED
-from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
+from folio_upm.xlsx.ws_constants import num_long_cw, num_short_cw, uuid_cw
 
 
-class EurekaUserStatsWorksheet(AbstractWorksheet):
-
-    title = "User-Stats"
+class EurekaUserStatsWorksheet(AbstractWorksheet[EurekaUserStats]):
 
     _columns = [
-        Column[EurekaUserStats](w=40, n="User Id", f=lambda x: x.userId),
-        Column[EurekaUserStats](w=20, n="# Roles", f=lambda x: x.totalRoles),
-        Column[EurekaUserStats](w=20, n="# Hash-Roles", f=lambda x: x.hashRoles),
-        Column[EurekaUserStats](w=25, n="# Role Capabilities", f=lambda x: x.roleCapabilities),
-        Column[EurekaUserStats](w=30, n="# Role Capability Sets", f=lambda x: x.roleCapabilitySets),
-        Column[EurekaUserStats](w=32, n="# Hash-Role Capabilities", f=lambda x: x.hashRoleCapabilities),
-        Column[EurekaUserStats](w=36, n="# Hash-Role Capability Sets", f=lambda x: x.hashRoleCapabilitySets),
-        Column[EurekaUserStats](w=25, n="# All Capabilities", f=lambda x: x.allCapabilities),
-        Column[EurekaUserStats](w=28, n="# All Capability Sets", f=lambda x: x.allCapabilitySets),
+        Column[EurekaUserStats](w=uuid_cw, n="User Id", f=lambda x: x.userId),
+        Column[EurekaUserStats](w=num_short_cw, n="# Roles", f=lambda x: x.totalRoles),
+        Column[EurekaUserStats](w=num_short_cw, n="# Hash-Roles", f=lambda x: x.hashRoles),
+        Column[EurekaUserStats](w=num_short_cw, n="# Role Capabilities", f=lambda x: x.roleCapabilities),
+        Column[EurekaUserStats](w=num_long_cw, n="# Role Capability Sets", f=lambda x: x.roleCapabilitySets),
+        Column[EurekaUserStats](w=num_long_cw, n="# Hash-Role Capabilities", f=lambda x: x.hashRoleCapabilities),
+        Column[EurekaUserStats](w=num_long_cw, n="# Hash-Role Capability Sets", f=lambda x: x.hashRoleCapabilitySets),
+        Column[EurekaUserStats](w=num_long_cw, n="# All Capabilities", f=lambda x: x.allCapabilities),
+        Column[EurekaUserStats](w=num_long_cw, n="# All Capability Sets", f=lambda x: x.allCapabilitySets),
     ]
 
     def __init__(self, ws: Worksheet, data: List[EurekaUserStats]):
-        super().__init__(ws, self.title, data, self._columns)
-        self._yellow_types = [x.get_name() for x in [DEPRECATED, QUESTIONABLE, UNPROCESSED]]
-
-    @override
-    def _get_row_fill_color(self, ps_stats: PermissionSetStats) -> Optional[PatternFill]:
-        return ws_constants.almost_white_fill
+        title = "User-Stats"
+        super().__init__(ws, title, data, self._columns)

@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Any, Dict
 
 from folio_upm.integration.services.okapi_service import OkapiService
 from folio_upm.integration.services.permission_service import PermissionService
@@ -12,7 +12,7 @@ class OkapiDataLoader(metaclass=SingletonMeta):
         self._permission_service = PermissionService()
         self._okapi_service = OkapiService()
 
-    def load_okapi_data(self) -> Dict[str, any]:
+    def load_okapi_data(self) -> Dict[str, Any]:
         self._log.info("Permission loading started...")
         all_records_query = "cql.allRecords=1"
         pass

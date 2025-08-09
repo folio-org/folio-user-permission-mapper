@@ -7,6 +7,6 @@ from folio_upm.model.eureka.capability_set import CapabilitySet
 from folio_upm.model.eureka.role import Role
 
 
-class FullRoleCapabilityOrSet(BaseModel):
+class RoleCapabilityOrSet(BaseModel):
     role: Role
-    capabilityOrSet: Union[Capability, CapabilitySet]
+    capabilityOrSet: Union[Capability, CapabilitySet, None]

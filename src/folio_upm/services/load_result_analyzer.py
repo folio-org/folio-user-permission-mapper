@@ -19,7 +19,7 @@ from folio_upm.utils import log_factory
 
 class LoadResultAnalyzer:
 
-    def __init__(self, okapi_load_rs: OkapiLoadResult, eureka_load_rs=Optional[EurekaLoadResult]):
+    def __init__(self, okapi_load_rs: OkapiLoadResult, eureka_load_rs: Optional[EurekaLoadResult]):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("LoadResultAnalyzer initialized.")
         self._analysis_json = okapi_load_rs
@@ -43,6 +43,7 @@ class LoadResultAnalyzer:
         ps_ar = self._ps_analysis_result
         roles = RolesProvider(load_result, ps_ar).get_roles()
         user_roles = UserRolesProvider(ps_ar, roles).get_user_roles()
+
         role_capabilities = RoleCapabilitiesProvider(ps_ar, roles, self._eureka_lr).get_role_capabilities()
 
         self.__update_role_users_count(roles, user_roles)
@@ -65,6 +66,7 @@ class LoadResultAnalyzer:
             if ur.userId in visited_users:
                 continue
             visited_users.add(ur.userId)
+
             for role_name in ur.roleNames:
                 if role_name in roles:
                     roles[role_name].usersCount += 1

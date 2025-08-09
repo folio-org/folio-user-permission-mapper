@@ -18,6 +18,10 @@ class RoleCapabilitiesClient(AbstractRoleEntityClient[RoleCapability], metaclass
     def find_by_query(self, query: str, limit: int, offset: int) -> List[RoleCapability]:
         query_params = {"query": query, "limit": limit, "offset": offset}
         response = self._http_client.get_json("/roles/capabilities", params=query_params)
+        if not isinstance(response, dict):
+            error_msg_template = "Invalid response type for role-capabilities query(%s, %s, %s): %s"
+            self._log.warning(error_msg_template, query, limit, offset, str(response))
+            return []
         return [RoleCapability(**rc) for rc in response.get("roleCapabilities", [])]
 
     @override
@@ -25,6 +29,10 @@ class RoleCapabilitiesClient(AbstractRoleEntityClient[RoleCapability], metaclass
         body = {"roleId": role_id, "capabilityIds": entity_ids}
         response = self._http_client.post_json("/roles/capabilities", request_body=body)
         role_capabilities_json = response.get("roleCapabilities", []) if response else []
+        if not isinstance(response, dict):
+            error_msg_template = "Invalid response type for role-capability-sets creation (%s, %s): %s"
+            self._log.error(error_msg_template, role_id, entity_ids, str(response))
+            return []
         return [RoleCapability(**rc) for rc in role_capabilities_json]
 
     @override

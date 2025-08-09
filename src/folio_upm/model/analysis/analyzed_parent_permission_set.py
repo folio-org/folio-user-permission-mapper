@@ -8,7 +8,7 @@ from folio_upm.utils.ordered_set import OrderedSet
 
 class AnalyzedParentPermSets(BaseModel):
     permissionName: str
-    permissionType: str = None
+    permissionType: Optional[str] = None
     displayName: Optional[str] = None
     parentPermissionName: str
     parentDisplayName: Optional[str] = None

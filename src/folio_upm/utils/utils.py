@@ -1,20 +1,22 @@
 import random
 import string
-from typing import Optional
+from typing import Optional, TypeVar
 
 from folio_upm.model.okapi.permission_set import PermissionSet
+
+T = TypeVar("T")
 
 
 class Utils:
 
     @staticmethod
-    def bool_to_char(value: bool | None) -> chr:
+    def bool_to_char(value: bool | None) -> str:
         if value is None:
             return chr(0x003F)
         return chr(0x2705) if value else chr(0x2BBD)
 
     @staticmethod
-    def safe_cast(val, to_type, default=None):
+    def safe_cast[T](val, to_type: type[T], default: T | None = None) -> T | None:
         try:
             return to_type(val)
         except (ValueError, TypeError):

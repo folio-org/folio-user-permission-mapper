@@ -1,4 +1,4 @@
-from typing import List, Optional, override
+from typing import List, override
 
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
@@ -6,30 +6,31 @@ from openpyxl.worksheet.worksheet import Worksheet
 from folio_upm.model.stats.permission_user_stats import PermissionUserStats
 from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
+from folio_upm.xlsx.ws_constants import num_short_cw, uuid_cw
 
 
-class UserStatsWorksheet(AbstractWorksheet):
+class UserStatsWorksheet(AbstractWorksheet[PermissionUserStats]):
 
     _title = "UserStats-Okapi"
     _columns = [
-        Column(w=40, n="User Id", f=lambda x: x.userId),
-        Column(w=25, n="# User-Created", f=lambda x: x.mutablePermissionSetsCount),
-        Column(w=25, n="# Invalid", f=lambda x: x.invalidPermissionSetsCount),
-        Column(w=25, n="# System-Created", f=lambda x: x.okapiPermissionSetsCount),
-        Column(w=25, n="# Deprecated", f=lambda x: x.deprecatedPermissionSetsCount),
-        Column(w=25, n="# Total", f=lambda x: x.allPermissionSetsCount),
+        Column[PermissionUserStats](w=uuid_cw, n="User Id", f=lambda x: x.userId),
+        Column[PermissionUserStats](w=num_short_cw, n="# User-Created", f=lambda x: x.mutablePermissionSetsCount),
+        Column[PermissionUserStats](w=num_short_cw, n="# Invalid", f=lambda x: x.invalidPermissionSetsCount),
+        Column[PermissionUserStats](w=num_short_cw, n="# System-Created", f=lambda x: x.okapiPermissionSetsCount),
+        Column[PermissionUserStats](w=num_short_cw, n="# Deprecated", f=lambda x: x.deprecatedPermissionSetsCount),
+        Column[PermissionUserStats](w=num_short_cw, n="# Total", f=lambda x: x.allPermissionSetsCount),
     ]
 
     def __init__(self, ws: Worksheet, data: List[PermissionUserStats]):
         super().__init__(ws, self._title, data, self._columns)
 
     @override
-    def _get_row_fill_color(self, user_stats: PermissionUserStats) -> Optional[PatternFill]:
-        if user_stats.invalidPermissionSetsCount > 0:
+    def _get_row_fill_color(self, value: PermissionUserStats) -> PatternFill:
+        if value.invalidPermissionSetsCount > 0:
             return ws_constants.light_red_fill
-        if user_stats.deprecatedPermissionSetsCount > 0:
+        if value.deprecatedPermissionSetsCount > 0:
             return ws_constants.light_yellow_fill
-        if user_stats.mutablePermissionSetsCount > 0:
+        if value.mutablePermissionSetsCount > 0:
             return ws_constants.light_green_fill
         return ws_constants.almost_white_fill
 

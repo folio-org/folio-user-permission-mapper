@@ -1,5 +1,8 @@
+import io
 from datetime import UTC, datetime
 from typing import Any, Optional
+
+from openpyxl import Workbook
 
 from folio_upm.utils import log_factory
 from folio_upm.utils.upm_env import Env
@@ -40,7 +43,7 @@ class TenantStorage:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
             return None
 
-    def find_object_by_key(self, ref_key):
+    def find_object_by_key(self, ref_key) -> Optional[Any]:
         if ref_key.endswith("json.gz"):
             return self._get_json_gz(ref_key)
         elif ref_key.endswith("json"):
@@ -58,16 +61,16 @@ class TenantStorage:
     def _save_json(self, file_key: str, object_data: Any):
         pass
 
-    def _get_json_gz(self, object_name: str):
+    def _get_json_gz(self, object_name: str) -> Optional[Any]:
         pass
 
-    def _save_json_gz(self, object_name: str, object_data: Any):
+    def _save_json_gz(self, object_name: str, object_data: Any) -> None:
         pass
 
-    def _get_xlsx(self, object_name: str):
+    def _get_xlsx(self, object_name: str) -> Optional[io.BytesIO]:
         pass
 
-    def _save_xlsx(self, object_name: str, object_data: Any):
+    def _save_xlsx(self, object_name: str, object_data: Workbook) -> None:
         pass
 
     def _get_file_key(self, file_name, extension, include_ts: bool = False) -> str:

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.storage.local_tenant_storage import LocalTenantStorage
@@ -40,7 +40,7 @@ class TenantStorageService(metaclass=SingletonMeta):
                 return found_object
         raise FileNotFoundError(f"File not found in storages {self._storage_names}: {object_name}.{object_ext}.")
 
-    def find_object_by_key(self, object_key: str):
+    def find_object_by_key(self, object_key: str) -> Optional[Any]:
         for storage in self._storages:
             found_object = storage.find_object_by_key(object_key)
             if found_object is not None:

@@ -47,6 +47,10 @@ class Env(metaclass=SingletonMeta):
 
     def get_bool_cached(self, env_variable_name: str, default_value: bool = False) -> bool:
         str_var = self.getenv_cached(env_variable_name, str(default_value))
+        if str_var is None:
+            self._log.debug("%s is not set, using default value: %s", env_variable_name, default_value)
+            return default_value
+
         return Utils.parse_bool(str_var, default_value)
 
     def get_migration_strategy(self) -> EurekaLoadStrategy:
@@ -59,6 +63,9 @@ class Env(metaclass=SingletonMeta):
 
     def get_enabled_storages(self):
         storages = self.getenv_cached("ENABLED_STORAGES", default_value="s3")
+        if not storages:
+            raise ValueError("ENABLED_STORAGES environment variable is not set or empty.")
+
         parsed_storages = [x.strip() for x in storages.split(",")]
         allowed_values = {"s3", "local"}
         if not set(parsed_storages) <= allowed_values:

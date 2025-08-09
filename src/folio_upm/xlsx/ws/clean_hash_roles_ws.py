@@ -5,40 +5,41 @@ from pydantic import BaseModel
 
 from folio_upm.model.cleanup.full_hash_role_cleanup_record import FullHashRoleCleanupRecord
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
+from folio_upm.xlsx.ws_constants import desc_long_cw, role_name_cw, type_cw
 
 
-class RecordRow(BaseModel):
+class RoleCapabilityRow(BaseModel):
     roleName: str
     c_type: str
     capabilityType: str
     name: str
 
 
-class CleanHashRolesWorksheet(AbstractWorksheet):
+class CleanHashRolesWorksheet(AbstractWorksheet[RoleCapabilityRow]):
 
-    _title = "Clean Hash-Roles"
     _columns = [
-        Column[RecordRow](w=60, n="Role Name", f=lambda x: x.roleName),
-        Column[RecordRow](w=25, n="Resolved Type", f=lambda x: x.c_type),
-        Column[RecordRow](w=15, n="Type", f=lambda x: x.capabilityType),
-        Column[RecordRow](w=100, n="Name", f=lambda x: x.name),
+        Column[RoleCapabilityRow](w=role_name_cw, n="Role Name", f=lambda x: x.roleName),
+        Column[RoleCapabilityRow](w=type_cw, n="Resolved Type", f=lambda x: x.c_type),
+        Column[RoleCapabilityRow](w=type_cw, n="Type", f=lambda x: x.capabilityType),
+        Column[RoleCapabilityRow](w=desc_long_cw, n="Capability | Set Name", f=lambda x: x.name),
     ]
 
     def __init__(self, ws: Worksheet, data: List[FullHashRoleCleanupRecord]):
-        super().__init__(ws, self._title, data, self._columns)
+        _title = "Clean Hash-Roles"
+        super().__init__(ws, _title, data, self._columns)
 
     @override
-    def _get_iterable_data(self) -> List[RecordRow]:
+    def _get_iterable_data(self) -> List[RoleCapabilityRow]:
         result = []
         for item in self._data:
             role_name = item.role.name
             if len(item.capabilities) == 0 and len(item.capabilitySets) == 0:
-                row = RecordRow(roleName=role_name, c_type="none", capabilityType="none", name="none")
+                row = RoleCapabilityRow(roleName=role_name, c_type="none", capabilityType="none", name="none")
                 result.append(row)
                 continue
 
             for capability in item.capabilities:
-                row = RecordRow(
+                row = RoleCapabilityRow(
                     roleName=role_name,
                     c_type="capability",
                     capabilityType=capability.capabilityType,
@@ -47,7 +48,7 @@ class CleanHashRolesWorksheet(AbstractWorksheet):
                 result.append(row)
 
             for capability_set in item.capabilitySets:
-                row = RecordRow(
+                row = RoleCapabilityRow(
                     roleName=role_name,
                     c_type="capability-set",
                     capabilityType=capability_set.capabilityType,

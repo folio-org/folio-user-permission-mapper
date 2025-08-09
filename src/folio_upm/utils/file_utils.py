@@ -13,7 +13,7 @@ _timestamp_pattern = r"-(\d{4}\d{2}\d{2}-\d{2}\d{2}\d{2}\d{6})"
 class FileUtils:
 
     @staticmethod
-    def read_binary_data(file_key) -> BytesIO | None:
+    def read_binary_data(file_key) -> Optional[BytesIO]:
         if not os.path.exists(file_key):
             _log.warning("File '%s' not found", file_key)
             return None
@@ -25,7 +25,7 @@ class FileUtils:
             return file_bytes_buffer
 
     @staticmethod
-    def write_binary_data(file_key, binary_data: BytesIO):
+    def write_binary_data(file_key, binary_data: BytesIO) -> None:
         _log.debug("Saving file: '%s' ...", file_key)
 
         if FileUtils.exists(file_key):
@@ -37,12 +37,12 @@ class FileUtils:
             _log.debug("Data saved to file '%s'", file_key)
 
     @staticmethod
-    def exists(file_key):
+    def exists(file_key) -> bool:
         _log.debug("Checking if file exists: '%s'", file_key)
         return os.path.exists(file_key)
 
     @staticmethod
-    def create_directory_safe(directory_path):
+    def create_directory_safe(directory_path) -> str:
         if not os.path.exists(directory_path):
             _log.debug("Creating directory: %s", directory_path)
             os.makedirs(directory_path)

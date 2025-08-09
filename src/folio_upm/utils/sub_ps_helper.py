@@ -12,14 +12,15 @@ from folio_upm.utils.utils import Utils
 class SubPermissionsHelper:
 
     def __init__(self, ps_analysis_result: PermissionAnalysisResult):
-        self._log = log_factory.get_logger(__class__.__name__)
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._ps_analysis_result = ps_analysis_result
         self._parent_ps_names = dict[str, OrderedSet[str]]()
 
     def expand_sub_ps(self, permission_name) -> list[ExpandedPermissionSet]:
         self._parent_ps_names = dict[str, OrderedSet[str]]()
         ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
-        analyzed_ps = self._ps_analysis_result[ps_type].get(permission_name)
+
+        analyzed_ps = self._ps_analysis_result.get(ps_type).get(permission_name)
         if analyzed_ps is None:
             return []
         _, parent_sub_ps = self.__get_sub_permissions(analyzed_ps, set(), None)
@@ -71,7 +72,9 @@ class SubPermissionsHelper:
 
             ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
             if ps_type == MUTABLE:
-                mutable_ps_sets.append(self._ps_analysis_result[ps_type].get(permission_name))
+                analyzed_ps = self._ps_analysis_result.get(ps_type).get(permission_name)
+                if analyzed_ps is not None:
+                    mutable_ps_sets.append(analyzed_ps)
             else:
                 other_ps_set_names.append(permission_name)
 

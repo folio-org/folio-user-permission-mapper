@@ -12,11 +12,10 @@ class SystemRolesProvider(metaclass=SingletonMeta):
         self._log.debug("Initializing SystemGeneratedRolesProvider")
         self._system_roles_dict = self.__get_system_roles_mappings()
 
-    def has_system_generated_ps(self, permission_set: str) -> bool:
-        return permission_set in self._system_roles_dict
-
-    def get_eureka_role_name(self, role_name: str) -> Optional[str]:
-        return self._system_roles_dict.get(role_name)
+    def find_system_generated_role_name(self, permission_set: str) -> Optional[str]:
+        if permission_set in self._system_roles_dict:
+            return self._system_roles_dict[permission_set]
+        return None
 
     def print_system_roles(self):
         self._log.debug("Defined system-generated roles: %s", self._system_roles_dict)

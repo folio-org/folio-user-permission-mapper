@@ -19,12 +19,12 @@ class HttpRequestResult(BaseModel):
     error: Optional[DetailedHttpError] = None
 
     @staticmethod
-    def for_role(role, status, reason=None, error=None) -> "HttpRequestResult":
+    def for_role(role: Optional[Role], status: str, reason=None, error=None) -> "HttpRequestResult":
         return HttpRequestResult(
             status=status,
             srcEntityName="role",
-            srcEntityId=role.id,
-            srcEntityDisplayName=role.name,
+            srcEntityId=role.id if role else None,
+            srcEntityDisplayName=role.name if role else None,
             reason=reason,
             error=error,
         )
@@ -61,14 +61,14 @@ class HttpRequestResult(BaseModel):
         )
 
     @staticmethod
-    def for_user_role(role: Role, user_id: str, status: str, reason=None, error=None) -> "HttpRequestResult":
+    def for_user_role(role: Optional[Role], user_id: str, status: str, reason=None, error=None) -> "HttpRequestResult":
         return HttpRequestResult(
             status=status,
             srcEntityName="user",
             srcEntityId=user_id,
             tarEntityName="role",
-            tarEntityId=role.id,
-            tarEntityDisplayName=role.name,
+            tarEntityId=role.id if role else None,
+            tarEntityDisplayName=role.name if role else None,
             reason=reason,
             error=error,
         )

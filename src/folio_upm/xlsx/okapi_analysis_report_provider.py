@@ -1,5 +1,5 @@
 from folio_upm.model.result.okapi_analysis_result import OkapiAnalysisResult
-from folio_upm.xlsx.abstract_result_service import AbstractReportProvider, WsDef
+from folio_upm.xlsx.abstract_report_provider import AbstractReportProvider, WsDef
 from folio_upm.xlsx.ws.ps_nesting_ws import PermissionNestingWorksheet
 from folio_upm.xlsx.ws.ps_stats_ws import PermissionStatsWorksheet
 from folio_upm.xlsx.ws.role_capabilities_ws import RolesCapabilitiesWorksheet

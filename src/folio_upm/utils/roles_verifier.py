@@ -17,13 +17,14 @@ class RoleLengthVerifier(metaclass=SingletonMeta):
         self._log = log_factory.get_logger(self.__class__.__name__)
         default_max_length = 4000
         env_max_jwt_length = Env().getenv("MAX_JWT_LENGTH", str(default_max_length))
-        self._max_jwt_length = Utils.safe_cast(env_max_jwt_length, int, default_max_length)
+        self._max_jwt_length = Utils.safe_cast(env_max_jwt_length, int, default_max_length) or default_max_length
 
     def has_invalid_amount_of_roles(self, roles: List[str]) -> bool:
         sample_key = self.read_private_key()
         sample_payload = self.read_sample_payload()
         sample_payload["realm_access"] = {"roles": roles}
         token = jwt.encode(sample_payload, key=sample_key, algorithm="RS256")
+
         return len(token) > self._max_jwt_length
 
     @cache  # noqa: B019

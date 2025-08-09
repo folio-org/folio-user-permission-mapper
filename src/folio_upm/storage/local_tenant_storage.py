@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import Optional
+from typing import Any, Optional
 
 from openpyxl.workbook import Workbook
 from typing_extensions import override
@@ -20,8 +20,8 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
         self._out_folder = ".temp"
 
     @override
-    def _get_json_gz(self, file_key):
-        json_bytes_buffer = self.__read_binary_data(file_key)
+    def _get_json_gz(self, object_name: str) -> Optional[Any]:
+        json_bytes_buffer = self.__read_binary_data(object_name)
         return json_bytes_buffer and JsonUtils.from_json_gz(json_bytes_buffer)
 
     @override
@@ -29,18 +29,18 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
         return FileUtils.find_latest_key_by_prefix(self._out_folder, prefix, object_ext)
 
     @override
-    def _save_json_gz(self, file_key, object_data: dict):
+    def _save_json_gz(self, object_name: str, object_data: Any) -> None:
         data_bytes = JsonUtils.to_json_gz(object_data)
-        self.__save_file_with_latest_included(file_key, data_bytes)
+        self.__save_file_with_latest_included(object_name, data_bytes)
 
     @override
-    def _save_xlsx(self, file_key, object_data: Workbook):
+    def _save_xlsx(self, object_name: str, object_data: Workbook) -> None:
         data_bytes = XlsxUtils.get_bytes(object_data)
-        self.__save_file_with_latest_included(file_key, data_bytes)
+        self.__save_file_with_latest_included(object_name, data_bytes)
 
     @override
-    def _get_xlsx(self, file_key):
-        self._log.debug("LocalTenantStorage._get_xlsx is not available.")
+    def _get_xlsx(self, object_name: str):
+        self._log.error("LocalTenantStorage._get_xlsx is not available.")
         return None
 
     def __save_file_with_latest_included(self, file_key, object_data):
@@ -51,6 +51,6 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
         file = f"{self._out_folder}/{file_key}"
         FileUtils.write_binary_data(file, binary_data)
 
-    def __read_binary_data(self, file_key) -> BytesIO | None:
+    def __read_binary_data(self, file_key) -> Optional[BytesIO]:
         file = f"{self._out_folder}/{file_key}"
         return FileUtils.read_binary_data(file)

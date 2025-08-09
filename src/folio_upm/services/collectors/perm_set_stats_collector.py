@@ -32,9 +32,10 @@ class PermSetStatisticsCollector:
         - parentPermsCount: Number of unique parent permissions (permissions this set is a child of)
     """
 
-    def __init__(self, ps_analysis_result: PermissionAnalysisResult, eureka_load_result=Optional[EurekaLoadResult]):
+    def __init__(self, ps_analysis_result: PermissionAnalysisResult, eureka_load_result: Optional[EurekaLoadResult]):
         self._eureka_load_result = eureka_load_result
         self._ps_analysis_result = ps_analysis_result
+
         self._capability_service = CapabilityService(eureka_load_result)
         self._ps_statistics = self.__collect_data()
 
@@ -44,7 +45,8 @@ class PermSetStatisticsCollector:
     def __collect_data(self):
         result = []
         for ps_type in self._ps_analysis_result.get_supported_types():
-            for ap in self._ps_analysis_result[ps_type].values():
+
+            for ap in self._ps_analysis_result.get(ps_type).values():
                 result.append(self.__get_stats_for_analyzed_ps(ap, ps_type))
         return result
 
@@ -55,7 +57,7 @@ class PermSetStatisticsCollector:
             permissionType=ps_type.get_name(),
             note=ap.note,
             reasons=ap.reasons,
-            uniqueSources=list(OrderedSet[str]([x.src for x in ap.sourcePermSets])),
+            uniqueSources=list(OrderedSet[str]([x.src.get_name() for x in ap.sourcePermSets])),
             refCount=len(ap.sourcePermSets),
             uniqueModules=self.__get_uq_module_ids(ap),
             subPermsCount=self.__get_sub_perms_count_by_type(ap, {PS, OKAPI_PS}),

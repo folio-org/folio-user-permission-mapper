@@ -5,11 +5,12 @@ from pydantic import BaseModel
 
 from folio_upm.model.eureka.capability import Capability
 from folio_upm.model.eureka.capability_set import CapabilitySet
-from folio_upm.model.eureka.eureka_role_capability import FullRoleCapabilityOrSet
+from folio_upm.model.eureka.role_capability_or_set import RoleCapabilityOrSet
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
+from folio_upm.xlsx.ws_constants import desc_long_cw, role_name_cw, type_cw
 
 
-class RecordRow(BaseModel):
+class RoleCapabilityRow(BaseModel):
     roleName: str
     capabilityId: str | None = None
     c_type: str
@@ -17,26 +18,25 @@ class RecordRow(BaseModel):
     name: str
 
 
-class EurekaRoleCapabilitiesWorksheet(AbstractWorksheet):
-    title = "Role-Capabilities"
+class EurekaRoleCapabilitiesWorksheet(AbstractWorksheet[RoleCapabilityRow]):
 
     _columns = [
-        Column[RecordRow](w=60, n="Role Name", f=lambda x: x.roleName),
-        # Column[RecordRow](w=40, n="Capability ID", f=lambda x: x.capabilityId),
-        Column[RecordRow](w=25, n="Resolved Type", f=lambda x: x.c_type),
-        Column[RecordRow](w=15, n="Type", f=lambda x: x.capabilityType),
-        Column[RecordRow](w=100, n="Name", f=lambda x: x.name),
+        Column[RoleCapabilityRow](w=role_name_cw, n="Role Name", f=lambda x: x.roleName),
+        Column[RoleCapabilityRow](w=type_cw, n="Resolved Type", f=lambda x: x.c_type),
+        Column[RoleCapabilityRow](w=type_cw, n="Type", f=lambda x: x.capabilityType),
+        Column[RoleCapabilityRow](w=desc_long_cw, n="Name", f=lambda x: x.name),
     ]
 
-    def __init__(self, ws: Worksheet, data: List[FullRoleCapabilityOrSet]):
-        super().__init__(ws, self.title, data, self._columns)
+    def __init__(self, ws: Worksheet, data: List[RoleCapabilityOrSet]):
+        title = "Role-Capabilities"
+        super().__init__(ws, title, data, self._columns)
 
     @override
-    def _get_iterable_data(self) -> List[RecordRow]:
+    def _get_iterable_data(self) -> List[RoleCapabilityRow]:
         result = []
         for item in self._data:
             result.append(
-                RecordRow(
+                RoleCapabilityRow(
                     roleName=item.role.name,
                     capabilityId=item.capabilityOrSet.id,
                     c_type=self.__get_c_type(item.capabilityOrSet),

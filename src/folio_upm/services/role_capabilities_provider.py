@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from folio_upm.model.analysis.analyzed_capability import AnalyzedCapability
 from folio_upm.model.analysis.analyzed_role import AnalyzedRole
@@ -7,7 +7,7 @@ from folio_upm.model.load.eureka_load_result import EurekaLoadResult
 from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
 from folio_upm.model.support.expanded_permission_set import ExpandedPermissionSet
 from folio_upm.model.types.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
-from folio_upm.model.types.permission_type import MUTABLE
+from folio_upm.model.types.permission_type import MUTABLE, PermissionType
 from folio_upm.services.capability_service import CapabilityService
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
@@ -20,9 +20,10 @@ class RoleCapabilitiesProvider:
         self,
         ps_analysis_result: PermissionAnalysisResult,
         roles: Dict[str, AnalyzedRole],
-        eureka_load_result: EurekaLoadResult,
+        eureka_load_result: Optional[EurekaLoadResult],
     ):
-        self._log = log_factory.get_logger(__class__.__name__)
+
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._roles = roles
         self._ps_analysis_result = ps_analysis_result
         self._not_found_permission_sets = OrderedSet[str]()
@@ -57,6 +58,7 @@ class RoleCapabilitiesProvider:
                 if capability.permissionName not in capabilities_dict:
                     capabilities_dict[capability.permissionName] = capability
         capabilities = list(capabilities_dict.values())
+
         return AnalyzedRoleCapabilities(roleName=ar.role.name, capabilities=capabilities)
 
     def __create_role_capability(self, expanded_ps, strategy: EurekaLoadStrategy) -> List[AnalyzedCapability]:
@@ -81,9 +83,12 @@ class RoleCapabilitiesProvider:
             return self.__convert_to_capability_placeholders(expanded_ps, permission_type)
         return []
 
-    def __convert_to_capability_placeholders(self, expanded_ps, ps_type) -> List[AnalyzedCapability]:
+    def __convert_to_capability_placeholders(
+        self, expanded_ps: ExpandedPermissionSet, ps_type: PermissionType
+    ) -> List[AnalyzedCapability]:
+
         ps_name = expanded_ps.permissionName
-        analyzed_ps = self._ps_analysis_result[ps_type].get(ps_name, None)
+        analyzed_ps = self._ps_analysis_result.get(ps_type).get(ps_name, None)
         expanded_pss = [(expanded_ps, ps_type)]
 
         if analyzed_ps is not None:
@@ -98,29 +103,32 @@ class RoleCapabilitiesProvider:
 
     def __create_capability_placeholder(self, expanded_ps, permission_type) -> AnalyzedCapability:
         permission_name = expanded_ps.permissionName
-        analyzed_ps = self._ps_analysis_result[permission_type].get(permission_name, None)
+
+        analyzed_ps = self._ps_analysis_result.get(permission_type).get(permission_name, None)
         capability_or_set, resolved_type = self._capability_service.find_by_ps_name(permission_name)
         return AnalyzedCapability(
             resolvedType=resolved_type,
             permissionName=permission_name,
             permissionType=permission_type.get_name(),
             expandedFrom=expanded_ps.expandedFrom,
-            displayName=analyzed_ps and analyzed_ps.get_uq_display_names_str(),
-            name=capability_or_set and capability_or_set.name,
-            resource=capability_or_set and capability_or_set.resource,
-            action=capability_or_set and capability_or_set.action,
-            capabilityType=capability_or_set and capability_or_set.capabilityType,
+            displayName=analyzed_ps.get_uq_display_names_str() if analyzed_ps else None,
+            name=capability_or_set.name if capability_or_set else None,
+            resource=capability_or_set.resource if capability_or_set else None,
+            action=capability_or_set.action if capability_or_set else None,
+            capabilityType=capability_or_set.capabilityType if capability_or_set else None,
         )
 
-    def __get_nested_capability_sets(self, analyzed_ps) -> List[ExpandedPermissionSet]:
+    def __get_nested_capability_sets(self, analyzed_ps) -> List[Tuple[ExpandedPermissionSet, PermissionType]]:
         expanded_pss = []
         for sub_ps_name in analyzed_ps.get_sub_permissions(include_flat=True):
             sub_ps_type = self._ps_analysis_result.identify_permission_type(sub_ps_name)
-            sub_analyzed_ps = self._ps_analysis_result[sub_ps_type].get(sub_ps_name, None)
+
+            sub_analyzed_ps = self._ps_analysis_result.get(sub_ps_type).get(sub_ps_name, None)
             if sub_analyzed_ps is None:
                 self._not_found_permission_sets.add(sub_ps_name)
                 continue
             if sub_analyzed_ps.get_sub_permissions():
                 expanded_sub_ps = ExpandedPermissionSet(permissionName=sub_ps_name, expandedFrom=[sub_ps_name])
+
                 expanded_pss.append((expanded_sub_ps, sub_ps_type))
         return expanded_pss

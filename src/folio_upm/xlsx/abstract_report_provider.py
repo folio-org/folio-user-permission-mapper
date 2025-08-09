@@ -28,7 +28,8 @@ class AbstractReportProvider:
     def __generate_workbook(self):
         self._log.info("Generating XLSX report...")
         wb = Workbook()
-        wb.remove(wb.active)
+        if wb.active:
+            wb.remove(wb.active)
         for ws_def in self._worksheet_defs:
             ws_class = ws_def.ws_class
             data_extractor = ws_def.data_extractor

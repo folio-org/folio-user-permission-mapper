@@ -8,7 +8,7 @@ from folio_upm.model.types.permission_type import PermissionType
 class PermissionSetStats(BaseModel):
     name: str
     displayNames: List[str]
-    permissionType: str = None
+    permissionType: Optional[str] = None
     uniqueSources: List[str]
     refCount: int
     note: Optional[str]

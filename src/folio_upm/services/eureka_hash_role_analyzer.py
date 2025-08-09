@@ -1,10 +1,10 @@
 import re
-from typing import Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 from folio_upm.model.cleanup.full_hash_role_cleanup_record import FullHashRoleCleanupRecord
 from folio_upm.model.cleanup.user_capabilities import UserCapabilities
-from folio_upm.model.eureka.eureka_role_capability import FullRoleCapabilityOrSet
 from folio_upm.model.eureka.role import Role
+from folio_upm.model.eureka.role_capability_or_set import RoleCapabilityOrSet
 from folio_upm.model.eureka.user_roles import UserRoles
 from folio_upm.model.load.eureka_load_result import EurekaLoadResult
 from folio_upm.model.result.hash_roles_analysis_result import HashRolesAnalysisResult
@@ -35,7 +35,7 @@ class EurekaHashRoleAnalyzer:
         return self._result
 
     def __get_roles_by_id(self) -> Dict[str, Role]:
-        return {role.id: role for role in self._lr.roles}
+        return {role.id: role for role in self._lr.roles if role.id}
 
     def __analyze_eureka_resources(self) -> HashRolesAnalysisResult:
         return HashRolesAnalysisResult(
@@ -49,14 +49,15 @@ class EurekaHashRoleAnalyzer:
     def __get_role_stats(self):
         role_stats = []
         for role in self._lr.roles:
+            role_id = role.id
             role_stats.append(
                 EurekaRoleStats(
                     roleId=role.id,
                     roleName=role.name,
                     isHashRole=role.id in self._hash_role_ids,
-                    totalUsers=len(self._role_users.get(role.id, [])),
-                    capabilitiesNum=len(self._rc.get(role.id, [])),
-                    capabilitySetsNum=len(self._rcs.get(role.id, [])),
+                    totalUsers=len(self.__get_or_empty(self._role_users, role_id)),
+                    capabilitiesNum=len(self.__get_or_empty(self._rc, role_id)),
+                    capabilitySetsNum=len(self.__get_or_empty(self._rcs, role_id)),
                 )
             )
         return role_stats
@@ -87,7 +88,7 @@ class EurekaHashRoleAnalyzer:
             user_capabilities[user_id] = self.__get_user_capabilities(role_ids)
         return user_capabilities
 
-    def __get_user_capabilities(self, role_ids):
+    def __get_user_capabilities(self, role_ids: List[str]) -> UserCapabilities:
         role_capabilities = OrderedSet()
         role_capability_sets = OrderedSet()
         all_role_capabilities = OrderedSet()
@@ -118,23 +119,25 @@ class EurekaHashRoleAnalyzer:
         hash_role_ids = OrderedSet()
         for role in self._lr.roles:
             if self.__is_sha1_hash(role.name):
-                hash_role_ids.add(role.id)
-
+                if role.id:
+                    hash_role_ids.add(role.id)
+                else:
+                    self._log.warning("Role with SHA1 hash name does not have an ID: %s", role.name)
         return hash_role_ids
 
     def __get_role_capabilities_for_ws(self):
         result = []
         for role in self._lr.roles:
-            result += [self.__generate_capability(role, "capability", x) for x in self._rc.get(role.id, [])]
-            result += [self.__generate_capability(role, "capability-set", x) for x in self._rcs.get(role.id, [])]
+            result += [self.__create_rcs(role, "capability", x) for x in self.__get_or_empty(self._rc, role.id)]
+            result += [self.__create_rcs(role, "capability-set", x) for x in self.__get_or_empty(self._rcs, role.id)]
         return result
 
-    def __generate_capability(self, role, c_type, capabilityOrSetId: str) -> FullRoleCapabilityOrSet:
+    def __create_rcs(self, role, c_type, capabilityOrSetId: str) -> RoleCapabilityOrSet:
         if c_type == "capability":
             capabilityOrSet = self._capabilities_by_id.get(capabilityOrSetId)
         else:
             capabilityOrSet = self._capability_sets_by_id.get(capabilityOrSetId)
-        return FullRoleCapabilityOrSet(role=role, capabilityOrSet=capabilityOrSet)
+        return RoleCapabilityOrSet(role=role, capabilityOrSet=capabilityOrSet)
 
     def __get_user_roles_for_ws(self) -> List[UserRoles]:
         user_roles = []
@@ -151,8 +154,8 @@ class EurekaHashRoleAnalyzer:
                 continue
 
             hash_role_id = role_id
-            hash_role_set_ids = set(self._rcs.get(hash_role_id, []))
-            hash_role_capability_ids = set(self._rc.get(hash_role_id, []))
+            hash_role_set_ids = set(self._rcs.get(hash_role_id, self.__get_empty_list()))
+            hash_role_capability_ids = set(self._rc.get(hash_role_id, self.__get_empty_list()))
 
             users_capability_set_ids = []
             users_capability_ids = []
@@ -181,21 +184,39 @@ class EurekaHashRoleAnalyzer:
         role_capability_set_ids = OrderedSet[str](user_capabilities.roleCapabilitySets)
         all_role_capability_ids = OrderedSet[str](user_capabilities.roleCapabilities)
         for capability_set_id in role_capability_set_ids:
-            set_by_id = self._capability_sets_by_id.get(capability_set_id, None)
+            set_by_id = self._capability_sets_by_id.get(capability_set_id)
             if set_by_id is not None:
                 all_role_capability_ids.add_all(set_by_id.capabilities)
         return all_role_capability_ids.to_list(), role_capability_set_ids.to_list()
 
     @staticmethod
-    def __is_sha1_hash(s: str) -> bool:
+    def __is_sha1_hash(s: Optional[str]) -> bool:
+        if s is None:
+            return False
         return bool(re.fullmatch(r"[a-fA-F0-9]{40}", s))
 
     @staticmethod
-    def __get_as_dict(iterable_obj, key_extractor, value_extractor) -> Dict[str, List[str]]:
-        result_dict = {}
+    def __get_as_dict(
+        iterable_obj: List[Any], key_extractor: Callable[[Any], str], value_extractor: Callable[[Any], Any]
+    ) -> Dict[str, List[str]]:
+        result_dict: Dict[str, OrderedSet[str]] = {}
         for value in iterable_obj:
             key = key_extractor(value)
             if key not in result_dict:
-                result_dict[key] = OrderedSet()
+                result_dict[key] = OrderedSet[str]()
             result_dict[key].add(value_extractor(value))
         return {x: y.to_list() for x, y in result_dict.items()}
+
+    @staticmethod
+    def __get_empty_list() -> List[str]:
+        empty_list: List[str] = []
+        return empty_list
+
+    @staticmethod
+    def __get_or_empty(values_dict: Dict[str, List[str]], key: Optional[str]) -> List[str]:
+        if key is None:
+            return []
+        if not values_dict:
+            return []
+        value_by_key = values_dict.get(key)
+        return value_by_key if value_by_key is not None else []

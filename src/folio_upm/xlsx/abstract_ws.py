@@ -1,6 +1,7 @@
 from typing import Any, Generic, List, Optional, TypeVar
 
 from black.lines import Callable
+from openpyxl.descriptors import Float
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
@@ -14,13 +15,13 @@ T = TypeVar("T")
 
 class Column(BaseModel, Generic[T]):
     n: str
-    w: int
+    w: Float
     f: Callable[[T], Optional[Any]]
 
 
-class AbstractWorksheet:
+class AbstractWorksheet(Generic[T]):
 
-    def __init__(self, ws: Worksheet, title: str, data: Any, columns: List[Column]):
+    def __init__(self, ws: Worksheet, title: str, data: Any, columns: List[Column[T]]):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._ws = ws
         self._data = data
@@ -50,19 +51,19 @@ class AbstractWorksheet:
     def _fill_rows(self):
         for value in self._get_iterable_data():
             colors_enabled = Env().get_bool_cached("ENABLE_REPORT_COLORING", default_value=False)
-            fill = self._get_row_fill_color(value) if colors_enabled else ws_constants.almost_white_fill
-            self._add_row(self._map_value(value), fill=fill)
+            _fill = self._get_row_fill_color(value) if colors_enabled else ws_constants.almost_white_fill
+            self._add_row(self._map_value(value), fill=_fill)
 
     def title(self):
         return self._ws.title
 
-    def _map_value(self, value: Any):
+    def _map_value(self, value: T) -> List[Optional[Any]]:
         return [col.f(value) for col in self._columns]
 
-    def _get_iterable_data(self) -> List[Any]:
+    def _get_iterable_data(self) -> List[T]:
         return self._data
 
-    def _add_row(self, row: List[Optional[Any]], fill: PatternFill = None):
+    def _add_row(self, row: List[Optional[Any]], fill: PatternFill):
         for col_num, cell_value in enumerate(row, start=1):
             cell = self._ws.cell(column=col_num, row=self._row_num, value=cell_value)
             cell.font = ws_constants.data_font
@@ -72,5 +73,5 @@ class AbstractWorksheet:
                 cell.fill = fill
         self._row_num += 1
 
-    def _get_row_fill_color(self, value) -> Optional[PatternFill]:
+    def _get_row_fill_color(self, value: T) -> PatternFill:
         return ws_constants.almost_white_fill

@@ -26,7 +26,8 @@ class ParentPermSetCollector:
     def __collect_data(self):
         result = []
         for ps_type in self._ps_analysis_result.get_supported_types():
-            for ap in self._ps_analysis_result[ps_type].values():
+
+            for ap in self._ps_analysis_result.get(ps_type).values():
                 result += self.__get_analyzed_parent_perm_set(ap, ps_type)
 
         skipped_perms_count = len(self._skipped_service_permissions)
@@ -46,14 +47,15 @@ class ParentPermSetCollector:
                     self._skipped_service_permissions.add(parent_ps)
                     continue
                 parent_ps_type = self._ps_analysis_result.identify_permission_type(parent_ps)
-                analyzed_ps = self._ps_analysis_result[parent_ps_type].get(parent_ps, None)
+
+                analyzed_ps = self._ps_analysis_result.get(parent_ps_type).get(parent_ps)
                 if parent_ps not in parent_ps_dict:
                     parent_ps_dict[parent_ps] = AnalyzedParentPermSets(
                         permissionName=ap.permissionName,
                         permissionType=ps_type.get_name(),
                         displayName=ap.get_uq_display_names_str(),
                         parentPermissionName=parent_ps,
-                        parentDisplayName=analyzed_ps and analyzed_ps.get_uq_display_names_str(),
+                        parentDisplayName=analyzed_ps.get_uq_display_names_str() if analyzed_ps else None,
                         parentPsTypes=OrderedSet(parent_ps_type.get_name()),
                         parentPsSources=OrderedSet(source_perm_set.src.get_name()),
                     )

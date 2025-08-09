@@ -34,6 +34,8 @@ pytest = "^8.4.1"
 types-cachetools = "^6.0.0.20250525"
 types-click = "^7.1.8"
 boto3-stubs = { extras = ["s3"], version = "^1.39.2" }
+pyrefly = "^0.27.2"
+types-openpyxl = "^3.1.5.20250602"
 
 [tool.black]
 line-length = 120
@@ -47,6 +49,10 @@ log_cli = true
 log_cli_level = "DEBUG"
 log_format = "%(asctime)s %(levelname)-8s %(name)-30s %(message)s"
 log_date_format = "%Y-%m-%d %H:%M:%S"
+
+[tool.pyrefly]
+project-includes = ["**/*"]
+project-excludes = ['**/*venv/**\*', '**/tmp/**\*']
 
 [build-system]
 requires = ["poetry-core"]

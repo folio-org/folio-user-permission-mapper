@@ -1,10 +1,12 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
 class EurekaRoleStats(BaseModel):
-    roleId: str
-    roleName: str
+    roleId: Optional[str] = None
+    roleName: Optional[str] = None
     isHashRole: bool = False
-    totalUsers: int
-    capabilitiesNum: int
-    capabilitySetsNum: int
+    totalUsers: int = 0
+    capabilitiesNum: int = 0
+    capabilitySetsNum: int = 0

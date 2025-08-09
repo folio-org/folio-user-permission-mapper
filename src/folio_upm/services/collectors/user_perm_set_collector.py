@@ -25,13 +25,13 @@ class UserPermSetCollector:
             user_id = user_perms.userId
             for ps_name in user_perms.permissions:
                 ps_type = self._ps_analysis_result.identify_permission_type(ps_name)
-                ar = self._ps_analysis_result[ps_type].get(ps_name)
-                result.append(
-                    AnalyzedUserPermissionSet(
-                        userId=user_id,
-                        permissionName=ps_name,
-                        displayName=ar and ar.get_uq_display_names_str(),
-                        permissionType=ps_type.get_name(),
-                    )
+
+                ar = self._ps_analysis_result.get(ps_type).get(ps_name)
+                analyzed_user_ps = AnalyzedUserPermissionSet(
+                    userId=user_id,
+                    permissionName=ps_name,
+                    displayName=ar.get_uq_display_names_str() if ar else None,
+                    permissionType=ps_type.get_name(),
                 )
+                result.append(analyzed_user_ps)
         return result

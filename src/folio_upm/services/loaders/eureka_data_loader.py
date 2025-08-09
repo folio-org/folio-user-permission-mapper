@@ -15,12 +15,12 @@ class EurekaDataLoader:
         self._src_file_name = src_file_name
         self._eureka_load_result = self.__load_eureka_capabilities()
 
-    def get_load_result(self) -> Optional[EurekaLoadResult]:
+    def get_load_result(self) -> EurekaLoadResult:
         if self._eureka_load_result is None:
             raise FileNotFoundError("Eureka load result not found in storage or reference file.")
         return self._eureka_load_result
 
-    def find_load_result(self) -> EurekaLoadResult:
+    def find_load_result(self) -> Optional[EurekaLoadResult]:
         return self._eureka_load_result
 
     def __load_eureka_capabilities(self) -> Optional[EurekaLoadResult]:

@@ -13,4 +13,8 @@ class EurekaClient(metaclass=SingletonMeta):
     def load_page_by_query(self, resource: str, path: str, query: str, limit: int, offset: int):
         query_params = {"query": query, "limit": limit, "offset": offset}
         response_json = self._client.get_json(path, params=query_params)
+        if not isinstance(response_json, dict):
+            error_msg_template = "Invalid response type for roles query(%s, %s, %s, %s, %s): %s"
+            self._log.error(error_msg_template, resource, path, query, limit, offset, str(response_json))
+            return []
         return response_json.get(resource, [])

@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import requests
 
@@ -54,7 +54,7 @@ class RoleUsersService(metaclass=SingletonMeta):
         found_roles = self._roles_service.find_roles_by_names(role_names)
         found_role_names = self.__get_role_names(found_roles)
         unmatched_roles = OrderedSet[str](role_names).remove_all(found_role_names).to_list()
-        role_ids = [r.id for r in found_roles if r]
+        role_ids = [r.id for r in found_roles if r if r.id]
         roles_by_ids = self.__collect_roles_by_id(found_roles)
         if unmatched_roles:
             self._log.warning("Roles not found by name, skipping user assignment %s -> %s", user_id, unmatched_roles)
@@ -99,7 +99,9 @@ class RoleUsersService(metaclass=SingletonMeta):
         if match:
             assigned_role_ids = [cap.strip() for cap in match.group(1).split(",")]
             unassigned_ids = OrderedSet[str](role_ids).remove_all(assigned_role_ids).to_list()
-            assigned_ids_result = [self._create_skipped_result(user_id, roles_by_id.get(i)) for i in assigned_role_ids]
+            assigned_ids_result = [
+                self._create_skipped_result(user_id, roles_by_id.get(role_id)) for role_id in assigned_role_ids
+            ]
             if unassigned_ids:
                 return assigned_ids_result + self.__assign_role_users(user_id, unassigned_ids, roles_by_id)
             return assigned_ids_result
@@ -122,7 +124,7 @@ class RoleUsersService(metaclass=SingletonMeta):
         )
 
     @staticmethod
-    def __create_error_result(user_id, role: Role, error: DetailedHttpError) -> HttpRequestResult:
+    def __create_error_result(user_id, role: Optional[Role], error: DetailedHttpError) -> HttpRequestResult:
         return HttpRequestResult.for_user_role(role, user_id, "error", "Failed to perform request", error)
 
     @staticmethod
@@ -134,21 +136,24 @@ class RoleUsersService(metaclass=SingletonMeta):
         return [RoleUsersService.__create_error_result(user_id, roles_by_id.get(r), error) for r in role_ids]
 
     @staticmethod
-    def __create_success_result(user_id: str, role: Role) -> HttpRequestResult:
+    def __create_success_result(user_id: str, role: Optional[Role]) -> HttpRequestResult:
         return HttpRequestResult.for_user_role(role, user_id, "success")
 
     @staticmethod
-    def _create_skipped_result(user_id, role: Role, reason: str = "already exists") -> HttpRequestResult:
+    def _create_skipped_result(user_id, role: Optional[Role], reason: str = "already exists") -> HttpRequestResult:
         return HttpRequestResult.for_user_role(role, user_id, "skipped", reason)
 
     @staticmethod
     def __get_role_names(roles: List[Role]) -> List[str]:
         return [r.name for r in roles if r]
 
-    @staticmethod
-    def __collect_roles_by_id(roles: List[Role]):
-        roles_by_ids = dict[str, Role]()
+    def __collect_roles_by_id(self, roles: List[Role]) -> Dict[str, Role]:
+        roles_by_ids = {}
         for role in roles:
-            if role.id not in roles_by_ids:
-                roles_by_ids[role.id] = role
+            role_id = role.id
+            if role_id is None:
+                self._log.warning("Failed to find role ID for role: %s", role.name)
+                continue
+            if role_id not in roles_by_ids:
+                roles_by_ids[role_id] = role
         return roles_by_ids

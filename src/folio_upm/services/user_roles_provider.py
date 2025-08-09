@@ -4,6 +4,7 @@ from folio_upm.model.analysis.analyzed_role import AnalyzedRole
 from folio_upm.model.analysis.analyzed_user_roles import AnalyzedUserRoles
 from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
 from folio_upm.model.types.eureka_load_strategy import CONSOLIDATED
+from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.roles_verifier import RoleLengthVerifier
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
@@ -14,6 +15,7 @@ class UserRolesProvider:
 
     def __init__(self, ps_analysis_result: PermissionAnalysisResult, roles: Dict[str, AnalyzedRole]):
         self._ps_analysis_result = ps_analysis_result
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._roles = roles
         self._roles_by_ps_name = self.__collect_roles_by_src_ps_name()
         self._user_roles = self.__collect_user_roles()
@@ -42,13 +44,14 @@ class UserRolesProvider:
         for user_id, role_names in user_roles.items():
             new_role_names = self.__get_distributed_role_names(role_names)
             role_names = new_role_names.to_list()
-            user_roles = AnalyzedUserRoles(
+
+            analyzed_user_roles = AnalyzedUserRoles(
                 userId=user_id,
                 roleNames=role_names,
                 skipRoleAssignment=self.__skip_user_role_assignment(role_names),
             )
 
-            distributed_user_roles.append(user_roles)
+            distributed_user_roles.append(analyzed_user_roles)
         return distributed_user_roles
 
     def __get_consolidated_user_roles(self, user_roles: Dict[str, OrderedSet[str]]) -> List[AnalyzedUserRoles]:
@@ -56,23 +59,30 @@ class UserRolesProvider:
         for user_id, role_names in user_roles.items():
             new_role_names = self.__get_consolidated_role_names(role_names)
             role_names = new_role_names.to_list()
-            user_roles = AnalyzedUserRoles(
+
+            analyzed_user_roles = AnalyzedUserRoles(
                 userId=user_id,
                 roleNames=role_names,
                 skipRoleAssignment=self.__skip_user_role_assignment(role_names),
             )
-            consolidated_user_roles.append(user_roles)
+
+            consolidated_user_roles.append(analyzed_user_roles)
         return consolidated_user_roles
 
     def __get_distributed_role_names(self, role_names):
         new_role_names = OrderedSet()
         for role_name in role_names:
             role = self._roles.get(role_name)
+            if not role:
+                self._log.warning("get_distributed_role_names:: Role not found by name: %s", role_name)
+                continue
+
             new_role_names.add(role_name)
             for expanded_ps in role.permissionSets:
                 ps_name = expanded_ps.permissionName
-                if SystemRolesProvider().has_system_generated_ps(ps_name):
-                    new_role_names.add(SystemRolesProvider().get_eureka_role_name(ps_name))
+                system_generated_role_name = SystemRolesProvider().find_system_generated_role_name(ps_name)
+                if system_generated_role_name:
+                    new_role_names.add(system_generated_role_name)
                     continue
                 if ps_name not in self._roles_by_ps_name:
                     continue
@@ -86,12 +96,20 @@ class UserRolesProvider:
         all_role_names = OrderedSet(role_names)
         for role_name in role_names:
             role = self._roles.get(role_name)
+            if not role:
+                self._log.warning("get_consolidated_role_names:: Role not found by name: %s", role_name)
+                continue
+
             src_ps_name = role.source
-            if SystemRolesProvider().has_system_generated_ps(src_ps_name):
+            if SystemRolesProvider().find_system_generated_role_name(src_ps_name):
                 new_role_names.add(role_name)
                 continue
             permission_type = self._ps_analysis_result.identify_permission_type(src_ps_name)
-            analyzed_permission = self._ps_analysis_result[permission_type].get(src_ps_name)
+            analyzed_permission = self._ps_analysis_result.get(permission_type).get(src_ps_name)
+            if analyzed_permission is None:
+                self._log.warning("get_consolidated_role_names:: Analyzed PS not found by name: %s", role_name)
+                continue
+
             parent_ps_names = analyzed_permission.get_parent_permission_names()
             if not self.__has_any_parent(all_role_names, parent_ps_names):
                 new_role_names.add(role_name)

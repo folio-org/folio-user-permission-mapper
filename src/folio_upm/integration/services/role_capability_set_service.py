@@ -2,10 +2,12 @@ from folio_upm.integration.clients.eureka.capability_set_client import Capabilit
 from folio_upm.integration.clients.eureka.role_capability_set_client import RoleCapabilitySetClient
 from folio_upm.integration.services.role_entity_service import RoleEntityService
 from folio_upm.model.cls_support import SingletonMeta
+from folio_upm.model.eureka.capability_set import CapabilitySet
+from folio_upm.model.eureka.role_capability_set import RoleCapabilitySet
 from folio_upm.utils import log_factory
 
 
-class RoleCapabilitySetService(RoleEntityService, metaclass=SingletonMeta):
+class RoleCapabilitySetService(RoleEntityService[CapabilitySet, RoleCapabilitySet], metaclass=SingletonMeta):
 
     def __init__(self):
         super().__init__(

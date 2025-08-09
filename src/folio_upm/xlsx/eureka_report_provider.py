@@ -1,5 +1,5 @@
 from folio_upm.model.result.hash_roles_analysis_result import HashRolesAnalysisResult
-from folio_upm.xlsx.abstract_result_service import AbstractReportProvider, WsDef
+from folio_upm.xlsx.abstract_report_provider import AbstractReportProvider, WsDef
 from folio_upm.xlsx.ws.clean_hash_role_stats_ws import CleanHashRoleStatsWorksheet
 from folio_upm.xlsx.ws.clean_hash_roles_ws import CleanHashRolesWorksheet
 from folio_upm.xlsx.ws.eureka_role_capabilities_ws import EurekaRoleCapabilitiesWorksheet

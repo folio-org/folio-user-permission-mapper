@@ -3,6 +3,7 @@ import json
 
 import click
 
+from folio_upm.integration.clients.eureka.roles_client import RolesClient
 from folio_upm.integration.services.eureka_cleanup_service import EurekaCleanupService
 from folio_upm.integration.services.eureka_migration_service import EurekaMigrationService
 from folio_upm.model.cleanup.hash_role_cleanup_record import HashRoleCleanupRecord
@@ -208,6 +209,13 @@ def explain_permissions(name, file):
             for line in f:
                 pd_service.print_explained_permission_set(line)
         return
+
+
+@cli.command("perform-test-op")
+def perform_test_op():
+    """A simple test command."""
+    rolesClient = RolesClient()
+    rolesClient.find_by_query("name==*admin*")
 
 
 def __collect_capabilities(result_fn: str) -> EurekaLoadResult:

@@ -13,4 +13,4 @@ class CapabilitySet(BaseModel):
     moduleId: str
     capabilityType: Optional[str] = Field(alias="type", default=None)
     permission: str
-    capabilities: Optional[List[str]] = []
+    capabilities: List[str] = []

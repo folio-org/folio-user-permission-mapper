@@ -50,15 +50,16 @@ class RoleService(metaclass=SingletonMeta):
         return load_rs
 
     def delete_roles(self, cleanup_records: List[HashRoleCleanupRecord]) -> List[HttpRequestResult]:
-        roles_to_delete = [hash_role.role.id for hash_role in cleanup_records if self.__should_delete(hash_role)]
-        total_roles = len(roles_to_delete)
-        self._log.debug("Removing roles %s: %s ...", total_roles, roles_to_delete)
+        role_ids_to_delete = [hash_role.role.id for hash_role in cleanup_records if self.__should_delete(hash_role)]
+        role_ids_to_delete = [rid for rid in role_ids_to_delete if rid is not None]
+        total_roles = len(role_ids_to_delete)
+        self._log.debug("Removing roles %s: %s ...", total_roles, role_ids_to_delete)
         roles_counter = 1
         remove_rs = []
-        for role_id in roles_to_delete:
+        for role_id in role_ids_to_delete:
             remove_rs.append(self.__delete_role_safe(role_id))
             self._log.info("Roles remove processed: %s/%s", roles_counter, total_roles)
-        self._log.info("Roles removed successfully %s: %s", roles_counter, roles_to_delete)
+        self._log.info("Roles removed successfully %s: %s", roles_counter, role_ids_to_delete)
         return remove_rs
 
     def __find_existing_roles(self, analyzed_roles):

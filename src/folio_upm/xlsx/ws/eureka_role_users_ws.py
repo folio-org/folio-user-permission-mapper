@@ -4,18 +4,19 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from folio_upm.model.eureka.user_roles import UserRoles
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
+from folio_upm.xlsx.ws_constants import role_name_cw, uuid_cw
 
 
 class EurekaRoleUsersWorksheet(AbstractWorksheet):
 
-    _title = "User-Roles"
     _columns = [
-        Column(w=40, n="User Id", f=lambda x: x[0]),
-        Column(w=80, n="Role Name", f=lambda x: x[1]),
+        Column(w=uuid_cw, n="User Id", f=lambda x: x[0]),
+        Column(w=role_name_cw, n="Role Name", f=lambda x: x[1]),
     ]
 
     def __init__(self, ws: Worksheet, data: List[UserRoles]):
-        super().__init__(ws, self._title, data, self._columns)
+        _title = "User-Roles"
+        super().__init__(ws, _title, data, self._columns)
 
     @override
     def _get_iterable_data(self):

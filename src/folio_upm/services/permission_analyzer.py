@@ -20,6 +20,9 @@ class PermissionAnalyzer:
         self._load_result = load_result
         self._analyzed_ps_dict = dict[str, AnalyzedPermissionSet]()
         self._result = PermissionAnalysisResult()
+        self._analyzed_permissions = 0
+        self._system_perms_count = dict[SourceType, int]()
+        self._system_permission_names = OrderedSet[str]()
         self.__analyze_permissions()
 
     def get_analysis_result(self) -> PermissionAnalysisResult:
@@ -27,9 +30,6 @@ class PermissionAnalyzer:
 
     def __analyze_permissions(self):
         self._log.info("Starting permissions analysis...")
-        self._analyzed_permissions = 0
-        self._system_perms_count = dict[SourceType, int]()
-        self._system_permission_names = OrderedSet[str]()
         self.__process_permissions()
         self.__process_flat_permissions()
         self.__process_okapi_permissions()
@@ -108,7 +108,7 @@ class PermissionAnalyzer:
             f"Invalid permissions found: {len(rs.invalid)}",
         )
         self._log.info(f"Unprocessed permissions found: {len(rs.unprocessed)}")
-        for t in [e for e in SourceType]:
+        for t in SourceType.__members__.values():
             self._log.info(f"System permissions filtered for type '{t.value}': {self._system_perms_count.get(t, 0)}")
 
 
@@ -131,7 +131,7 @@ class _Utils:
     def is_deprecated_ps(ap: AnalyzedPermissionSet) -> bool:
         deprecated_values_without_okapi = set([sp.val.deprecated for sp in ap.sourcePermSets if sp.src != OKAPI_PS])
         if len(deprecated_values_without_okapi) == 1 and next(iter(deprecated_values_without_okapi)) is True:
-            ap.note = "Deprecated (not in okapi)"
+            ap.set_note("Deprecated (not in okapi)")
             return True
         deprecated_values_set = set([sp.val.deprecated for sp in ap.sourcePermSets])
         return len(deprecated_values_set) == 1 and next(iter(deprecated_values_set)) is True

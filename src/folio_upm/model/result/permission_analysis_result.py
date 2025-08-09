@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from pydantic import BaseModel
 
@@ -14,9 +14,9 @@ class PermissionAnalysisResult(BaseModel):
     deprecated: Dict[str, AnalyzedPermissionSet] = {}
     questionable: Dict[str, AnalyzedPermissionSet] = {}
     unprocessed: Dict[str, AnalyzedPermissionSet] = {}
-    systemPermissionNames: OrderedSet[str] = []
+    systemPermissionNames: OrderedSet[str] = OrderedSet[str]()
 
-    def __getitem__(self, ps_type: PermissionType) -> Optional[Dict[str, "AnalyzedPermissionSet"]]:
+    def get(self, ps_type: PermissionType) -> Dict[str, "AnalyzedPermissionSet"]:
         if ps_type not in SUPPORTED_PS_TYPES:
             return {}
         return getattr(self, ps_type.get_name())

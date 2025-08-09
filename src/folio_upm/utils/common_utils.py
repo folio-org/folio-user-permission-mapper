@@ -1,21 +1,23 @@
-from typing import Any, Iterable, List, Sequence, Set
+from typing import Any, Iterable, List, Optional, Sequence, Set, TypeVar
+
+T = TypeVar("T")
 
 
 class IterableUtils:
 
     @staticmethod
-    def partition(data: Sequence, size):
+    def partition(data: Sequence[T], size) -> List[List[T]]:
         _data = data
-        return [_data[i : i + size] for i in range(0, len(_data), size)]
+        return [list(_data[i : i + size]) for i in range(0, len(_data), size)]
 
     @staticmethod
-    def first(value: Sequence[Any | None]):
+    def first(value: Sequence[Optional[Any]]):
         if value is not None and len(value) > 0:
             return value[0]
         return None
 
     @staticmethod
-    def last(value: Sequence[Any | None]):
+    def last(value: Sequence[Optional[Any]]) -> Optional[Any]:
         if value is not None and len(value) > 0:
             return value[-1]
         return None
