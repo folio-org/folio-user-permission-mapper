@@ -34,16 +34,25 @@ class TestDataProvider:
             pytest.param("empty-ps-in-middle.json", id="Empty permission sets"),
             pytest.param("permission+permission-sets.json", id="Permission set + permissions"),
             pytest.param("0users-permission-set.json", id="Permission set without user"),
+            pytest.param("1user-1ps-extra-permissions.json", id="Permission set without user"),
         ]
 
 
-class TestDistributedLoadResultAnalyzer:
+class TestLoadResultAnalyzer:
 
     @pytest.fixture(autouse=True)
     def set_environment_variables(self):
         os.environ["TENANT_ID"] = "test_tenant"
         yield
         del os.environ["TENANT_ID"]
+        Env().getenv_cached.cache_clear()
+        Env().require_env_cached.cache_clear()
+
+    @pytest.fixture(autouse=True)
+    def set_extra_ps_set_location(self):
+        os.environ["LOCAL_MOD_ROLES_KC_FILE_LOCATION"] = "test_tenant"
+        yield
+        del os.environ["LOCAL_MOD_ROLES_KC_FILE_LOCATION"]
         Env().getenv_cached.cache_clear()
         Env().require_env_cached.cache_clear()
 
@@ -65,7 +74,7 @@ class TestDistributedLoadResultAnalyzer:
         analyzer = LoadResultAnalyzer(okapi_load_rs, None)
         actual = analyzer.get_results()
         expected_file_key = f"../../resources/results/{strategy.get_name()}/{filename}"
-        expected_dict = JsonUtils.read_string(_Utils.get_file_key(expected_file_key))
+        expected_dict = JsonUtils().read_string_safe(_Utils.get_file_key(expected_file_key))
         Assert.compare_json_str(expected_dict, _Utils.to_comparable_json(actual))
 
 
@@ -98,7 +107,7 @@ class _Utils:
 
     @staticmethod
     def eureka_load_result(filename) -> EurekaLoadResult:
-        json_dict = JsonUtils.read_string(filename)
+        json_dict = JsonUtils.read_string_safe(filename)
         return EurekaLoadResult(**json_dict)
 
     @staticmethod
@@ -111,7 +120,7 @@ class _Utils:
         full_file_path = _Utils.get_file_key(filename)
         if not FileUtils.exists(full_file_path):
             pytest.fail(f"Failed to find required file: {filename}")
-        json_dict = JsonUtils.read_string(full_file_path)
+        json_dict = JsonUtils().read_string_safe(full_file_path)
         return json_dict
 
     @staticmethod

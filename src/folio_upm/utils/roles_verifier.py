@@ -42,4 +42,4 @@ class RoleLengthVerifier(metaclass=SingletonMeta):
         full_path = f"../../resources/role-length-test-data/{file_name}"
         curr_dir = os.path.dirname(os.path.realpath(__file__))
         file_path = os.path.join(curr_dir, full_path)
-        return JsonUtils.read_string(file_path)
+        return JsonUtils().read_string_safe(file_path)

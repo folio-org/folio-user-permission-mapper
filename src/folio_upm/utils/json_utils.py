@@ -3,13 +3,22 @@ import io
 import json
 from typing import Any
 
+from folio_upm.model.cls_support import SingletonMeta
+from folio_upm.utils import log_factory
 
-class JsonUtils:
 
-    @staticmethod
-    def read_string(file_path: str):
-        with open(file_path, "r") as file:
-            return json.load(file)
+class JsonUtils(metaclass=SingletonMeta):
+
+    def __init__(self):
+        self._log = log_factory.get_logger(self.__class__.__name__)
+
+    def read_string_safe(self, file_path: str) -> Any:
+        try:
+            with open(file_path, "r") as file:
+                return json.load(file)
+        except Exception as e:
+            self._log.error("Failed to read JSON file '%s': %s", file_path, e)
+            return None
 
     @staticmethod
     def from_json(json_string: str) -> Any:

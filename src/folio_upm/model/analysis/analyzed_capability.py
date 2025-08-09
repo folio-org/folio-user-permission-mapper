@@ -8,7 +8,7 @@ from folio_upm.model.types.permission_type import PermissionType
 class AnalyzedCapability(BaseModel):
     resolvedType: str
     permissionName: str
-    permissionType: Optional[str]
+    permissionType: Optional[str] = None
     displayName: Optional[str] = None
     expandedFrom: List[str] = []
     name: Optional[str] = None

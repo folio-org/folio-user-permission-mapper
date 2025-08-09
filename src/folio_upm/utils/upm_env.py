@@ -24,26 +24,30 @@ class Env(metaclass=SingletonMeta):
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._log.debug("Env class initialized.")
 
-    def get_okapi_url(self):
+    def get_okapi_url(self) -> str:
         return self.require_env_cached("OKAPI_URL", default_value="http://localhost:9130")
 
-    def get_eureka_url(self):
+    def get_eureka_url(self) -> str:
         return self.require_env_cached("EUREKA_URL", default_value="http://kong:8000")
 
-    def get_tenant_id(self):
+    def get_tenant_id(self) -> str:
         return self.require_env_cached("TENANT_ID")
 
-    def get_s3_bucket(self):
+    def get_s3_bucket(self) -> str:
         return self.require_env_cached("AWS_S3_BUCKET")
 
-    def get_admin_username(self):
+    def get_admin_username(self) -> str:
         return self.require_env_cached("ADMIN_USERNAME")
 
-    def get_admin_password(self):
+    def get_admin_password(self) -> str:
         return self.require_env_cached("ADMIN_PASSWORD", log_result=False)
 
-    def get_http_client_timeout(self):
-        return int(self.require_env_cached("HTTP_CLIENT_TIMEOUT", default_value="60", log_result=False))
+    def get_http_client_timeout(self) -> int:
+        default_timeout = 60
+        request_timeout = self.require_env_cached("HTTP_CLIENT_TIMEOUT", default_value=str(default_timeout))
+        if not request_timeout:
+            return default_timeout
+        return int(request_timeout)
 
     def get_bool_cached(self, env_variable_name: str, default_value: bool = False) -> bool:
         str_var = self.getenv_cached(env_variable_name, str(default_value))
@@ -61,7 +65,7 @@ class Env(metaclass=SingletonMeta):
             raise ValueError(f"Invalid role migration strategy provided. Allowed values are: {allowed_values}.")
         return eureka_load_strategy
 
-    def get_enabled_storages(self):
+    def get_enabled_storages(self) -> list[str]:
         storages = self.getenv_cached("ENABLED_STORAGES", default_value="s3")
         if not storages:
             raise ValueError("ENABLED_STORAGES environment variable is not set or empty.")
@@ -70,7 +74,7 @@ class Env(metaclass=SingletonMeta):
         allowed_values = {"s3", "local"}
         if not set(parsed_storages) <= allowed_values:
             raise ValueError(f"Invalid storages: '{parsed_storages}'. Allowed values are: {allowed_values}'.")
-        return parsed_storages
+        return list(parsed_storages)
 
     @cache  # noqa: B019
     def getenv_cached(self, env_variable_name, default_value: str | None = None, log_result=True) -> Optional[str]:
@@ -88,7 +92,7 @@ class Env(metaclass=SingletonMeta):
             self._log.info(f"Resolved value for {env_variable_name}: {env_variable_value}")
         return env_variable_value
 
-    def getenv(self, env_variable_name, default_value: str | None = None, log_result=True) -> Optional[str]:
+    def getenv(self, env_variable_name, default_value: Optional[str] = None, log_result=True) -> Optional[str]:
         env_variable_value = os.getenv(env_variable_name)
         if env_variable_value is None:
             self._log.debug(f"{env_variable_name} is not set, using default value: {default_value}")

@@ -8,6 +8,7 @@ from folio_upm.model.result.permission_analysis_result import PermissionAnalysis
 from folio_upm.model.support.expanded_permission_set import ExpandedPermissionSet
 from folio_upm.model.types.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy
 from folio_upm.model.types.permission_type import MUTABLE, PermissionType
+from folio_upm.services.extra_permissions_service import ExtraPermissionsService
 from folio_upm.services.capability_service import CapabilityService
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
@@ -50,23 +51,22 @@ class RoleCapabilitiesProvider:
     def __process_single_role(self, ar: AnalyzedRole, migration_strategy) -> Optional[AnalyzedRoleCapabilities]:
         if ar.systemGenerated:
             return None
-        capabilities_dict = dict[str, AnalyzedCapability]()
-        role_permissions = ar.permissionSets
-        for expanded_ps in role_permissions:
+        capabilities_by_ps_name = dict[str, AnalyzedCapability]()
+        for expanded_ps in ar.permissionSets:
             capabilities = self.__create_role_capability(expanded_ps, migration_strategy)
             for capability in capabilities:
-                if capability.permissionName not in capabilities_dict:
-                    capabilities_dict[capability.permissionName] = capability
-        capabilities = list(capabilities_dict.values())
-
+                if capability.permissionName not in capabilities_by_ps_name:
+                    capabilities_by_ps_name[capability.permissionName] = capability
+                else:
+                    self._log.warning("The capability by name already exists: %s", capability.permissionName)
+        capabilities = list(capabilities_by_ps_name.values())
+        additional_ps_names = ExtraPermissionsService().find_extra_ps_names(capabilities)
         return AnalyzedRoleCapabilities(roleName=ar.role.name, capabilities=capabilities)
 
     def __create_role_capability(self, expanded_ps, strategy: EurekaLoadStrategy) -> List[AnalyzedCapability]:
         if strategy == CONSOLIDATED:
             return self.__get_consolidated_capabilities(expanded_ps)
-        if strategy == DISTRIBUTED:
-            return self.__get_distributed_capabilities(expanded_ps)
-        return []
+        return self.__get_distributed_capabilities(expanded_ps)
 
     def __get_distributed_capabilities(self, expanded_ps) -> List[AnalyzedCapability]:
         if len(expanded_ps.expandedFrom) == 0:

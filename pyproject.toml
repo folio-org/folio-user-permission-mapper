@@ -36,6 +36,7 @@ types-click = "^7.1.8"
 boto3-stubs = { extras = ["s3"], version = "^1.39.2" }
 pyrefly = "^0.27.2"
 types-openpyxl = "^3.1.5.20250602"
+responses = "^0.25.8"
 
 [tool.black]
 line-length = 120

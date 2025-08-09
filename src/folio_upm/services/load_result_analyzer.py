@@ -18,6 +18,27 @@ from folio_upm.utils import log_factory
 
 
 class LoadResultAnalyzer:
+    """
+    Analyzes FOLIO permission data and generates comprehensive analysis results.
+
+    This class processes Okapi and Eureka load results to analyze user permissions,
+    roles, and capabilities. It consolidates data from multiple sources to provide
+    statistics, role mappings, and migration data for FOLIO systems.
+
+    Attributes:
+        _log: Logger instance for debugging and information messages
+        _okapi_lr: Okapi load result containing permission and user data
+        _eureka_lr: Optional Eureka load result for additional capability data
+        _ps_analysis_result: Analyzed permission set data from PermissionAnalyzer
+        _result: Final OkapiAnalysisResult containing all analyzed data
+
+    Example:
+        >>> okapi_result = OkapiLoadResult(...)
+        >>> eureka_result = EurekaLoadResult(...)
+        >>> analyzer = LoadResultAnalyzer(okapi_result, eureka_result)
+        >>> analysis = analyzer.get_results()
+        >>> migration_data = analyzer.get_eureka_migration_data()
+    """
 
     def __init__(self, okapi_load_rs: OkapiLoadResult, eureka_load_rs: Optional[EurekaLoadResult]):
         self._log = log_factory.get_logger(self.__class__.__name__)
@@ -29,9 +50,39 @@ class LoadResultAnalyzer:
         self._result = self.__analyze_results()
 
     def get_results(self) -> OkapiAnalysisResult:
+        """
+        Returns the complete analysis results for the Okapi load data.
+
+        Provides comprehensive analysis including user statistics, permission set statistics,
+        user permission mappings, permission set nesting, roles, user roles, and role capabilities.
+
+        Returns:
+            OkapiAnalysisResult: Complete analysis result containing all processed data
+                including statistics, mappings, and role information.
+
+        Example:
+            >>> analyzer = LoadResultAnalyzer(okapi_result, eureka_result)
+            >>> results = analyzer.get_results()
+            >>> print(f"Users analyzed: {len(results.userStatistics)}")
+        """
         return self._result
 
     def get_eureka_migration_data(self) -> EurekaMigrationData:
+        """
+        Extracts and returns migration data specifically formatted for Eureka systems.
+
+        Consolidates roles, user roles, and role capabilities into a format suitable
+        for migrating permission data to Eureka-based systems.
+
+        Returns:
+            EurekaMigrationData: Migration-ready data containing roles as a list,
+                user role assignments, and role capability mappings.
+
+        Example:
+            >>> analyzer = LoadResultAnalyzer(okapi_result, eureka_result)
+            >>> migration_data = analyzer.get_eureka_migration_data()
+            >>> print(f"Roles to migrate: {len(migration_data.roles)}")
+        """
         return EurekaMigrationData(
             roles=list(self._result.roles.values()),
             userRoles=self._result.userRoles,
