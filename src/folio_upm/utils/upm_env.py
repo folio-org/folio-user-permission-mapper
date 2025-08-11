@@ -62,7 +62,10 @@ class Env(metaclass=SingletonMeta):
         eureka_load_strategy = EurekaLoadStrategy.from_string(resolved_strategy_name)
         if eureka_load_strategy is None:
             allowed_values = EurekaLoadStrategy.get_names()
-            raise ValueError(f"Invalid role migration strategy provided. Allowed values are: {allowed_values}.")
+            raise ValueError(
+                f"Invalid role migration strategy provided: {eureka_load_strategy}. "
+                f"Allowed values are: {allowed_values}."
+            )
         return eureka_load_strategy
 
     def get_enabled_storages(self) -> list[str]:

@@ -4,7 +4,6 @@ from black.lines import Callable
 from openpyxl.descriptors import Float
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
-from pydantic import BaseModel
 
 from folio_upm.utils import log_factory
 from folio_upm.utils.upm_env import Env
@@ -13,10 +12,11 @@ from folio_upm.xlsx import ws_constants
 T = TypeVar("T")
 
 
-class Column(BaseModel, Generic[T]):
-    n: str
-    w: Float
-    f: Callable[[T], Optional[Any]]
+class Column(Generic[T]):
+    def __init__(self, n: str, w: Float, f: Callable[[T], Optional[Any]]):
+        self.n = n
+        self.w = w
+        self.f = f
 
 
 class AbstractWorksheet(Generic[T]):

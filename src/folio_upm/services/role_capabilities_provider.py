@@ -58,7 +58,7 @@ class RoleCapabilitiesProvider:
                 if capability.permissionName not in capabilities_by_ps_name:
                     capabilities_by_ps_name[capability.permissionName] = capability
                 else:
-                    self._log.warning("The capability by name already exists: %s", capability.permissionName)
+                    self._log.debug("The capability by name already exists: %s", capability.permissionName)
         capabilities = list(capabilities_by_ps_name.values())
         extra_ps_names = ExtraPermissionsService().find_extra_ps_names(capabilities)
         for extra_ps_name in extra_ps_names:
