@@ -1,0 +1,54 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/_/proxy/tenants/okapi_test/modules",
+    "queryParameters": {
+      "full": {
+        "equalTo": "true"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "test-module-1.0.0",
+        "name": "Test Module",
+        "provides": [
+          {
+            "id": "test-interface",
+            "version": "1.0",
+            "handlers": [
+              {
+                "methods": [ "GET" ],
+                "pathPattern": "/entity/{id}",
+                "permissionsRequired": [ "test-module.item.get" ]
+              },
+              {
+                "methods": [ "POST" ],
+                "pathPattern": "/entity",
+                "permissionsRequired": [ "test-module.item.post" ]
+              }
+            ]
+          }
+        ],
+        "permissionSets": [
+          {
+            "permissionName": "test-module.item.get",
+            "displayName": "Test Read Permission",
+            "description": "Permission to read test data"
+          },
+          {
+            "permissionName": "test-module.item.post",
+            "displayName": "Test Write Permission",
+            "description": "Permission to write test data",
+            "subPermissions": [ "test-module.item.get" ]
+          }
+        ]
+      }
+    ]
+  }
+}

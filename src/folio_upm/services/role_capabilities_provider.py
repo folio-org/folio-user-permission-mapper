@@ -52,13 +52,16 @@ class RoleCapabilitiesProvider:
         if ar.systemGenerated:
             return None
         capabilities_by_ps_name = dict[str, AnalyzedCapability]()
+        visited_ps_names=  OrderedSet[str]()
         for expanded_ps in ar.permissionSets:
             capabilities = self.__create_role_capability(expanded_ps, migration_strategy)
             for capability in capabilities:
                 if capability.permissionName not in capabilities_by_ps_name:
                     capabilities_by_ps_name[capability.permissionName] = capability
                 else:
-                    self._log.debug("The capability by name already exists: %s", capability.permissionName)
+                    visited_ps_names.add(capability.permissionName)
+        if visited_ps_names.to_list():
+            self._log.debug("Role '%s' has duplicated capabilities: %s", ar.role.name, visited_ps_names.to_list())
         capabilities = list(capabilities_by_ps_name.values())
         extra_ps_names = ExtraPermissionsService().find_extra_ps_names(capabilities)
         for extra_ps_name in extra_ps_names:

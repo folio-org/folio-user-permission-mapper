@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import json
+from datetime import datetime
 
 import click
 
-from folio_upm.integration.clients.eureka.roles_client import RolesClient
 from folio_upm.integration.services.eureka_cleanup_service import EurekaCleanupService
 from folio_upm.integration.services.eureka_migration_service import EurekaMigrationService
 from folio_upm.model.cleanup.hash_role_cleanup_record import HashRoleCleanupRecord
@@ -54,9 +54,12 @@ def cli():
 
 @cli.command("collect-permissions")
 def collect_permissions():
+    start_time = datetime.now()
+    _log.info("Collecting permissions...")
     storage_service = TenantStorageService()
     perms_load_result = OkapiDataLoader().load_okapi_data()
     storage_service.save_object(okapi_permissions_fn, json_gz_ext, perms_load_result)
+    _log.info("Permissions collected successfully (time: %s)", _get_time_taken(start_time))
 
 
 @cli.command("collect-capabilities")
@@ -66,6 +69,7 @@ def collect_capabilities():
 
 @cli.command("generate-report")
 def generate_report():
+    start_time = datetime.now()
     migration_strategy = Env().get_migration_strategy()
     strategy_name = migration_strategy.get_name()
     _log.info("Generating report for strategy: %s ...", strategy_name)
@@ -85,11 +89,12 @@ def generate_report():
     eureka_data_fn = f"{eureka_migration_data_fn}-{strategy_name}"
     eureka_migration_data = load_result_analyzer.get_eureka_migration_data()
     storage_service.save_object(eureka_data_fn, json_gz_ext, eureka_migration_data.model_dump(by_alias=True))
-    _log.info("Report is successfully generated for strategy: %s", strategy_name)
+    _log.info("Okapi Report is generated for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
 
 
 @cli.command("run-eureka-migration")
 def run_eureka_migration():
+    start_time = datetime.now()
     strategy_name = Env().get_migration_strategy().get_name()
     _log.info("Running eureka migration for strategy: %s ...", strategy_name)
 
@@ -101,11 +106,12 @@ def run_eureka_migration():
 
     _migration_result_fn = f"{migration_result_fn}-{strategy_name}"
     storage_service.save_object(_migration_result_fn, json_gz_ext, migration_report.model_dump(by_alias=True))
-    _log.info("Eureka migration successfully finished for strategy: %s", strategy_name)
+    _log.info("Eureka migration finished for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
 
 
 @cli.command("generate-migration-report")
 def generate_migration_report():
+    start_time = datetime.now()
     _log.info("Generating migration report ...")
     strategy_name = Env().get_migration_strategy().get_name()
     storage_service = TenantStorageService()
@@ -114,12 +120,13 @@ def generate_migration_report():
     migration_report = EurekaMigrationReport(**raw_migration_report)
     migration_xlsx_report = MigrationProcessReportProvider(migration_report).generate()
     storage_service.save_object(_migration_result_fn, xlsx_ext, migration_xlsx_report)
-    _log.info("Migration report successfully generated for strategy: %s", strategy_name)
+    _log.info("Migration Report is generated for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
 
 
 @cli.command("analyze-hash-roles")
 @click.option("--force-reload", is_flag=True, default=False, help="Force reloading of eureka capabilities.")
 def analyze_hash_roles(force_reload: bool):
+    start_time = datetime.now()
     strategy_name = Env().get_migration_strategy().get_name()
     storage_service = TenantStorageService()
     _log.info("Analyzing hash-role capabilities for: %s", strategy_name)
@@ -142,11 +149,12 @@ def analyze_hash_roles(force_reload: bool):
     cleanup_records_dicts = [x.model_dump(by_alias=True) for x in cleanup_records]
     _hash_roles_cleanup_data_fn = f"{hash_roles_cleanup_data_fn}-{strategy_name}"
     storage_service.save_object(_hash_roles_cleanup_data_fn, json_gz_ext, cleanup_records_dicts)
-    _log.info("Hash-Roles analysis successfully finished for strategy: %s", strategy_name)
+    _log.info("Hash-Roles analysis is finished for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
 
 
 @cli.command("cleanup-hash-roles")
 def clean_hash_roles():
+    start_time = datetime.now()
     migration_strategy = Env().get_migration_strategy()
     strategy_name = migration_strategy.get_name()
     _log.info("Cleaning hash roles for strategy: %s ...", strategy_name)
@@ -160,11 +168,12 @@ def clean_hash_roles():
 
     result_fn = f"{hash_roles_cleanup_report_fn}-{strategy_name}"
     storage_service.save_object(result_fn, json_gz_ext, hash_role_cleanup_report.model_dump(by_alias=True))
-    _log.info("Hash-Roles cleanup successfully finished for strategy: %s", strategy_name)
+    _log.info("Hash-Roles cleanup is finished for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
 
 
 @cli.command("generate-cleanup-report")
 def generate_cleanup_report():
+    start_time = datetime.now()
     _log.info("Generating cleanup report...")
     strategy_name = Env().get_migration_strategy().get_name()
     storage_service = TenantStorageService()
@@ -173,7 +182,7 @@ def generate_cleanup_report():
     cleanup_report = HashRolesCleanupReport(**raw_cleanup_report)
     migration_xlsx_report = CleanupProcessReportProvider(cleanup_report).generate()
     storage_service.save_object(cleanup_report_fm, json_gz_ext, migration_xlsx_report)
-    _log.info("Cleanup report successfully generated for strategy: %s", strategy_name)
+    _log.info("Cleanup report is generated for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
 
 
 @cli.command("download-json")
@@ -211,18 +220,19 @@ def explain_permissions(name, file):
         return
 
 
-@cli.command("perform-test-op")
-def perform_test_op():
-    """A simple test command."""
-    rolesClient = RolesClient()
-    rolesClient.find_by_query("name==*admin*")
-
-
 def __collect_capabilities(result_fn: str) -> EurekaLoadResult:
     storage_service = TenantStorageService()
     capability_load_result = CapabilitiesLoader().load_capabilities()
     storage_service.save_object(result_fn, json_gz_ext, capability_load_result)
     return EurekaLoadResult(**capability_load_result)
+
+
+def _get_time_taken(start_time):
+    end_time = datetime.now()
+    delta = end_time - start_time
+    hours, remainder = divmod(delta.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours}h{minutes}m{seconds}s"
 
 
 if __name__ == "__main__":

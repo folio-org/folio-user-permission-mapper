@@ -1,0 +1,58 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/perms/permissions",
+    "queryParameters": {
+      "query": {
+        "equalTo": "cql.allRecords=1"
+      },
+      "expanded": {
+        "equalTo": "false"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "permissions": [
+        {
+          "id": "2543cb3b-d0bd-4433-8899-38b9f57d81e8",
+          "permissionName": "test-module.item.get",
+          "displayName": "Test Read Permission",
+          "description": "Permission to read test data",
+          "subPermissions": [ ],
+          "childOf": [ ],
+          "grantedTo": [ ],
+          "mutable": false,
+          "visible": true
+        },
+        {
+          "id": "4f00c6d2-c65d-4f43-bacb-d1e5bd8762ef",
+          "permissionName": "test-module.item.post",
+          "displayName": "Test Write Permission",
+          "description": "Permission to write test data",
+          "subPermissions": [ "test-module.item.get" ],
+          "childOf": [ ],
+          "grantedTo": [ ],
+          "mutable": false,
+          "visible": true
+        },
+        {
+          "id": "50cceb55-a0eb-4d9a-b2f3-aa44573e142b",
+          "permissionName": "user.entity.view",
+          "displayName": "Test Permission View",
+          "description": "View test resources",
+          "subPermissions": [ "test-module.item.post" ],
+          "childOf": [ ],
+          "grantedTo": [ "141ec4f8-57a9-4a05-a1c6-60ff1fab4762" ],
+          "mutable": true,
+          "visible": true
+        }
+      ],
+      "totalRecords": 3
+    }
+  }
+}

@@ -1,7 +1,6 @@
 from typing import Any, Generic, List, Optional, TypeVar
 
 from black.lines import Callable
-from openpyxl.descriptors import Float
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
@@ -13,7 +12,7 @@ T = TypeVar("T")
 
 
 class Column(Generic[T]):
-    def __init__(self, n: str, w: Float, f: Callable[[T], Optional[Any]]):
+    def __init__(self, n: str, w: float, f: Callable[[T], Optional[Any]]):
         self.n = n
         self.w = w
         self.f = f
@@ -44,7 +43,7 @@ class AbstractWorksheet(Generic[T]):
             cell.border = ws_constants.thin_border
             cell.alignment = ws_constants.header_cell_alignment
             cell.fill = ws_constants.light_gray_fill
-            self._ws.column_dimensions[cell.column_letter].width = header.w
+            self._ws.column_dimensions[cell.column_letter].width = header.w  # type: ignore
             self._ws.row_dimensions[self._row_num].height = 20
         self._row_num += 1
 

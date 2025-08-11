@@ -1,3 +1,5 @@
+import requests
+
 from folio_upm.integration.clients.base.okapi_http_client import OkapiHttpClient
 from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
@@ -29,7 +31,16 @@ class PermissionsClient(metaclass=SingletonMeta):
 
     def load_user_permissions_by_ids(self, ids_cql_query):
         query_params = {"query": ids_cql_query, "limit": 500}
-        response_json = self._client.get_json("/perms/users", params=query_params)
+        try:
+            response_json = self._client.get_json("/perms/users", params=query_params)
+        except requests.HTTPError as http_err:
+            resp = http_err.response
+            msg_template = "Failed to load user permissions by ids query(%s): (%s) -> %s"
+            self._log.error(msg_template, ids_cql_query, resp.status_code, resp.text)
+            return []
+        except Exception as e:
+            self._log.error("Failed to load user permissions by ids query(%s): %s", ids_cql_query, e)
+            return []
         if not isinstance(response_json, dict):
             error_msg_template = "Invalid response type for permissions query(%s): %s"
             self._log.error(error_msg_template, ids_cql_query)
