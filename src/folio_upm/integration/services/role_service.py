@@ -59,6 +59,7 @@ class RoleService(metaclass=SingletonMeta):
         for role_id in role_ids_to_delete:
             remove_rs.append(self.__delete_role_safe(role_id))
             self._log.info("Roles remove processed: %s/%s", roles_counter, total_roles)
+            roles_counter += 1
         self._log.info("Roles removed successfully %s: %s", roles_counter, role_ids_to_delete)
         return remove_rs
 

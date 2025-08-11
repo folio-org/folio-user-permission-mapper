@@ -55,6 +55,7 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
             cleanup_result.append(self._rc_service.update(hr.role, hr.capabilities))
             cleanup_result.append(self._rcs_service.update(hr.role, hr.capabilitySets))
             self._log.info("Role cleanup processed: %s/%s", records_counter, total_records)
+            records_counter += 1
         self._log.info("Role capabilities updated: %s", records_counter)
         return cleanup_result
 
