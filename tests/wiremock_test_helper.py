@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, Generator
 
 from wiremock.constants import Config
-from wiremock.resources.mappings.models import Mapping
+from wiremock.resources.mappings import Mapping
 from wiremock.resources.mappings.resource import Mappings
 from wiremock.resources.requests.resource import Requests
 from wiremock.testing.testcontainer import WireMockContainer
@@ -30,8 +30,8 @@ class WireMockTestHelper:
     @staticmethod
     def set_mapping(file_path: str) -> Generator[Mapping, None, None]:
         mapping = WireMockTestHelper.create_mapping(file_path)
-        yield mapping
-        WireMockTestHelper.delete_mapping(mapping)
+        yield mapping  # type: ignore[invalid-yield]
+        WireMockTestHelper.delete_mapping(mapping)  # type: ignore[bad-argument-type]
 
     @staticmethod
     def create_mapping(file_path: str) -> Mapping:
@@ -40,7 +40,7 @@ class WireMockTestHelper:
         try:
             mapping_to_create = Mapping.from_dict(json_mapping)
             mapping = Mappings.create_mapping(mapping_to_create)
-            return mapping
+            return mapping  # type: ignore[bad-return]
         except Exception as error:
             raise AssertionError("Failed to create mapping from file %s: %s" % (file_path, error))
 
@@ -49,8 +49,8 @@ class WireMockTestHelper:
         _log.info("Deleting hello world mapping...")
         query_params = {"matchingStub": mapping.id}
         received_requests_pet_stub = Requests.get_all_received_requests(limit=100, parameters=query_params)
-        if received_requests_pet_stub.meta.total < 1:
-            raise AssertionError(f"No matching requests were found for mapping: {mapping.request.to_json()}")
+        if received_requests_pet_stub.meta.total < 1:  # type: ignore[missing-attribute]
+            raise AssertionError(f"No matching requests were found for mapping: {mapping.request.to_json()}")  # type: ignore[missing-attribute]
         Mappings.delete_mapping(mapping.id)
 
     @staticmethod

@@ -52,7 +52,7 @@ class RoleCapabilitiesProvider:
         if ar.systemGenerated:
             return None
         capabilities_by_ps_name = dict[str, AnalyzedCapability]()
-        visited_ps_names=  OrderedSet[str]()
+        visited_ps_names = OrderedSet[str]()
         for expanded_ps in ar.permissionSets:
             capabilities = self.__create_role_capability(expanded_ps, migration_strategy)
             for capability in capabilities:

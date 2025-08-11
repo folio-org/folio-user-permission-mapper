@@ -2,12 +2,11 @@ import logging
 import time
 
 import pytest
-from testcontainers.core.waiting_utils import wait_for_logs
+from minio_test_helper import MinioTestHelper  # type: ignore[import-error]
 from wiremock.constants import Config
+from wiremock_test_helper import WireMockTestHelper  # type: ignore[import-error]
 
 from folio_upm.model.cls_support import SingletonMeta
-from minio_test_helper import MinioTestHelper
-from wiremock_test_helper import WireMockTestHelper
 
 logging.getLogger("testcontainers").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.INFO)
@@ -39,11 +38,6 @@ def wiremock_url(wiremock_container):
     return wiremock_container.get_url("")
 
 
-@pytest.fixture(scope="class", autouse=True)
-def clean_wiremock():
-    yield WireMockTestHelper.delete_all_mappings()
-
-
 @pytest.fixture(scope="module")
 def minio_container():
     """Set the base URL for WireMock"""
@@ -64,6 +58,7 @@ def minio_container():
 @pytest.fixture(scope="module")
 def minio_client(minio_container):
     yield minio_container.get_client()
+
 
 @pytest.fixture(scope="function")
 def test_s3_bucket(minio_client):

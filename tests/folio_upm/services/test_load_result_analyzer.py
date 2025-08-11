@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 
 import pytest
+from assert_utils import Assert  # type: ignore[import-error]
 
-from assert_utils import Assert
 from folio_upm.model.load.okapi_load_result import OkapiLoadResult
 from folio_upm.model.result.okapi_analysis_result import OkapiAnalysisResult
 from folio_upm.model.types.eureka_load_strategy import CONSOLIDATED, DISTRIBUTED, EurekaLoadStrategy

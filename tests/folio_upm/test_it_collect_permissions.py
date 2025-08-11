@@ -4,15 +4,15 @@ from typing import Generator
 
 import pytest
 from _pytest.capture import CaptureFixture
+from assert_utils import Assert  # type: ignore[import-error]
 from click.testing import CliRunner
 from minio import Minio
 from wiremock.resources.mappings import Mapping
+from wiremock_test_helper import WireMockTestHelper  # type: ignore[import-error]
 
-from assert_utils import Assert
 from folio_upm.cli import cli
 from folio_upm.storage.s3_tenant_storage import S3TenantStorage
 from folio_upm.utils.json_utils import JsonUtils
-from wiremock_test_helper import WireMockTestHelper
 
 
 class TestCollectPermissionsIT:
