@@ -4,7 +4,58 @@
 FOLIO environment. It integrates with various services to fetch, process, and store permission data
 for further analysis.
 
+# Table of Contents
+
+<!-- TOC -->
+* [FOLIO User Permission Mapper](#folio-user-permission-mapper)
+* [Table of Contents](#table-of-contents)
+    * [Script Migration Order](#script-migration-order)
+* [Installation](#installation)
+  * [Prerequisites](#prerequisites)
+  * [Installation Options](#installation-options)
+    * [Option 1: Install Using `pip` and the Wheel File](#option-1-install-using-pip-and-the-wheel-file)
+  * [Prerequisites](#prerequisites-1)
+  * [Steps](#steps)
+* [Usage](#usage)
+  * [Commands](#commands)
+    * [`collect-permissions`](#collect-permissions)
+    * [`collect-capabilities`](#collect-capabilities)
+    * [`generate-report`](#generate-report)
+    * [`run-eureka-migration`](#run-eureka-migration)
+    * [`generate-migration-report`](#generate-migration-report)
+    * [`analyze-hash-roles`](#analyze-hash-roles)
+    * [`cleanup-hash-roles`](#cleanup-hash-roles)
+    * [`generate-cleanup-report`](#generate-cleanup-report)
+    * [`download-json`](#download-json)
+    * [`explain-permissions`](#explain-permissions)
+  * [Development Tips](#development-tips)
+    * [General environment variables](#general-environment-variables)
+    * [Environment Variables (S3 Storage)](#environment-variables-s3-storage)
+    * [Environment Variables (Local Storage)](#environment-variables-local-storage)
+    * [Pre-Commit Command](#pre-commit-command)
+  * [License](#license)
+<!-- TOC -->
+
 ---
+
+### Script Migration Order
+
+1. **Collect Permissions**</br>
+   Use the `collect-permissions` command to gather permissions from an Okapi-based deployment.
+2. **Collect Capabilities**</br>
+   Use the `collect-capabilities` command to gather capabilities from Eureka-based deployment.
+3. **Generate Report**</br>
+   Use the `generate-report` command to analyze the collected permissions and capabilities.
+4. **Run Eureka Migration**</br>
+   Use the `run-eureka-migration` command to create roles and assign capabilities/capability-sets/users based on the generated roles.
+5. **Generate Migration Report**</br>
+   Use the `generate-migration-report` to generate a report of the Eureka migration process.
+6. **Analyze Hash Roles**</br>
+   Use the `analyze-hash-roles` command to analyze roles and prepare for cleanup.
+7. **Cleanup Hash Roles**</br>
+   Use the `cleanup-hash-roles` command to remove duplicated relations and clean up hash roles.
+8. **Generate Cleanup Report**</br>
+   Use the `generate-cleanup-report` to generate a report of the Eureka Hash-Role Cleanup process.
 
 # Installation
 
@@ -68,11 +119,9 @@ poetry run folio-permission-migration-cli <command>
 
 ---
 
-# Commands
+## Commands
 
-## `collect-permissions`
-
-### Description
+### `collect-permissions`
 
 The command will do the following actions:
 
@@ -82,25 +131,18 @@ The command will do the following actions:
     - user permissions relations from `mod-permissions`
 - Save the result as a gzipped JSON file to the configured storage (S3 or local).
 
-### Requires
-
+**Requires:**
 - Access to the Okapi-based environment.
 - User credentials with read access to the `mod-permissions` and `okapi` modules.
 - Access to the AWS S3 bucket or local storage where the `okapi-permissions` load result will be stored.
 
-### Output
-
+**Output:**
 - `<tenant_id>/<tenant_id>-okapi-permissions-<timestamp>.json.gz`
 
-### Environment Variables (Collect-Permissions)
+**Environment Variables:**
 
 | Env Variable                  | Default Value         | Required | Description                                               |
 |:------------------------------|:----------------------|:---------|:----------------------------------------------------------|
-| AWS_ACCESS_KEY_ID             |                       | true     | AWS access key                                            |
-| AWS_SECRET_ACCESS_KEY         |                       | true     | AWS secret key                                            |
-| AWS_REGION                    | `us-east-1`           | false    | AWS S3 Region                                             |
-| AWS_S3_ENDPOINT               |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used )   |
-| AWS_S3_BUCKET                 |                       | true     | S3 Bucket name (required)                                 |
 | OKAPI_URL                     | http://localhost:9130 | true     | Okapi URL                                                 |
 | TENANT_ID                     |                       | true     | The tenant ID for the FOLIO environment                   |
 | OKAPI_ADMIN_USERNAME          |                       | true     | The username for the admin user in Okapi                  |
@@ -109,9 +151,7 @@ The command will do the following actions:
 
 ---
 
-## `collect-capabilities`
-
-### Description
+### `collect-capabilities`
 
 The command will do the following actions:
 
@@ -126,25 +166,18 @@ The command will do the following actions:
     - role capability-set relations
 - Save them as a gzipped JSON file to the configured storage.
 
-### Requires
-
+**Requires:**
 - Access to the Eureka-based environment.
 - User credentials with read access to the `mod-roles-keycloak` module.
 - Access to the AWS S3 bucket or local storage where the `eureka-capabilities` load result will be stored.
 
-### Output
-
+**Output:**
 - `<tenant_id>/<tenant_id>-eureka-capabilities-<timestamp>.json.gz`
 
-### Environment Variables (Collect-Capabilities)
+**Environment Variables:**
 
 | Env Variable          | Default Value         | Required | Description                                            |
 |:----------------------|:----------------------|:---------|:-------------------------------------------------------|
-| AWS_ACCESS_KEY_ID     |                       | true     | AWS access key                                         |
-| AWS_SECRET_ACCESS_KEY |                       | true     | AWS secret key                                         |
-| AWS_REGION            | `us-east-1`           | false    | AWS S3 Region                                          |
-| AWS_S3_BUCKET         |                       | true     | S3 Bucket name (required)                              |
-| AWS_S3_ENDPOINT       |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used) |
 | EUREKA_URL            | http://localhost:8000 | true     | Kong Gateway URL                                       |
 | TENANT_ID             |                       | true     | The tenant ID for the FOLIO environment                |
 | EUREKA_ADMIN_USERNAME |                       | true     | The username for the admin user in Okapi               |
@@ -152,9 +185,7 @@ The command will do the following actions:
 
 ---
 
-## `generate-report`
-
-### Description
+### `generate-report`
 
 The command will do the following actions:
 
@@ -164,25 +195,18 @@ The command will do the following actions:
 - Generate both an Excel report and a gzipped JSON analysis result.
 - Store generated files in the configured storage (s3, local).
 
-### Requires
-
+**Requires:**
 - Access to the AWS S3 bucket or local storage where `okapi-permissions-<timestamp>.json.gz` is stored.
 - The `collect-permissions` and (_optionally_) `collect-capabilities` commands must be run before this command.
 
-### Output
+**Output:**
+- `<tenant_id>/<tenant_id>-okapi-analysis-result-<strategy>-<timestamp>.xlsx`
+- `<tenant_id>/<tenant_id>-eureka-migration-data-<strategy>-<timestamp>.json.gz`
 
-- `<tenant_id>/<tenant_id>-analysis-result-<strategy>-<timestamp>.xlsx`
-- `<tenant_id>/<tenant_id>-analysis-result-<strategy>-<timestamp>.json.gz`
-
-### Environment Variables
+**Environment Variables:**
 
 | Env Variable                   | Default Value | Required | Description                                                                                                                                 |
 |:-------------------------------|:--------------|:---------|:--------------------------------------------------------------------------------------------------------------------------------------------|
-| AWS_ACCESS_KEY_ID              |               | true     | AWS access key                                                                                                                              |
-| AWS_SECRET_ACCESS_KEY          |               | true     | AWS secret key                                                                                                                              |
-| AWS_REGION                     | `us-east-1`   | false    | AWS S3 Region                                                                                                                               |
-| AWS_S3_BUCKET                  |               | true     | S3 Bucket name (required)                                                                                                                   |
-| AWS_S3_ENDPOINT                |               | false    | Custom AWS S3 Endpoint (for example, if MinIO is used )                                                                                     |
 | TENANT_ID                      |               | true     | The tenant ID for the FOLIO environment                                                                                                     |
 | SYSTEM_GENERATED_PERM_MAPPINGS |               | false    | Comma-separated list of system-generated permission mappings to highlight in analysis (e.g., `folio_admin:AdminRole`)                       |
 | REF_CAPABILITIES_FILE_KEY      |               | false    | File key in storage that can be used as reference for capabilities (Recommended to pull this data for tenant with all applications enabled) |
@@ -190,13 +214,11 @@ The command will do the following actions:
 
 ---
 
-## `run-eureka-migration`
-
-### Description
+### `run-eureka-migration`
 
 The command will do the following actions:
 
-- Load latest `analysis-result-<timestamp>.json.gz` and from storage.
+- Load latest `<tenant_id>-eureka-migration-data-<strategy>-<timestamp>.json.gz` and from storage.
 - Create roles (values specified in `SYSTEM_GENERATED_PERM_MAPPINGS` will be skipped)</br>
   _If a role exists, it will be skipped (skipped operations will be visible in error report)._
 - Assign capabilities and capability-sets to a role</br>
@@ -207,28 +229,21 @@ The command will do the following actions:
   _If a user already has a role, it will be skipped (skipped operations will be visible in error report)._
 - Save a report with performed operations into storage (s3, local).
 
-### Requires
-
+**Requires:**
 - The `generate-report`command must be run before this command.
 - Access to the AWS S3 bucket or local storage where `analysis-result.json.gz` is stored.
 
-### Output
-
+**Output:**
 - new roles
 - new user-role relations
 - new role-capability relations
 - new role capability-set relations
 - `<tenant_id>/<tenant_id>-eureka-migration-report-<strategy>-<timestamp>.json.gz`
 
-### Environment Variables (Run-Eureka-Migration)
+**Environment Variables:**
 
 | Env Variable              | Default Value         | Required | Description                                                              |
 |:--------------------------|:----------------------|:---------|:-------------------------------------------------------------------------|
-| AWS_ACCESS_KEY_ID         |                       | true     | AWS access key                                                           |
-| AWS_SECRET_ACCESS_KEY     |                       | true     | AWS secret key                                                           |
-| AWS_REGION                | `us-east-1`           | false    | AWS S3 Region                                                            |
-| AWS_S3_BUCKET             |                       | true     | S3 Bucket name (required)                                                |
-| AWS_S3_ENDPOINT           |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)                   |
 | EUREKA_URL                | http://localhost:8000 | true     | Kong Gateway URL                                                         |
 | TENANT_ID                 |                       | true     | The tenant ID for the FOLIO environment                                  |
 | EUREKA_ADMIN_USERNAME     |                       | true     | The username for the admin user in Eureka                                |
@@ -237,9 +252,32 @@ The command will do the following actions:
 
 ---
 
-## `analyze-hash-roles`
+### `generate-migration-report`
 
-### Description
+The command will do the following actions:
+
+- Load the latest migration result file (`migration-report-<strategy>-<timestamp>.json.gz`) from storage.
+- Parse the migration report data and generate a comprehensive Excel report.
+- Store the generated Excel report in the configured storage (S3 or local).
+
+**Requires:**
+- The `run-eureka-migration` command must be run before this command.
+- Access to the AWS S3 bucket or local storage where the migration report JSON file is stored.
+
+**Output:**
+- `<tenant_id>/<tenant_id>-migration-report-<strategy>-<timestamp>.xlsx`
+
+**Environment Variables:**
+
+| Env Variable              | Default Value | Required | Description                                                              |
+|:--------------------------|:--------------|:---------|:-------------------------------------------------------------------------|
+| TENANT_ID                 |               | true     | The tenant ID for the FOLIO environment                                  |
+| EUREKA_ROLE_LOAD_STRATEGY | distributed   | true     | Approach how roles were generated (one of: distributed, consolidated)    |
+
+
+---
+
+### `analyze-hash-roles`
 
 The command will do the following actions:
 
@@ -257,29 +295,17 @@ The command will do the following actions:
 - Generate both an Excel report and a gzipped JSON analysis result.
 - Store generated files in the configured storage (s3, local).
 
-### Requires
-
+**Requires:**
 - The `run-eureka-migration` command must be run before this command.
 
-### Output
+**Output:**
+- `<tenant_id>/<tenant_id>-hash-roles-analysis-result-<strategy>-<timestamp>.xlsx`
+- `<tenant_id>/<tenant_id>-hash-roles-cleanup-data-<strategy>-<timestamp>.json.gz`
 
-- new roles
-- new user-role relations
-- new role-capability relations
-- new role capability-set relations
-- `<tenant_id>/<tenant_id>-capabilities-cleanup-data-<strategy>-<timestamp>.json.gz`
-- `<tenant_id>/<tenant_id>-capabilities-cleanup-data-<strategy>-<timestamp>.xlsx`
-- `<tenant_id>/<tenant_id>-eureka-cleanup-data-<strategy>-<timestamp>.json.gz`
-
-### Environment Variables (Analyze-Hash-Roles)
+**Environment Variables:**
 
 | Env Variable              | Default Value         | Required | Description                                                           |
 |:--------------------------|:----------------------|:---------|:----------------------------------------------------------------------|
-| AWS_ACCESS_KEY_ID         |                       | true     | AWS access key                                                        |
-| AWS_SECRET_ACCESS_KEY     |                       | true     | AWS secret key                                                        |
-| AWS_REGION                | `us-east-1`           | false    | AWS S3 Region                                                         |
-| AWS_S3_BUCKET             |                       | true     | S3 Bucket name (required)                                             |
-| AWS_S3_ENDPOINT           |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)                |
 | TENANT_ID                 |                       | true     | The tenant ID for the FOLIO environment                               |
 | EUREKA_URL                | http://localhost:8000 | true     | Kong Gateway URL                                                      |
 | EUREKA_ADMIN_USERNAME     |                       | true     | The username for the admin user in Eureka                             |
@@ -291,8 +317,6 @@ The command will do the following actions:
 
 ### `cleanup-hash-roles`
 
-### Description
-
 The command will do the following actions:
 
 - Load latest `eureka-cleanup-data-<strategy>-<timestamp>.json.gz`
@@ -300,24 +324,17 @@ The command will do the following actions:
 - Remove hash-roles with empty relations
 - Save a report with performed operations into storage (s3, local).
 
-### Requires
-
+**Requires:**
 - The `analyze-hash-roles` command must be run before this command.
 
-### Output
-
+**Output:**
 - clean hash-roles
-- `<tenant_id>/<tenant_id>-cleanup-result-<strategy>-<timestamp>.json.gz`
+- `<tenant_id>/<tenant_id>-hash-roles-cleanup-report-<strategy>-<timestamp>.json.gz`
 
-### Environment Variables (Cleanup-Hash-Roles)
+**Environment Variables:**
 
 | Env Variable              | Default Value         | Required | Description                                                           |
 |:--------------------------|:----------------------|:---------|:----------------------------------------------------------------------|
-| AWS_ACCESS_KEY_ID         |                       | true     | AWS access key                                                        |
-| AWS_SECRET_ACCESS_KEY     |                       | true     | AWS secret key                                                        |
-| AWS_REGION                | `us-east-1`           | false    | AWS S3 Region                                                         |
-| AWS_S3_BUCKET             |                       | true     | S3 Bucket name (required)                                             |
-| AWS_S3_ENDPOINT           |                       | false    | Custom AWS S3 Endpoint (for example, if MinIO is used)                |
 | TENANT_ID                 |                       | true     | The tenant ID for the FOLIO environment                               |
 | EUREKA_URL                | http://localhost:8000 | true     | Kong Gateway URL                                                      |
 | EUREKA_ADMIN_USERNAME     |                       | true     | The username for the admin user in Eureka                             |
@@ -326,36 +343,81 @@ The command will do the following actions:
 
 ---
 
-### `download-json`
-
-### Description
+### `generate-cleanup-report`
 
 The command will do the following actions:
 
-- Load `source_file` file and save it on local drive using `out_file` argument
+- Load the latest cleanup result file (`hash-roles-cleanup-report-<strategy>-<timestamp>.json.gz`) from storage.
+- Parse the cleanup report data and generate a comprehensive Excel report.
+- Store the generated Excel report in the configured storage (S3 or local).
 
-### Requires
+**Requires:**
+- The `cleanup-hash-roles` command must be run before this command.
+- Access to the AWS S3 bucket or local storage where the cleanup report JSON file is stored.
 
-- Access to the AWS S3 bucket or local storage where `source_file` is stored.
+**Output:**
+- `<tenant_id>/<tenant_id>-hash-roles-cleanup-report-<strategy>-<timestamp>.xlsx`
 
-### Output
+**Environment Variables:**
 
-- `out_file` file with the content of `source_file`
-
-### Environment Variables (Download-JSON)
-
-| Env Variable          | Default Value | Required | Description                                            |
-|:----------------------|:--------------|:---------|:-------------------------------------------------------|
-| AWS_ACCESS_KEY_ID     |               | true     | AWS Access Key                                         |
-| AWS_SECRET_ACCESS_KEY |               | true     | AWS Secret Key                                         |
-| AWS_SESSION_TOKEN     |               | false    | AWS Session Key                                        |
-| AWS_REGION            | `us-east-1`   | false    | AWS S3 Region                                          |
-| AWS_S3_BUCKET         |               | true     | S3 Bucket name (required)                              |
-| AWS_S3_ENDPOINT       |               | false    | Custom AWS S3 Endpoint (for example, if MinIO is used) |
+| Env Variable              | Default Value | Required | Description                                                              |
+|:--------------------------|:--------------|:---------|:-------------------------------------------------------------------------|
+| TENANT_ID                 |               | true     | The tenant ID for the FOLIO environment                                  |
+| EUREKA_ROLE_LOAD_STRATEGY | distributed   | true     | Approach how roles were generated (one of: distributed, consolidated)    |
 
 ---
 
-# Development Tips
+### `download-json`
+
+The command will do the following actions:
+- Load `source_file` file and save it on local drive using `out_file` argument
+
+**Requires:**
+- Access to the AWS S3 bucket or local storage where `source_file` is stored.
+
+**Output:**
+- `out_file` file with the content of `source_file`
+
+---
+
+### `explain-permissions`
+
+The command will do the following actions:
+
+- Load the latest `okapi-permissions-<timestamp>.json.gz` file from storage.
+- Explain a specific permission or a list of permissions from a file.
+- Display detailed information about permission hierarchies and dependencies.
+
+**Requires:**
+- The `collect-permissions` command must be run before this command.
+- Access to the AWS S3 bucket or local storage where the `okapi-permissions` file is stored.
+
+**Usage:**
+
+```bash
+# Explain a single permission by name
+folio-permission-migration-cli explain-permissions --name "permission.name"
+
+# Explain multiple permissions from a file
+folio-permission-migration-cli explain-permissions --file "permissions.txt"
+```
+
+**Options:**
+- `--name, -n`: Name of the permission to explain
+- `--file, -f`: File containing permission names to explain (one per line)
+
+**Output:**
+- Console output with detailed permission explanations
+
+**Environment Variables:**
+
+| Env Variable | Default Value | Required | Description                             |
+|:-------------|:--------------|:---------|:----------------------------------------|
+| TENANT_ID    |               | true     | The tenant ID for the FOLIO environment |
+
+---
+
+## Development Tips
 
 You can use a `.env` file to manage these variables.
 
@@ -365,7 +427,7 @@ You can use a `.env` file to manage these variables.
 > - On command initialization, variables `.env` from env will be loaded, then they will be overridden by the variables
     > from the file specified in `DOTENV` env variable.
 
-## General environment variables
+### General environment variables
 
 | Env Variable           | Default Value | Required | Description                                                            |
 |:-----------------------|:--------------|:---------|:-----------------------------------------------------------------------|
@@ -376,7 +438,9 @@ You can use a `.env` file to manage these variables.
 | ACCESS_TOKEN_TTL       | 60            | false    | TTL for access token refresh                                           |
 
 
-## S3 Environment Variables
+### Environment Variables (S3 Storage)
+
+This environment variables are used to configure the connection to AWS S3 or a compatible storage service (like MinIO).
 
 | Env Variable          | Default Value | Required | Description                                            |
 |:----------------------|:--------------|:---------|:-------------------------------------------------------|
@@ -387,9 +451,18 @@ You can use a `.env` file to manage these variables.
 | AWS_S3_BUCKET         |               | true     | S3 Bucket name (required)                              |
 | AWS_S3_ENDPOINT       |               | false    | Custom AWS S3 Endpoint (for example, if MinIO is used) |
 
+
+### Environment Variables (Local Storage)
+
+This environment variables are used to configure the local storage for the CLI tool.
+
+| Env Variable         | Default Value | Required | Description                                    |
+|:---------------------|:--------------|:---------|:-----------------------------------------------|
+| STORAGE_LOCAL_FOLDER | `./.temp`     | false    | Path to directory where results will be stored |
+
 ---
 
-## Pre-Commit Command
+### Pre-Commit Command
 
 This command is used to normalize the project (applies import sorting, code formatting, and linting):
 
@@ -403,6 +476,6 @@ poetry run pyrefly check --output-format min-text \
 
 ---
 
-# License
+## License
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.

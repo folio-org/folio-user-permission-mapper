@@ -30,16 +30,21 @@ from folio_upm.xlsx.okapi_analysis_report_provider import OkapiAnalysisReportPro
 xlsx_ext = "xlsx"
 json_gz_ext = "json.gz"
 
+#load file names
 okapi_permissions_fn = "okapi-permissions"
 eureka_capabilities_fn = "eureka-capabilities"
 
+# analysis file names
 okapi_analysis_result_fn = "okapi-analysis-result"
-eureka_migration_data_fn = "eureka-migration-data"
-migration_result_fn = "migration-report"
-
-eureka_migrated_data_fn = "eureka-migrated-data"
 hash_roles_analysis_result_fn = "hash-roles-analysis-result"
+
+# result file names
+eureka_migrated_data_fn = "eureka-migrated-data"
+eureka_migration_data_fn = "eureka-migration-data"
 hash_roles_cleanup_data_fn = "hash-roles-cleanup-data"
+
+# reports
+migration_result_fn = "migration-report"
 hash_roles_cleanup_report_fn = "hash-roles-cleanup-report"
 
 
@@ -177,11 +182,11 @@ def generate_cleanup_report():
     _log.info("Generating cleanup report...")
     strategy_name = Env().get_migration_strategy().get_name()
     storage_service = TenantStorageService()
-    cleanup_report_fm = f"{hash_roles_cleanup_report_fn}-{strategy_name}"
-    raw_cleanup_report = storage_service.require_object(cleanup_report_fm, json_gz_ext)
+    cleanup_report_fn = f"{hash_roles_cleanup_report_fn}-{strategy_name}"
+    raw_cleanup_report = storage_service.require_object(cleanup_report_fn, json_gz_ext)
     cleanup_report = HashRolesCleanupReport(**raw_cleanup_report)
     migration_xlsx_report = CleanupProcessReportProvider(cleanup_report).generate()
-    storage_service.save_object(cleanup_report_fm, json_gz_ext, migration_xlsx_report)
+    storage_service.save_object(cleanup_report_fn, xlsx_ext, migration_xlsx_report)
     _log.info("Cleanup report is generated for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
 
 
@@ -201,6 +206,8 @@ def download_json(source_file, out_file):
 @click.option("--name", "-n", type=str, default=None, help="Name of the permission to explain")
 @click.option("--file", "-f", type=str, default=None, help="File containing permission names to explain")
 def explain_permissions(name, file):
+    if not name and not file:
+        raise click.UsageError("Either --name or --file must be provided")
     """Explain a permission by its name."""
     _log.info("Explaining permission: %s", name)
     storage_service = TenantStorageService()
