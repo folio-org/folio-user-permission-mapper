@@ -36,11 +36,11 @@ class RoleService(metaclass=SingletonMeta):
         loader = self._role_client.find_by_query
         return PartitionedDataLoader("roles", role_names, loader, qb).load()
 
-    def create_roles(self, analyzed_roles: List[AnalyzedRole]):
+    def create_roles(self, analyzed_roles: List[AnalyzedRole]) -> List[HttpRequestResult]:
         total_roles = len(analyzed_roles)
         self._log.info("Creating %s role(s)...", total_roles)
         existing_role_names = self.__find_existing_roles(analyzed_roles)
-        load_rs = []
+        load_rs = list[HttpRequestResult]()
         role_counter = 1
         for ar in analyzed_roles:
             load_rs.append(self.__verify_and_create_role(ar, existing_role_names))
@@ -55,7 +55,7 @@ class RoleService(metaclass=SingletonMeta):
         total_roles = len(role_ids_to_delete)
         self._log.debug("Removing roles %s: %s ...", total_roles, role_ids_to_delete)
         roles_counter = 1
-        remove_rs = []
+        remove_rs = list[HttpRequestResult]()
         for role_id in role_ids_to_delete:
             remove_rs.append(self.__delete_role_safe(role_id))
             self._log.info("Roles remove processed: %s/%s", roles_counter, total_roles)

@@ -25,7 +25,7 @@ class RoleUsersService(metaclass=SingletonMeta):
         self._role_user_service = UserRolesClient()
 
     def assign_users(self, analyzed_user_role_records: List[AnalyzedUserRoles]) -> List[HttpRequestResult]:
-        migration_result = []
+        migration_result = list[HttpRequestResult]()
         total_user_roles = len(analyzed_user_role_records)
         self._log.info("Total user roles to assign: %s", total_user_roles)
         user_roles_counter = 1
@@ -45,7 +45,7 @@ class RoleUsersService(metaclass=SingletonMeta):
 
         if analyzed_user_roles.skipRoleAssignment:
             self._log.info(f"Skipping role assignment for user: {user_id}")
-            _result = []
+            _result = list[HttpRequestResult]()
             for role_name in role_names:
                 role_placeholder = Role(name=role_name, id=None)
                 _result.append(self._create_skipped_result(user_id, role_placeholder, "Too many roles"))

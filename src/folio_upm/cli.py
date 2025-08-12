@@ -30,7 +30,7 @@ from folio_upm.xlsx.okapi_analysis_report_provider import OkapiAnalysisReportPro
 xlsx_ext = "xlsx"
 json_gz_ext = "json.gz"
 
-#load file names
+# load file names
 okapi_permissions_fn = "okapi-permissions"
 eureka_capabilities_fn = "eureka-capabilities"
 

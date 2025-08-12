@@ -22,8 +22,8 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         self._rc_service = RoleCapabilityService()
         self._rcs_service = RoleCapabilitySetService()
 
-    def assign_role_capabilities(self, role_capabilities: List[AnalyzedRoleCapabilities]):
-        migration_results = []
+    def assign_role_capabilities(self, role_capabilities: List[AnalyzedRoleCapabilities]) -> List[HttpRequestResult]:
+        migration_results = list[HttpRequestResult]()
         role_capabilities_counter = 1
         total_role_capabilities = len(role_capabilities)
         self._log.info("Total role capabilities to assign: %s", total_role_capabilities)
@@ -46,14 +46,14 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         self._log.info("Role capabilities assigned: %s", total_role_capabilities)
         return migration_results
 
-    def update_role_capabilities(self, hash_role_cleanup_records: List[HashRoleCleanupRecord]):
-        cleanup_result = []
-        total_records = len(hash_role_cleanup_records)
+    def update_role_capabilities(self, cleanup_records: List[HashRoleCleanupRecord]) -> List[HttpRequestResult]:
+        cleanup_result = list[HttpRequestResult]()
+        total_records = len(cleanup_records)
         records_counter = 1
         self._log.info("Total cleanup records: %s", total_records)
-        for hr in hash_role_cleanup_records:
-            cleanup_result.append(self._rc_service.update(hr.role, hr.capabilities))
-            cleanup_result.append(self._rcs_service.update(hr.role, hr.capabilitySets))
+        for hr in cleanup_records:
+            cleanup_result += self._rc_service.update(hr.role, hr.capabilities)
+            cleanup_result += self._rcs_service.update(hr.role, hr.capabilitySets)
             self._log.info("Role cleanup processed: %s/%s", records_counter, total_records)
             records_counter += 1
         self._log.info("Role capabilities updated: %s", records_counter)
@@ -74,7 +74,7 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         return capability_sets, capabilities, unmatched_names
 
     @staticmethod
-    def __create_unmatched_result(role, permission_name):
+    def __create_unmatched_result(role, permission_name) -> HttpRequestResult:
         return HttpRequestResult(
             status="not_matched",
             srcEntityName="role",
