@@ -1,5 +1,5 @@
-from folio_upm.utils.common_utils import IterableUtils
-from folio_upm.utils.cql_query_utils import CqlQueryUtils
+from folio_upm.utils.cql import CQL
+from folio_upm.utils.iterable_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
 
 
@@ -42,11 +42,11 @@ class TestCqlQueryUtils:
         field = "id"
         values = ["id1", "id2", "id3"]
         expected_query = 'id==("id1" or "id2" or "id3")'
-        query_result = CqlQueryUtils.any_match_by_field(field, values)
+        query_result = CQL.any_match_by_field(field, values)
         assert query_result == expected_query
 
     def test_any_match_by_field_empty_values(self):
         field = "id"
         values = []
-        query_result = CqlQueryUtils.any_match_by_field(field, values)
+        query_result = CQL.any_match_by_field(field, values)
         assert query_result == "id==()"

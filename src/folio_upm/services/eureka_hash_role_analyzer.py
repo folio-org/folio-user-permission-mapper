@@ -11,7 +11,7 @@ from folio_upm.model.result.hash_roles_analysis_result import HashRolesAnalysisR
 from folio_upm.model.stats.eureka_role_stats import EurekaRoleStats
 from folio_upm.model.stats.eureka_user_stats import EurekaUserStats
 from folio_upm.utils import log_factory
-from folio_upm.utils.common_utils import IterableUtils
+from folio_upm.utils.iterable_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
 
 

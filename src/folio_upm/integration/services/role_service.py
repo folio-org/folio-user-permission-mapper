@@ -10,8 +10,8 @@ from folio_upm.model.eureka.role import Role
 from folio_upm.model.report.detailed_http_error import DetailedHttpError
 from folio_upm.model.report.http_request_result import HttpRequestResult
 from folio_upm.utils import log_factory
-from folio_upm.utils.common_utils import IterableUtils
-from folio_upm.utils.cql_query_utils import CqlQueryUtils
+from folio_upm.utils.cql import CQL
+from folio_upm.utils.iterable_utils import IterableUtils
 from folio_upm.utils.loading_utils import PartitionedDataLoader
 
 
@@ -24,7 +24,7 @@ class RoleService(metaclass=SingletonMeta):
 
     def find_role_by_name(self, role_name: str) -> Role | None:
         try:
-            query = CqlQueryUtils.any_match_by_name([role_name])
+            query = CQL.any_match_by_name([role_name])
             found_roles = self._role_client.find_by_query(query)
             return IterableUtils.first(found_roles)
         except requests.HTTPError as e:
@@ -32,7 +32,7 @@ class RoleService(metaclass=SingletonMeta):
             return None
 
     def find_roles_by_names(self, role_names: List[str]) -> List[Role]:
-        qb = CqlQueryUtils.any_match_by_name
+        qb = CQL.any_match_by_name
         loader = self._role_client.find_by_query
         return PartitionedDataLoader("roles", role_names, loader, qb).load()
 

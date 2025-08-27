@@ -1,26 +1,26 @@
 from typing import List
 
 
-class CqlQueryUtils:
+class CQL:
 
     @staticmethod
     def any_match_by_name(values: List[str]) -> str:
-        return CqlQueryUtils.any_match_by_field("name", values)
+        return CQL.any_match_by_field("name", values)
 
     @staticmethod
     def any_match_by_permission(values: List[str]) -> str:
-        return CqlQueryUtils.any_match_by_field("permission", values)
+        return CQL.any_match_by_field("permission", values)
 
     @staticmethod
     def any_match_by_field(field: str, values: list[str]) -> str:
-        appendable_values = [f'"{CqlQueryUtils.__cql_encode(x)}"' for x in values if x is not None and len(x) > 0]
+        appendable_values = [f'"{CQL.__cql_encode(x)}"' for x in values if x is not None and len(x) > 0]
         return f'{field}==({" or ".join(appendable_values)})'
 
     @staticmethod
     def __cql_encode(s: str) -> str:
         if s is None:
             return '""'
-        appendable = CqlQueryUtils.__append_cql_encoded([], s)
+        appendable = CQL.__append_cql_encoded([], s)
         return "".join(appendable)
 
     @staticmethod

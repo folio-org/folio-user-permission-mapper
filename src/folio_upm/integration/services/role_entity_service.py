@@ -2,6 +2,7 @@ import re
 from typing import Generic, List, TypeVar
 
 import requests
+from black.lines import Callable
 
 from folio_upm.integration.clients.eureka.absract_role_entity_client import AbstractRoleEntityClient
 from folio_upm.integration.clients.eureka.abstract_entity_client import AbstractEntityClient
@@ -15,7 +16,7 @@ from folio_upm.model.eureka.role_capability_set import RoleCapabilitySet
 from folio_upm.model.report.detailed_http_error import DetailedHttpError
 from folio_upm.model.report.http_request_result import HttpRequestResult
 from folio_upm.utils import log_factory
-from folio_upm.utils.cql_query_utils import CqlQueryUtils
+from folio_upm.utils.cql import CQL
 from folio_upm.utils.loading_utils import PartitionedDataLoader
 from folio_upm.utils.ordered_set import OrderedSet
 
@@ -40,6 +41,17 @@ class RoleEntityService(Generic[C_TYPE, RC_TYPE], metaclass=SingletonMeta):
         self._role_entity_client = role_entity_client
         self._client = EurekaClient()
 
+    def find_by(self, permission_names: List[str], query_builder: Callable[[List[str]], str]) -> List[C_TYPE]:
+        """
+        Find entities (Capabilities or CapabilitySets) by permission names.
+
+        :param permission_names: List of permission names to search for.
+        :param query_builder: query builder function to create the CQL query.
+        :return: List of entities (Capabilities or CapabilitySets) that match the permission names.
+        """
+        entity_loader = self._entity_client.find_by_query
+        return PartitionedDataLoader(self._name, permission_names, entity_loader, query_builder).load()
+
     def find_by_ps_names(self, permission_names: List[str]) -> List[C_TYPE]:
         """
         Find entities (Capabilities or CapabilitySets) by permission names.
@@ -47,7 +59,7 @@ class RoleEntityService(Generic[C_TYPE, RC_TYPE], metaclass=SingletonMeta):
         :param permission_names: List of permission names to search for.
         :return: List of entities (Capabilities or CapabilitySets) that match the permission names.
         """
-        qb = CqlQueryUtils.any_match_by_permission
+        qb = CQL.any_match_by_permission
         entity_loader = self._entity_client.find_by_query
         return PartitionedDataLoader(self._name, permission_names, entity_loader, qb).load()
 

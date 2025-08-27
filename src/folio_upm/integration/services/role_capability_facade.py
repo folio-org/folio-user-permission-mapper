@@ -1,5 +1,7 @@
 from typing import List, Tuple
 
+from black.lines import Callable
+
 from folio_upm.integration.services.role_capability_service import RoleCapabilityService
 from folio_upm.integration.services.role_capability_set_service import RoleCapabilitySetService
 from folio_upm.integration.services.role_service import RoleService
@@ -10,6 +12,8 @@ from folio_upm.model.eureka.capability import Capability
 from folio_upm.model.eureka.capability_set import CapabilitySet
 from folio_upm.model.report.http_request_result import HttpRequestResult
 from folio_upm.utils import log_factory
+from folio_upm.utils.cql import CQL
+from folio_upm.utils.iterable_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
 
 
@@ -22,19 +26,19 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         self._rc_service = RoleCapabilityService()
         self._rcs_service = RoleCapabilitySetService()
 
-    def assign_role_capabilities(self, role_capabilities: List[AnalyzedRoleCapabilities]) -> List[HttpRequestResult]:
+    def assign_role_capabilities(self, arc_list: List[AnalyzedRoleCapabilities]) -> List[HttpRequestResult]:
         migration_results = list[HttpRequestResult]()
         role_capabilities_counter = 1
-        total_role_capabilities = len(role_capabilities)
+        total_role_capabilities = len(arc_list)
         self._log.info("Total role capabilities to assign: %s", total_role_capabilities)
-        for rch in role_capabilities:
-            role_name = rch.roleName
+        for analyzed_role_capabilities in arc_list:
+            role_name = analyzed_role_capabilities.roleName
             role_by_name = self._role_service.find_role_by_name(role_name)
             if role_by_name is None:
                 self._log.warning("Role '%s' not found by name, skipping capability assignment...", role_name)
                 migration_results.append(HttpRequestResult.role_capability_not_found_result(role_name))
                 continue
-            capability_sets, capabilities, issues = self.__find_by_permission_names(rch)
+            capability_sets, capabilities, issues = self.__find_role_entities(analyzed_role_capabilities)
             migration_results += [self.__create_unmatched_result(role_by_name, i) for i in issues]
             role_capability_assign_rs = self._rc_service.assign_to_role(role_by_name, capabilities)
             role_set_assign_rs = self._rcs_service.assign_to_role(role_by_name, capability_sets)
@@ -59,19 +63,53 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         self._log.info("Role capabilities updated: %s", records_counter)
         return cleanup_result
 
-    def __find_by_permission_names(
+    def __find_role_entities(
         self, arc: AnalyzedRoleCapabilities
     ) -> Tuple[List[CapabilitySet], List[Capability], List[str]]:
-        unmatched_ps_names = OrderedSet[str]([x.permissionName for x in arc.capabilities])
-        capability_sets = self._rcs_service.find_by_ps_names(unmatched_ps_names.to_list())
-        unmatched_ps_names.remove_all([cs.permission for cs in capability_sets])
+        found_capability_sets = list[CapabilitySet]()
+        found_capabilities = list[Capability]()
+        unmatched_values = list[str]()
+        if not arc.capabilities:
+            return found_capability_sets, found_capabilities, unmatched_values
 
-        capabilities = self._rc_service.find_by_ps_names(unmatched_ps_names.to_list())
-        unmatched_ps_names.remove_all([c.permission for c in capabilities])
-        unmatched_names = unmatched_ps_names.to_list()
+        # gather capabilities by permission name
+        ps_names = [x.permissionName for x in arc.capabilities if x.permissionName]
+        sets_by_ps, capabilities_by_ps, unmatched_ps = self.__find_by(ps_names, CQL.any_match_by_permission)
+        found_capabilities += capabilities_by_ps
+        found_capability_sets += sets_by_ps
+        unmatched_values += unmatched_ps
+
+        # gather extra capabilities by name (if eureka load result was not provided)
+        capability_names = [x.name for x in arc.capabilities if not x.permissionName and x.name]
+        sets_by_name, capabilities_by_name, unmatched_names = self.__find_by(capability_names, CQL.any_match_by_name)
+        found_capabilities += capabilities_by_name
+        found_capability_sets += sets_by_name
+        unmatched_values += unmatched_names
+        unmatched_values = IterableUtils.unique_values(unmatched_names)
+
         if unmatched_names:
-            self._log.warning("Unmatched permission names found for role '%s': %s", arc.roleName, unmatched_names)
-        return capability_sets, capabilities, unmatched_names
+            self._log.warning("Unmatched entities found for role '%s': %s", arc.roleName, unmatched_names)
+
+        return (
+            IterableUtils.unique_values_by_key(found_capability_sets, lambda x: x.id),
+            IterableUtils.unique_values_by_key(found_capabilities, lambda x: x.id),
+            unmatched_values,
+        )
+
+    def __find_by(
+        self, identifiers: List[str], query_builder_func: Callable[[List[str]], str]
+    ) -> Tuple[List[CapabilitySet], List[Capability], List[str]]:
+
+        found_capability_sets = list[CapabilitySet]()
+        unmatched_values = OrderedSet[str](identifiers)
+        found_capability_sets += self._rcs_service.find_by(unmatched_values.to_list(), query_builder_func)
+        unmatched_values.remove_all([cs.permission for cs in found_capability_sets])
+
+        found_capabilities = list[Capability]()
+        found_capabilities += self._rc_service.find_by(unmatched_values.to_list(), CQL.any_match_by_permission)
+        unmatched_values.remove_all([c.permission for c in found_capabilities])
+
+        return found_capability_sets, found_capabilities, unmatched_values.to_list()
 
     @staticmethod
     def __create_unmatched_result(role, permission_name) -> HttpRequestResult:

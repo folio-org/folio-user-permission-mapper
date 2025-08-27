@@ -1,4 +1,4 @@
-from typing import Any, Iterable, List, Optional, Sequence, Set, TypeVar
+from typing import Any, Callable, Iterable, List, Optional, Sequence, Set, TypeVar
 
 T = TypeVar("T")
 
@@ -25,6 +25,18 @@ class IterableUtils:
     @staticmethod
     def unique_values(iterable):
         return list(dict.fromkeys(iterable).keys())
+
+    @staticmethod
+    def unique_values_by_key(iterable: List[T], key_mapper: Callable[[T], str]) -> List[T]:
+        visited_keys = set[str]()
+        result = list[T]()
+        for item in iterable:
+            key = key_mapper(item)
+            if key in visited_keys:
+                continue
+            result.append(item)
+            visited_keys.add(key)
+        return result
 
     @staticmethod
     def intersection(sets: Iterable[List[Any]]) -> Set[Any]:

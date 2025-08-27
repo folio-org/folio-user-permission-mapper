@@ -40,22 +40,22 @@ class TestExtraPermissionsProvider:
     def test_find_extra_ps_names_with_edit_permissions(self):
         """Test finding extra permissions when user has edit permissions."""
         capabilities = [self.analyzed_capability("ps.item.get"), self.analyzed_capability("ps.item.post")]
-        result = self._extra_ps_service.find_extra_ps_names(capabilities)
+        result = self._extra_ps_service.find_extra_capability_names(capabilities)
         assert result == self._extra_ps_service._extra_ps_names_to_edit
 
     def test_find_extra_ps_names_with_view_permissions_only(self):
         """Test finding extra permissions when user has edit permissions."""
         capabilities = [self.analyzed_capability("ps.item.get"), self.analyzed_capability("other.item.post")]
-        result = self._extra_ps_service.find_extra_ps_names(capabilities)
+        result = self._extra_ps_service.find_extra_capability_names(capabilities)
         assert result == self._extra_ps_service._extra_ps_names_to_view
 
     def test_find_extra_ps_names_with_no_permissions(self):
         capabilities = [self.analyzed_capability("other.item.post")]
-        result = self._extra_ps_service.find_extra_ps_names(capabilities)
+        result = self._extra_ps_service.find_extra_capability_names(capabilities)
         assert result == []
 
     def test_find_extra_ps_names_with_empty_input(self):
-        result = self._extra_ps_service.find_extra_ps_names([])
+        result = self._extra_ps_service.find_extra_capability_names([])
         assert result == []
 
     @staticmethod

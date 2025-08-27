@@ -17,7 +17,7 @@ class ExtraPermissionsService(metaclass=SingletonMeta):
         self._extra_ps_names_to_view = self._remapping_data.viewCapabilities
         self._extra_ps_names_to_edit = self.__get_edit_capabilities()
 
-    def find_extra_ps_names(self, analyzed_capabilities: List[AnalyzedCapability]) -> List[str]:
+    def find_extra_capability_names(self, analyzed_capabilities: List[AnalyzedCapability]) -> List[str]:
         """
         Add to user capabilities to edit and view other capabilities
         if user has permission to edit and view other permissions.

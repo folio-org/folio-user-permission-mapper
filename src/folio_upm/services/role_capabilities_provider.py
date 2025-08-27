@@ -23,7 +23,6 @@ class RoleCapabilitiesProvider:
         roles: Dict[str, AnalyzedRole],
         eureka_load_result: Optional[EurekaLoadResult],
     ):
-
         self._log = log_factory.get_logger(self.__class__.__name__)
         self._roles = roles
         self._ps_analysis_result = ps_analysis_result
@@ -41,39 +40,39 @@ class RoleCapabilitiesProvider:
             role_capabilities_holder = self.__process_single_role(ar, migration_strategy)
             if role_capabilities_holder:
                 role_capabilities.append(role_capabilities_holder)
-
         not_found_ps_sets = self._not_found_permission_sets.to_list()
         if not_found_ps_sets:
             self._log.warning("The following permission sets were not found: %s", not_found_ps_sets)
-
         return role_capabilities
 
-    def __process_single_role(self, ar: AnalyzedRole, migration_strategy) -> Optional[AnalyzedRoleCapabilities]:
+    def __process_single_role(
+        self, ar: AnalyzedRole, migration_strategy: EurekaLoadStrategy
+    ) -> Optional[AnalyzedRoleCapabilities]:
         if ar.systemGenerated:
             return None
+        capabilities_by_ps_name = self.__get_analyzed_capabilities(ar, migration_strategy)
+        analyzed_capabilities = list(capabilities_by_ps_name.values())
+        all_analyzed_capabilities = list[AnalyzedCapability](capabilities_by_ps_name.values())
+        all_analyzed_capabilities += self.__get_extra_capabilities(analyzed_capabilities)
+        return AnalyzedRoleCapabilities(roleName=ar.role.name, capabilities=all_analyzed_capabilities)
+
+    def __get_analyzed_capabilities(self, ar, migration_strategy: EurekaLoadStrategy) -> Dict[str, AnalyzedCapability]:
         capabilities_by_ps_name = dict[str, AnalyzedCapability]()
         visited_ps_names = OrderedSet[str]()
         for expanded_ps in ar.permissionSets:
-            capabilities = self.__create_role_capability(expanded_ps, migration_strategy)
-            for capability in capabilities:
+            analyzed_capabilities = self.__get_role_capabilities(expanded_ps, migration_strategy)
+            for capability in analyzed_capabilities:
+                if capability.permissionName is None:
+                    continue
                 if capability.permissionName not in capabilities_by_ps_name:
                     capabilities_by_ps_name[capability.permissionName] = capability
                 else:
                     visited_ps_names.add(capability.permissionName)
         if visited_ps_names.to_list():
             self._log.debug("Role '%s' has duplicated capabilities: %s", ar.role.name, visited_ps_names.to_list())
-        capabilities = list(capabilities_by_ps_name.values())
-        extra_ps_names = ExtraPermissionsService().find_extra_ps_names(capabilities)
-        for extra_ps_name in extra_ps_names:
-            if extra_ps_name in capabilities_by_ps_name:
-                continue
-            permission_type = self._ps_analysis_result.identify_permission_type(extra_ps_name)
-            expanded_ps = ExpandedPermissionSet(permissionName=extra_ps_name, expandedFrom=[])
-            placeholder = self.__create_capability_placeholder(expanded_ps, permission_type)
-            capabilities_by_ps_name[extra_ps_name] = placeholder
-        return AnalyzedRoleCapabilities(roleName=ar.role.name, capabilities=list(capabilities_by_ps_name.values()))
+        return capabilities_by_ps_name
 
-    def __create_role_capability(self, expanded_ps, strategy: EurekaLoadStrategy) -> List[AnalyzedCapability]:
+    def __get_role_capabilities(self, expanded_ps, strategy: EurekaLoadStrategy) -> List[AnalyzedCapability]:
         if strategy == EurekaLoadStrategy.CONSOLIDATED:
             return self.__get_consolidated_capabilities(expanded_ps)
         return self.__get_distributed_capabilities(expanded_ps)
@@ -106,14 +105,13 @@ class RoleCapabilitiesProvider:
         else:
             self._not_found_permission_sets.add(ps_name)
 
-        capability_placeholders = []
+        capability_placeholders = list[AnalyzedCapability]()
         for ps, ps_type in expanded_pss:
-            capability_placeholders.append(self.__create_capability_placeholder(ps, ps_type))
+            capability_placeholders.append(self.__create_analyzed_capability(ps, ps_type))
         return capability_placeholders
 
-    def __create_capability_placeholder(self, expanded_ps, permission_type) -> AnalyzedCapability:
+    def __create_analyzed_capability(self, expanded_ps, permission_type) -> AnalyzedCapability:
         permission_name = expanded_ps.permissionName
-
         analyzed_ps = self._ps_analysis_result.get(permission_type).get(permission_name, None)
         capability_or_set, resolved_type = self._capability_service.find_by_ps_name(permission_name)
         return AnalyzedCapability(
@@ -129,7 +127,7 @@ class RoleCapabilitiesProvider:
         )
 
     def __get_nested_capability_sets(self, analyzed_ps) -> List[Tuple[ExpandedPermissionSet, PermissionType]]:
-        expanded_pss = []
+        expanded_pss = list[Tuple[ExpandedPermissionSet, PermissionType]]()
         for sub_ps_name in analyzed_ps.get_sub_permissions(include_flat=True):
             sub_ps_type = self._ps_analysis_result.identify_permission_type(sub_ps_name)
 
@@ -142,3 +140,29 @@ class RoleCapabilitiesProvider:
 
                 expanded_pss.append((expanded_sub_ps, sub_ps_type))
         return expanded_pss
+
+    def __get_extra_capabilities(self, capabilities: List[AnalyzedCapability]) -> List[AnalyzedCapability]:
+        extra_analyzed_capabilities = list[AnalyzedCapability]()
+        extra_capability_names = ExtraPermissionsService().find_extra_capability_names(capabilities)
+        for extra_capability_name in extra_capability_names:
+            analyzed_capability = self.find_extra_capability_or_set(extra_capability_name)
+            extra_analyzed_capabilities.append(analyzed_capability)
+        return extra_analyzed_capabilities
+
+    def find_extra_capability_or_set(self, extra_capability_name: str) -> AnalyzedCapability:
+        capability_or_set, resolved_type = self._capability_service.find_by_name(extra_capability_name)
+        if capability_or_set is None:
+            return AnalyzedCapability(
+                resolvedType=resolved_type,
+                permissionType="extra",
+                name=extra_capability_name,
+            )
+        return AnalyzedCapability(
+            resolvedType=resolved_type,
+            permissionName=capability_or_set.permission,
+            permissionType="extra",
+            name=extra_capability_name,
+            resource=capability_or_set.resource,
+            action=capability_or_set.action,
+            capabilityType=capability_or_set.capabilityType,
+        )

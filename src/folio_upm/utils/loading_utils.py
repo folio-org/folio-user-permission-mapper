@@ -1,7 +1,7 @@
 from typing import Any, Callable, List, Optional
 
 from folio_upm.utils import log_factory
-from folio_upm.utils.common_utils import IterableUtils
+from folio_upm.utils.iterable_utils import IterableUtils
 from folio_upm.utils.upm_env import Env
 
 

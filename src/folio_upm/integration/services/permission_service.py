@@ -1,7 +1,7 @@
 from folio_upm.integration.clients.permissions_client import PermissionsClient
 from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
-from folio_upm.utils.cql_query_utils import CqlQueryUtils
+from folio_upm.utils.cql import CQL
 from folio_upm.utils.loading_utils import PagedDataLoader, PartitionedDataLoader
 from folio_upm.utils.ordered_set import OrderedSet
 
@@ -28,7 +28,7 @@ class PermissionService(metaclass=SingletonMeta):
             "permission users",
             list(all_granted_to_unique),
             lambda q: self._client.load_user_permissions_by_ids(q),
-            lambda ids: CqlQueryUtils.any_match_by_field("id", ids),
+            lambda ids: CQL.any_match_by_field("id", ids),
         )
 
         return partitioned_data_loader.load()

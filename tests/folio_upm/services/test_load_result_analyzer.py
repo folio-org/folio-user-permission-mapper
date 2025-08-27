@@ -21,21 +21,21 @@ class TestDataProvider:
     @staticmethod
     def get_data():
         return [
-            pytest.param("1user-1ps.json", id="Single role assignment"),
-            pytest.param("1user-nested-ps.json", id="Single role assignment with nested okapi permission set"),
-            pytest.param("2user-1ps.json", id="2 users share a simple role"),
-            pytest.param("2user-2ps.json", id="2 users share 2 same permission sets => 2 users with 2 same roles"),
-            pytest.param("3user-many-ps+shared-ps.json", id="shared ps between 3 users + individual permissions"),
-            pytest.param("simple-nesting.json", id="Simple nesting (assignments on diff levels)"),
-            pytest.param("deep-nesting.json", id="Deep nesting"),
-            pytest.param("mixed-role-feature-assignment.json", id="Mixed role/feature assignments"),
-            pytest.param("circular-references.json", id="Circular references (A contains B contains C contains A)"),
-            pytest.param("duplicates-at-different-levels.json", id="Duplicate permissions at different nesting levels"),
-            pytest.param("empty-ps-in-middle.json", id="Empty permission sets"),
-            pytest.param("permission+permission-sets.json", id="Permission set + permissions"),
-            pytest.param("0users-permission-set.json", id="Permission set without user"),
-            pytest.param("1user-1ps-extra-view-permissions.json", id="Single role (extra view permissions)"),
-            pytest.param("1user-1ps-extra-edit-permissions.json", id="Single role (extra edit permissions)"),
+            pytest.param("0--1user-1ps.json", id="0. Single role assignment"),
+            pytest.param("1--1user-nested-ps.json", id="1. Single role assignment with nested okapi permission set"),
+            pytest.param("2--2user-1ps.json", id="2. 2 users share a simple role"),
+            pytest.param("3--2user-2ps.json", id="3. 2 users share 2 same permission sets"),
+            pytest.param("4--3user-many-ps+shared-ps.json", id="4. shared between 3 users + individual permissions"),
+            pytest.param("5--simple-nesting.json", id="5. Simple nesting (assignments on diff levels)"),
+            pytest.param("6--deep-nesting.json", id="6. Deep nesting"),
+            pytest.param("7--mixed-role-feature-assignment.json", id="7. Mixed role/feature assignments"),
+            pytest.param("8--circular-references.json", id="8. Circular references (A in B in C in A)"),
+            pytest.param("9--duplicates-at-different-levels.json", id="9. Duplicate permissions at different levels"),
+            pytest.param("10--empty-ps-in-middle.json", id="10. Empty permission sets"),
+            pytest.param("11--permission+permission-sets.json", id="11. Permission set + permissions"),
+            pytest.param("12--0users-permission-set.json", id="12. Permission set without user"),
+            pytest.param("13--1user-1ps-extra-view-permissions.json", id="13. Single role (extra view permissions)"),
+            pytest.param("14--1user-1ps-extra-edit-permissions.json", id="14. Single role (extra edit permissions)"),
         ]
 
 
@@ -111,13 +111,23 @@ class _Utils:
         return _current_dir / filename
 
     @staticmethod
-    def __get_role_capabilities(rs):
-        role_capabilities = {}
+    def __get_role_capabilities(rs: OkapiAnalysisResult):
+        role_values_dict = {}
         for rch in rs.roleCapabilities:
             role_name = rch.roleName
             for ch in rch.capabilities:
-                if role_name not in role_capabilities:
-                    role_capabilities[role_name] = []
-                role_capabilities[role_name].append(ch.permissionName)
-        role_capabilities = [{"roleName": role_name, "ps": pss} for role_name, pss in role_capabilities.items()]
-        return role_capabilities
+                if role_name not in role_values_dict:
+                    role_values_dict[role_name] = []
+                if ch.permissionName is None:
+                    role_values_dict[role_name].append({"type": "capability", "value": ch.name})
+                else:
+                    role_values_dict[role_name].append({"type": "permission", "value": ch.permissionName})
+
+        return [
+            {
+                "roleName": role_name,
+                "ps": [x.get("value") for x in entities if x.get("type") == "permission"],
+                "capabilities": [x.get("value") for x in entities if x.get("type") == "capability"] or None,
+            }
+            for role_name, entities in role_values_dict.items()
+        ]

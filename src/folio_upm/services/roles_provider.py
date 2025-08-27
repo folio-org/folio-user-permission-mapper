@@ -8,7 +8,7 @@ from folio_upm.model.result.permission_analysis_result import PermissionAnalysis
 from folio_upm.model.support.expanded_permission_set import ExpandedPermissionSet
 from folio_upm.model.types.permission_type import MUTABLE
 from folio_upm.utils import log_factory
-from folio_upm.utils.common_utils import IterableUtils
+from folio_upm.utils.iterable_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
 from folio_upm.utils.sub_ps_helper import SubPermissionsHelper
 from folio_upm.utils.system_roles_provider import SystemRolesProvider

@@ -80,9 +80,7 @@
     },
     {
       "roleName": "PS 6",
-      "ps": [
-        "m6_okapi.all"
-      ]
+      "ps": [ "m6_okapi.all" ]
     }
   ]
 }
