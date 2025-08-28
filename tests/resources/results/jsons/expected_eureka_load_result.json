@@ -1,105 +1,160 @@
 {
-  "okapiPermissions": [
+  "roles": [
     {
-      "id": "test-module-1.0.0",
-      "name": "Test Module",
-      "permissionSets": [
+      "id": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "name": "99ebdbd711b0e1854a6c2e93f759efc2af291fd0",
+      "description": "System generated role"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "62381a70-5286-42a3-980c-ac3ac8478440",
+      "name": "users_collection.view",
+      "description": "Get a collection of user records",
+      "resource": "Users Collection",
+      "action": "view",
+      "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+      "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+      "permission": "users.collection.get",
+      "endpoints": [
         {
-          "permissionName": "test-module.item.get",
-          "displayName": "Test Read Permission",
-          "description": "Permission to read test data"
-        },
-        {
-          "permissionName": "test-module.item.post",
-          "displayName": "Test Write Permission",
-          "description": "Permission to write test data",
-          "subPermissions": [ "test-module.item.get" ]
+          "path": "/users",
+          "method": "GET"
         }
-      ]
-    }
-  ],
-  "allPermissions": [
-    {
-      "id": "2543cb3b-d0bd-4433-8899-38b9f57d81e8",
-      "permissionName": "test-module.item.get",
-      "displayName": "Test Read Permission",
-      "description": "Permission to read test data",
-      "subPermissions": [ ],
-      "childOf": [ ],
-      "grantedTo": [ ],
-      "mutable": false,
-      "visible": true
+      ],
+      "dummyCapability": false,
+      "type": "data",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.844+00:00",
+        "updatedDate": "2025-07-25T11:46:02.844+00:00"
+      },
+      "visible": false
     },
     {
-      "id": "4f00c6d2-c65d-4f43-bacb-d1e5bd8762ef",
-      "permissionName": "test-module.item.post",
-      "displayName": "Test Write Permission",
-      "description": "Permission to write test data",
-      "subPermissions": [ "test-module.item.get" ],
-      "childOf": [ ],
-      "grantedTo": [ ],
-      "mutable": false,
-      "visible": true
+      "id": "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
+      "name": "users_item.view",
+      "description": "Read an individual record in the User module",
+      "resource": "Users Item",
+      "action": "view",
+      "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+      "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+      "permission": "users.item.get",
+      "endpoints": [
+        {
+          "path": "/users/{id}",
+          "method": "GET"
+        }
+      ],
+      "dummyCapability": false,
+      "type": "data",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      },
+      "visible": false
     },
     {
-      "id": "50cceb55-a0eb-4d9a-b2f3-aa44573e142b",
-      "permissionName": "user.entity.view",
-      "displayName": "Test Permission View",
-      "description": "View test resources",
-      "subPermissions": [ "test-module.item.post" ],
-      "childOf": [ ],
-      "grantedTo": [ "141ec4f8-57a9-4a05-a1c6-60ff1fab4762" ],
-      "mutable": true,
-      "visible": true
+      "id": "26ea4a24-4f03-457e-9a37-b9456dcd808e",
+      "name": "users_item.create",
+      "description": "Create new records in the User module",
+      "resource": "Users Item",
+      "action": "create",
+      "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+      "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+      "permission": "users.item.post",
+      "endpoints": [
+        {
+          "path": "/users",
+          "method": "POST"
+        }
+      ],
+      "dummyCapability": false,
+      "type": "data",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      },
+      "visible": false
     }
   ],
-  "allPermissionsExpanded": [
+  "capabilitySets": [
     {
-      "id": "2543cb3b-d0bd-4433-8899-38b9f57d81e8",
-      "permissionName": "test-module.item.get",
-      "displayName": "Test Read Permission",
-      "description": "Permission to read test data",
-      "subPermissions": [ ],
-      "childOf": [ ],
-      "grantedTo": [ ],
-      "mutable": false,
-      "visible": true
+      "id": "4afb0a1d-72bc-49e0-bb76-aa11188f1585",
+      "name": "users.manage",
+      "description": "All permissions for the mod-users module",
+      "resource": "Users",
+      "action": "manage",
+      "applicationId": "app-platform-minimal-1.0.0",
+      "moduleId": "mod-users-1.0.0",
+      "type": "data",
+      "permission": "users.all",
+      "capabilities": [
+        "62381a70-5286-42a3-980c-ac3ac8478440", "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
+        "26ea4a24-4f03-457e-9a37-b9456dcd808e"
+      ],
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.995+00:00",
+        "updatedDate": "2025-07-25T11:46:02.995+00:00"
+      },
+      "visible": false
+    }
+  ],
+  "roleUsers": [
+    {
+      "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "userId": "3ea9ea32-45e7-4143-b221-a611aea29b50",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.995+00:00",
+        "updatedDate": "2025-07-25T11:46:02.995+00:00"
+      }
+    }
+  ],
+  "roleCapabilities": [
+    {
+      "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "capabilityId": "62381a70-5286-42a3-980c-ac3ac8478440",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
     },
     {
-      "id": "4f00c6d2-c65d-4f43-bacb-d1e5bd8762ef",
-      "permissionName": "test-module.item.post",
-      "displayName": "Test Write Permission",
-      "description": "Permission to write test data",
-      "subPermissions": [ "test-module.item.get" ],
-      "childOf": [ ],
-      "grantedTo": [ ],
-      "mutable": false,
-      "visible": true
+      "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "capabilityId": "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
     },
     {
-      "id": "50cceb55-a0eb-4d9a-b2f3-aa44573e142b",
-      "permissionName": "user.entity.view",
-      "displayName": "Test Permission View",
-      "description": "View test resources",
-      "subPermissions": [ "test-module.item.post", "test-module.item.get" ],
-      "childOf": [ ],
-      "grantedTo": [ "141ec4f8-57a9-4a05-a1c6-60ff1fab4762" ],
-      "mutable": true,
-      "visible": true
+      "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "capabilityId": "26ea4a24-4f03-457e-9a37-b9456dcd808e",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
     }
   ],
-  "allPermissionUsers": [
+  "userCapabilities": [
     {
-      "id": "141ec4f8-57a9-4a05-a1c6-60ff1fab4762",
-      "userId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
-      "permissions": [ "user.entity.view" ]
+      "userId": "36f2ca6b-7e15-4b1b-be07-07e403a3d385",
+      "capabilityId": "26ea4a24-4f03-457e-9a37-b9456dcd808e"
     }
   ],
-  "allPermissionUsersExpanded": [
+  "roleCapabilitySets": [
     {
-      "id": "141ec4f8-57a9-4a05-a1c6-60ff1fab4762",
-      "userId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
-      "permissions": [ "user.entity.view" ]
+      "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "capabilitySetId": "4afb0a1d-72bc-49e0-bb76-aa11188f1585",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
+    }
+  ],
+  "userCapabilitySets": [
+    {
+      "userId": "36f2ca6b-7e15-4b1b-be07-07e403a3d385",
+      "capabilitySetId": "4afb0a1d-72bc-49e0-bb76-aa11188f1585"
     }
   ]
 }

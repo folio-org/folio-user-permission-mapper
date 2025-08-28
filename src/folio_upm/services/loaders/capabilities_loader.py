@@ -21,7 +21,7 @@ class CapabilitiesLoader(metaclass=SingletonMeta):
         role_users = self.__load_data_by_query("userRoles", "/roles/users", cql_all_query)
         role_capabilities = self.__load_data_by_query("roleCapabilities", "/roles/capabilities", cql_all_query)
         role_capability_sets = self.__load_data_by_query("roleCapabilitySets", "/roles/capability-sets", cql_all_query)
-        user_capabilities = self.__load_data_by_query("userCapabilities", "/users/capability-sets", cql_all_query)
+        user_capabilities = self.__load_data_by_query("userCapabilities", "/users/capabilities", cql_all_query)
         user_capability_sets = self.__load_data_by_query("userCapabilitySets", "/users/capability-sets", cql_all_query)
 
         self._log.info("Eureka data loaded successfully.")

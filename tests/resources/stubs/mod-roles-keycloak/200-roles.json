@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/roles",
+    "queryParameters": {
+      "query": {
+        "equalTo": "cql.allRecords=1"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "roles": [
+        {
+          "id": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+          "name": "99ebdbd711b0e1854a6c2e93f759efc2af291fd0",
+          "description": "System generated role"
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}

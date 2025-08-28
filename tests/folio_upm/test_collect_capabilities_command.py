@@ -63,8 +63,16 @@ class BaseTest:
         yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-roles.json")
 
     @pytest.fixture(scope="function", autouse=False)
-    def eureka_user_roles_http_mock(self) -> Generator[Mapping, None, None]:
-        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-user-roles.json")
+    def eureka_capabilities_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-capabilities.json")
+
+    @pytest.fixture(scope="function", autouse=False)
+    def eureka_capability_sets_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-capability-sets.json")
+
+    @pytest.fixture(scope="function", autouse=False)
+    def eureka_roles_users_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-roles-users.json")
 
     @pytest.fixture(scope="function", autouse=False)
     def eureka_role_capabilities_http_mock(self) -> Generator[Mapping, None, None]:
@@ -74,17 +82,29 @@ class BaseTest:
     def eureka_role_capability_sets_http_mock(self) -> Generator[Mapping, None, None]:
         yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-roles-capability-sets.json")
 
+    @pytest.fixture(scope="function", autouse=False)
+    def eureka_users_capabilities_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-users-capabilities.json")
+
+    @pytest.fixture(scope="function", autouse=False)
+    def eureka_users_capability_sets_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-users-capability-sets.json")
+
 
 class TestCollectCapabilitiesCommand(BaseTest):
 
-    def test_load_okapi_permissions(
+    def test_collect_capabilities(
         self,
         capsys: CaptureFixture,
         login_http_mock,
+        eureka_capabilities_http_mock,
+        eureka_capability_sets_http_mock,
         eureka_roles_http_mock,
-        eureka_user_roles_http_mock,
+        eureka_roles_users_http_mock,
         eureka_role_capabilities_http_mock,
         eureka_role_capability_sets_http_mock,
+        eureka_users_capabilities_http_mock,
+        eureka_users_capability_sets_http_mock,
     ):
         runner = CliRunner()
         with capsys.disabled() as _:

@@ -1,0 +1,30 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/roles/capability-sets",
+    "queryParameters": {
+      "query": {
+        "equalTo": "cql.allRecords=1"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "roleCapabilitySets": [
+        {
+          "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+          "capabilitySetId": "4afb0a1d-72bc-49e0-bb76-aa11188f1585",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          }
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}

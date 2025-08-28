@@ -46,7 +46,7 @@ class WireMockTestHelper:
 
     @staticmethod
     def delete_mapping(mapping: Mapping):
-        _log.info("Deleting hello world mapping...")
+        _log.info("Deleting mapping: %s ...", mapping)
         query_params = {"matchingStub": mapping.id}
         received_requests_pet_stub = Requests.get_all_received_requests(limit=100, parameters=query_params)
         if received_requests_pet_stub.meta.total < 1:  # type: ignore[missing-attribute]

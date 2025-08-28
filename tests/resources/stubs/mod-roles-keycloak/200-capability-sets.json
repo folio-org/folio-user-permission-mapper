@@ -1,0 +1,43 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/capability-sets",
+    "queryParameters": {
+      "query": {
+        "equalTo": "cql.allRecords=1"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "capabilitySets": [
+        {
+          "id": "4afb0a1d-72bc-49e0-bb76-aa11188f1585",
+          "name": "users.manage",
+          "description": "All permissions for the mod-users module",
+          "resource": "Users",
+          "action": "manage",
+          "applicationId": "app-platform-minimal-1.0.0",
+          "moduleId": "mod-users-1.0.0",
+          "type": "data",
+          "permission": "users.all",
+          "capabilities": [
+            "62381a70-5286-42a3-980c-ac3ac8478440",
+            "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
+            "26ea4a24-4f03-457e-9a37-b9456dcd808e"
+          ],
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.995+00:00",
+            "updatedDate": "2025-07-25T11:46:02.995+00:00"
+          },
+          "visible": false
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}
