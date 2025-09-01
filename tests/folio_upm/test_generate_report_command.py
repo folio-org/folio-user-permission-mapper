@@ -1,21 +1,30 @@
 import os
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Generator
 
 import pytest
 from _pytest.capture import CaptureFixture
-from assert_utils import Assert  # type: ignore[import-error]
 from click.testing import CliRunner
-from minio import Minio
-from wiremock.resources.mappings import Mapping
-from wiremock_test_helper import WireMockTestHelper  # type: ignore[import-error]
 
+from assert_utils import Assert  # type: ignore[import-error]
 from folio_upm.cli import cli
 from folio_upm.storage.s3_tenant_storage import S3TenantStorage
 from folio_upm.utils.json_utils import JsonUtils
+from minio_test_helper import MinioTestHelper
+from wiremock_test_helper import WireMockTestHelper  # type: ignore[import-error]
+
+_tenant_id = "okapi_test"
 
 
 class BaseTest:
+
+    @pytest.fixture(scope="function", autouse=False)
+    def okapi_permissions_s3_object(self, minio_client, test_s3_bucket) -> Generator[str, None, None]:
+        file_path = Path("../resources/test-data/okapi-permissions.json")
+        okapi_capabilities = JsonUtils().read_string_safe(Path(os.path.dirname(__file__)) / file_path)
+        fk = f"{_tenant_id}/{_tenant_id}-okapi-permissions-{datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S%f")}.json.gz"
+        yield from MinioTestHelper.with_jsongz_object(minio_client, test_s3_bucket, fk, okapi_capabilities)
 
     @pytest.fixture(autouse=True, scope="function")
     def setup_environment(self, minio_container, minio_client, test_s3_bucket):
@@ -49,16 +58,20 @@ class BaseTest:
 
 class TestGenerateReportCommand(BaseTest):
 
-    def test_load_okapi_permissions(self, capsys: CaptureFixture):
+    def test_generate_report(
+        self,
+        capsys: CaptureFixture,
+        okapi_permissions_s3_object,
+    ):
         runner = CliRunner()
         with capsys.disabled() as _:
-            result = runner.invoke(cli, ["collect-capabilities"], color=True)
-            assert result.exit_code == 0
+            result = runner.invoke(cli, ["generate-report"], color=True)
             if result.exception:
                 print(f"CLI failed as expected: {result.exception}")
+            assert result.exit_code == 0
 
-            result_object = S3TenantStorage().find_object("generate-report", "json.gz")
-            file_path = Path("../resources/results/jsons/expected_okapi_load_result.json")
+            result_object = S3TenantStorage().find_object("eureka-migration-data-distributed", "json.gz")
+            file_path = Path("../resources/results/jsons/expected_eureka_migration_data.json")
             expected_fp = Path(os.path.dirname(__file__)) / file_path
             expected_object = JsonUtils().read_string_safe(expected_fp)
             Assert.compare_json_str(result_object, expected_object)

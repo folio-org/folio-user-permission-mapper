@@ -13,7 +13,7 @@ from folio_upm.xlsx.ws_constants import bool_cw_short, desc_med_cw, desc_short_c
 
 class RoleCapabilityRow(BaseModel):
     roleName: str
-    source: str
+    source: Optional[str]
     excluded: bool
     expandedFrom: Optional[str] = None
     sourceDisplayName: Optional[str]
