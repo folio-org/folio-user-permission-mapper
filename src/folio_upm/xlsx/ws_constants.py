@@ -22,5 +22,23 @@ thin_border = Border(
 
 data_font = Font(name="Consolas", bold=False, italic=False, size=10)
 header_font = Font(name="Consolas", bold=True, size=11)
+
 header_cell_alignment = Alignment(horizontal="left", vertical="center")
 data_cell_alignment = Alignment(horizontal="left", vertical="top", wrapText=True)
+
+uuid_cw: float = 40
+num_short_cw: float = 25
+num_long_cw: float = 40
+bool_cw_short: float = 20
+bool_long_cw: float = 30
+number_cw_long: float = 40
+
+type_cw: float = 25
+note_cw: float = 35
+desc_short_cw: float = 60
+desc_med_cw: float = 90
+desc_long_cw: float = 120
+
+role_id_cw: float = 60
+role_name_cw: float = 80
+ps_name_cw: float = 80

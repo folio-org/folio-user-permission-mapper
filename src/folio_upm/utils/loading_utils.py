@@ -1,7 +1,7 @@
-from typing import Any, Callable, Iterable, List, Optional
+from typing import Any, Callable, List, Optional
 
 from folio_upm.utils import log_factory
-from folio_upm.utils.common_utils import IterableUtils
+from folio_upm.utils.iterable_utils import IterableUtils
 from folio_upm.utils.upm_env import Env
 
 
@@ -10,14 +10,18 @@ class PartitionedDataLoader:
     def __init__(
         self,
         resource: str,
-        data: Iterable[Any],
+        data: List[Any],
         data_loader: Callable[[str], List[Any]],
-        query_builder=Callable[[List[Any]], str],
+        query_builder: Callable[[List[Any]], str],
         partition_size: Optional[int] = None,
     ):
-        _partition_size = partition_size or int(Env().get_env("DEFAULT_API_CHUNK_SIZE", default_value=50))
+
+        default_partition_size = "50"
+        cached = Env().getenv_cached("QUERY_CHUNK_SIZE", default_value=default_partition_size)
+        _partition_size = partition_size or int(cached or default_partition_size)
         self._resource = resource
         self._log = log_factory.get_logger(self.__class__.__name__)
+
         self._partitioned_data = IterableUtils.partition(data, _partition_size)
         self._data_loader = data_loader
         self._query_builder = query_builder
@@ -27,6 +31,7 @@ class PartitionedDataLoader:
 
         self._log.info("Loading partitioned data for '%s'", self._resource)
         for partition in self._partitioned_data:
+
             query = self._query_builder(partition)
             self._log.debug("Loading partitioned data ('%s') for query: '%s'", self._resource, query)
             loaded_data = self._data_loader(query)
@@ -55,7 +60,6 @@ class PagedDataLoader:
         self._log.info("Loading paged data for '%s' and query: '%s'...", self._resource, self._query)
         result = []
         last_offset = 0
-
         while True:
             self._log.debug(
                 "Loading '%s' page: query='%s', limit=%s, offset=%s",
@@ -72,12 +76,11 @@ class PagedDataLoader:
             if last_load_size < self._batch_limit:
                 self._log.info("Paged data loading finished for '%s': total=%s", self._resource, len(result))
                 break
-
         return result
 
     def load_page(self, last_offset: int = 0) -> List[Any]:
         try:
             return self._loader_func(self._query, self._batch_limit, last_offset)
         except Exception as e:
-            self._log.warn("Failed to load page for '%s': %s", self._resource, e)
+            self._log.warning("Failed to load page for '%s': %s", self._resource, e)
             return []

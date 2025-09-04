@@ -1,24 +1,26 @@
 from typing import List, Set, Tuple
 
-from folio_upm.dto.permission_type import MUTABLE
-from folio_upm.dto.results import PermissionAnalysisResult
-from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet
+from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.support.expanded_permission_set import ExpandedPermissionSet
+from folio_upm.model.types.permission_type import MUTABLE
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.utils.utils import Utils
 
 
 class SubPermissionsHelper:
 
     def __init__(self, ps_analysis_result: PermissionAnalysisResult):
-        self._log = log_factory.get_logger(__class__.__name__)
+        self._log = log_factory.get_logger(self.__class__.__name__)
         self._ps_analysis_result = ps_analysis_result
         self._parent_ps_names = dict[str, OrderedSet[str]]()
 
     def expand_sub_ps(self, permission_name) -> list[ExpandedPermissionSet]:
         self._parent_ps_names = dict[str, OrderedSet[str]]()
         ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
-        analyzed_ps = self._ps_analysis_result[ps_type].get(permission_name)
+
+        analyzed_ps = self._ps_analysis_result.get(ps_type).get(permission_name)
         if analyzed_ps is None:
             return []
         _, parent_sub_ps = self.__get_sub_permissions(analyzed_ps, set(), None)
@@ -61,7 +63,7 @@ class SubPermissionsHelper:
         source_ps_name = ap.permissionName
 
         for permission_name in ap.get_sub_permissions():
-            if source_ps_name == permission_name or ServiceUtils.is_system_permission(permission_name):
+            if source_ps_name == permission_name or Utils.is_system_permission(permission_name):
                 continue
 
             self.__add_parent(permission_name, root_ps_name)
@@ -70,7 +72,9 @@ class SubPermissionsHelper:
 
             ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
             if ps_type == MUTABLE:
-                mutable_ps_sets.append(self._ps_analysis_result[ps_type].get(permission_name))
+                analyzed_ps = self._ps_analysis_result.get(ps_type).get(permission_name)
+                if analyzed_ps is not None:
+                    mutable_ps_sets.append(analyzed_ps)
             else:
                 other_ps_set_names.append(permission_name)
 

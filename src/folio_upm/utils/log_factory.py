@@ -34,10 +34,11 @@ def _get_log_level():
 
 class CustomFormatter(logging.Formatter):
     def __init__(self, fmt=None):
-        super().__init__(fmt or "%(asctime)s %(levelname)-8s %(name)-30s %(message)s")
+        super().__init__(fmt or "[%(asctime)s] [%(levelname)-8s] [%(shortname)-30s] %(message)s")
 
     def format(self, record):
         log_color = _COLORS.get(record.levelname, _RESET)
+        record.shortname = record.name[-30:]
         message = super().format(record)
         return f"{log_color}[{_get_tenant_id()}] {message}{_RESET}"
 

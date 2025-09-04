@@ -1,0 +1,44 @@
+{
+  "roles": [
+    {
+      "status": "success",
+      "srcEntityName": "role",
+      "srcEntityId": "0cf81fda-00fd-4402-9ab8-6003c0edd985",
+      "reason": "Role removed successfully"
+    }
+  ],
+  "roleCapabilities": [
+    {
+      "status": "success",
+      "srcEntityName": "role",
+      "srcEntityId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+      "srcEntityDisplayName": "99ebdbd711b0e1854a6c2e93f759efc2af291fd0",
+      "tarEntityName": "capability-set",
+      "tarEntityId": "[]"
+    },
+    {
+      "status": "success",
+      "srcEntityName": "role",
+      "srcEntityId": "0cf81fda-00fd-4402-9ab8-6003c0edd985",
+      "srcEntityDisplayName": "51abb9636078defbf888d8457a7c76f85c8f114c",
+      "tarEntityName": "capability-set",
+      "tarEntityId": "[]"
+    },
+    {
+      "status": "success",
+      "srcEntityName": "role",
+      "srcEntityId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+      "srcEntityDisplayName": "99ebdbd711b0e1854a6c2e93f759efc2af291fd0",
+      "tarEntityName": "capability",
+      "tarEntityId": "18eeded7-955b-4cec-871b-a3c39ac08328"
+    },
+    {
+      "status": "success",
+      "srcEntityName": "role",
+      "srcEntityId": "0cf81fda-00fd-4402-9ab8-6003c0edd985",
+      "srcEntityDisplayName": "51abb9636078defbf888d8457a7c76f85c8f114c",
+      "tarEntityName": "capability",
+      "tarEntityId": "[]"
+    }
+  ]
+}

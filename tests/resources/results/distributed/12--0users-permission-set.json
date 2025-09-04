@@ -1,0 +1,15 @@
+{
+  "roles": [
+    {
+      "name": "PS 2",
+      "description": "PS 2 - Description"
+    }
+  ],
+  "userRoles": [ ],
+  "roleCapabilities": [
+    {
+      "roleName": "PS 2",
+      "ps": [ "m1_okapi.all", "m2_okapi.all" ]
+    }
+  ]
+}

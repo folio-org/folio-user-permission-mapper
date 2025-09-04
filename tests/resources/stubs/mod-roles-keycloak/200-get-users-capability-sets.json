@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/users/capability-sets",
+    "queryParameters": {
+      "query": {
+        "equalTo": "cql.allRecords=1"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "userCapabilitySets": [
+        {
+          "userId": "36f2ca6b-7e15-4b1b-be07-07e403a3d385",
+          "capabilitySetId": "4afb0a1d-72bc-49e0-bb76-aa11188f1585"
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}

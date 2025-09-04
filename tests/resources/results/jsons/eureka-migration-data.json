@@ -1,0 +1,379 @@
+{
+  "roles": [
+    {
+      "role": {
+        "name": "Test Permission View (User-Defined)",
+        "description": "View test resources"
+      },
+      "permissionSets": [
+        {
+          "permissionName": "test-module.item.post",
+          "expandedFrom": [ ]
+        },
+        {
+          "permissionName": "perms.users.item.put",
+          "expandedFrom": [ ]
+        }
+      ],
+      "source": "d842e69d-9602-4b1f-af32-eda32d1a350c",
+      "users": [ "99eaae21-d7db-4b2c-a7b5-091f14a8b38a" ],
+      "usersCount": 1,
+      "systemGenerated": false,
+      "capabilitiesCount": 56,
+      "originalPermissionsCount": 2,
+      "expandedPermissionsCount": 2
+    }
+  ],
+  "userRoles": [
+    {
+      "userId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
+      "skipRoleAssignment": false,
+      "roleNames": [ "Test Permission View (User-Defined)" ]
+    }
+  ],
+  "roleCapabilities": [
+    {
+      "roleName": "Test Permission View (User-Defined)",
+      "capabilities": [
+        {
+          "resolvedType": "unknown",
+          "permissionName": "test-module.item.post",
+          "permissionType": "okapi",
+          "displayName": "Test Write Permission",
+          "expandedFrom": [ ]
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionName": "perms.users.item.put",
+          "permissionType": "unprocessed",
+          "displayName": "perms.users.item.put",
+          "expandedFrom": [ ]
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "user-capabilities_collection.execute"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "user-capabilities_collection.edit"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "user-capabilities_collection.delete"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "user-capability-sets_collection.execute"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "user-capability-sets_collection.edit"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "user-capability-sets_collection.delete"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_users_item.edit"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_users_item.delete"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_users_item.create"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "role-capabilities_collection.execute"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "role-capabilities_collection.create"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "role-capabilities_collection.edit"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "role-capabilities_collection.delete"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "role-capability-sets_collection.execute"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "role-capability-sets_collection.create"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "role-capability-sets_collection.edit"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "role-capability-sets_collection.delete"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_item.edit"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_item.delete"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_item.create"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_collection.execute"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_collection.create"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "ui-authorization-roles_settings_admin.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "ui-authorization-roles_users_settings.manage"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "users-keycloak_auth-users_item.create"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "ui-authorization-roles_settings.create"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "ui-authorization-roles_settings.edit"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "ui-authorization-roles_settings.delete"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "ui-authorization-policies_settings_admin.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "policies_item.edit"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "policies_item.delete"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "policies_item.create"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "policies_collection.create"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "user-capabilities_collection.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "user-capability-sets_collection.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_users_item.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_users_collection.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "role-capabilities_collection.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "role-capability-sets_collection.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_item.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "roles_collection.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "capabilities_item.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "capabilities_collection.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "capability-sets_capabilities_collection.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "capability-sets_item.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "capability-sets_collection.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "users-keycloak_auth-users_item.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "ui-authorization-roles_users_settings.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "ui-authorization-roles_settings.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "settings_authorization-roles_enabled.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "settings_authorization-policies_enabled.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "policies_item.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "policies_collection.view"
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "settings_enabled.view"
+        }
+      ]
+    }
+  ]
+}

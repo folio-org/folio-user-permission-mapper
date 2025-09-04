@@ -1,0 +1,85 @@
+{
+  "roles": [
+    {
+      "name": "PS 1.1",
+      "description": "PS 1.1 - Description"
+    },
+    {
+      "name": "PS 1.2",
+      "description": "PS 1.2 - Description"
+    },
+    {
+      "name": "PS 3",
+      "description": "PS 3 - Description"
+    },
+    {
+      "name": "PS 2.1",
+      "description": "PS 2.1 - Description"
+    },
+    {
+      "name": "PS 2.2",
+      "description": "PS 2.2 - Description"
+    },
+    {
+      "name": "PS 2.3",
+      "description": "PS 2.3 - Description"
+    },
+    {
+      "name": "PS 3.1",
+      "description": "PS 3.1 - Description"
+    },
+    {
+      "name": "PS 3.2",
+      "description": "PS 3.2 - Description"
+    },
+    {
+      "name": "PS 3.3",
+      "description": "PS 3.3 - Description"
+    }
+  ],
+  "userRoles": [
+    {
+      "userId": "user_A",
+      "skipRoleAssignment": false,
+      "roleNames": [ "PS 1.1", "PS 2.1", "PS 3.1" ]
+    }
+  ],
+  "roleCapabilities": [
+    {
+      "roleName": "PS 1.1",
+      "ps": [ "m1_okapi.all", "m2_okapi.all", "m3_okapi.all" ]
+    },
+    {
+      "roleName": "PS 1.2",
+      "ps": [ "m2_okapi.all", "m3_okapi.all" ]
+    },
+    {
+      "roleName": "PS 3",
+      "ps": [ "m3_okapi.all" ]
+    },
+    {
+      "roleName": "PS 2.1",
+      "ps": [ "m4_okapi.all", "m5_okapi.all", "m6_okapi.all" ]
+    },
+    {
+      "roleName": "PS 2.2",
+      "ps": [ "m5_okapi.all", "m6_okapi.all" ]
+    },
+    {
+      "roleName": "PS 2.3",
+      "ps": [ "m6_okapi.all" ]
+    },
+    {
+      "roleName": "PS 3.1",
+      "ps": [ "m7_okapi.all", "m8_okapi.all", "m9_okapi.all" ]
+    },
+    {
+      "roleName": "PS 3.2",
+      "ps": [ "m8_okapi.all", "m9_okapi.all" ]
+    },
+    {
+      "roleName": "PS 3.3",
+      "ps": [ "m9_okapi.all" ]
+    }
+  ]
+}

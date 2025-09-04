@@ -1,9 +1,11 @@
 from collections import OrderedDict
 
-from folio_upm.dto.okapi import PermissionSet
-from folio_upm.dto.results import PermissionAnalysisResult
-from folio_upm.dto.source_type import PS
-from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet, SourcedPermissionSet
+from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
+from folio_upm.model.okapi.permission_set import PermissionSet
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.support.expanded_permission_set import ExpandedPermissionSet
+from folio_upm.model.support.sourced_permission_set import SourcedPermissionSet
+from folio_upm.model.types.source_type import PS
 from folio_upm.utils.sub_ps_helper import SubPermissionsHelper
 
 
@@ -30,18 +32,18 @@ class TestSubPermissionsUtils:
         assert result == [
             ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=[]),
             ExpandedPermissionSet(permissionName="user_ps2", expandedFrom=[]),
-            ExpandedPermissionSet(permissionName="user_ps3", expandedFrom=['user_ps1']),
-            ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=['user_ps1']),
-            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=['user_ps1']),
-            ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=['user_ps1']),
+            ExpandedPermissionSet(permissionName="user_ps3", expandedFrom=["user_ps1"]),
+            ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=["user_ps1"]),
+            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=["user_ps1"]),
+            ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=["user_ps1"]),
         ]
 
         result2 = sub_ps_helper.expand_sub_ps("user_ps2")
         assert result2 == [
             ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=[]),
             ExpandedPermissionSet(permissionName="user_ps3", expandedFrom=[]),
-            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=['user_ps2']),
-            ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=['user_ps2']),
+            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=["user_ps2"]),
+            ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=["user_ps2"]),
         ]
 
         result3 = sub_ps_helper.expand_sub_ps("user_ps3")
@@ -56,12 +58,12 @@ class TestSubPermissionsUtils:
 
         assert result == [
             ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=[]),
-            ExpandedPermissionSet(permissionName="user_ps2", expandedFrom=['user_ps2']),
-            ExpandedPermissionSet(permissionName="user_ps1", expandedFrom=['user_ps1', 'user_ps2']),
-            ExpandedPermissionSet(permissionName="user_ps3", expandedFrom=['user_ps1']),
-            ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=['user_ps1']),
-            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=['user_ps2']),
-            ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=['user_ps2']),
+            ExpandedPermissionSet(permissionName="user_ps2", expandedFrom=["user_ps2"]),
+            ExpandedPermissionSet(permissionName="user_ps1", expandedFrom=["user_ps1", "user_ps2"]),
+            ExpandedPermissionSet(permissionName="user_ps3", expandedFrom=["user_ps1"]),
+            ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=["user_ps1"]),
+            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=["user_ps2"]),
+            ExpandedPermissionSet(permissionName="okapi_ps4", expandedFrom=["user_ps2"]),
         ]
 
     def test_nested_ps_with_unknown_ps_name(self):
@@ -72,8 +74,8 @@ class TestSubPermissionsUtils:
             ExpandedPermissionSet(permissionName="okapi_ps1", expandedFrom=[]),
             ExpandedPermissionSet(permissionName="unknown_ps", expandedFrom=[]),
             ExpandedPermissionSet(permissionName="user_ps2", expandedFrom=[]),
-            ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=['user_ps1']),
-            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=['user_ps1']),
+            ExpandedPermissionSet(permissionName="okapi_ps2", expandedFrom=["user_ps1"]),
+            ExpandedPermissionSet(permissionName="okapi_ps3", expandedFrom=["user_ps1"]),
         ]
 
     def simple_ps_analysis_result(self) -> PermissionAnalysisResult:

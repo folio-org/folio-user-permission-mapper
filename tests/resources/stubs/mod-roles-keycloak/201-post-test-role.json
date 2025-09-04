@@ -1,0 +1,38 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/roles",
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "equalToJson": {
+          "id": null,
+          "name": "Test Permission View (User-Defined)",
+          "description": "View test resources"
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "id": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "name": "Test Permission View (User-Defined)",
+      "description": "View test resources",
+      "metadata": {
+        "createdDate": "2024-06-10T12:00:00Z",
+        "createdByUserId": "6c26853a-4b0f-4732-b725-83111b13d364",
+        "updatedDate": "2024-06-10T12:00:00Z",
+        "updatedByUserId": "6c26853a-4b0f-4732-b725-83111b13d364"
+      }
+    }
+  }
+}

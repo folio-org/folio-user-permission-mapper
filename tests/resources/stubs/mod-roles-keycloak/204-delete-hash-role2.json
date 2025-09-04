@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "DELETE",
+    "urlPathTemplate": "/roles/{roleId}",
+    "pathParameters": {
+      "roleId": {
+        "equalTo": "0cf81fda-00fd-4402-9ab8-6003c0edd985"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 204,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "body": ""
+  }
+}

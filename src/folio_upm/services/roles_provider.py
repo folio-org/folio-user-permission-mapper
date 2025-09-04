@@ -1,15 +1,18 @@
 from typing import Dict, List
 
-from folio_upm.dto.eureka import Role
-from folio_upm.dto.permission_type import MUTABLE
-from folio_upm.dto.results import AnalyzedRole, OkapiLoadResult, PermissionAnalysisResult
-from folio_upm.dto.support import AnalyzedPermissionSet, ExpandedPermissionSet
+from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
+from folio_upm.model.analysis.analyzed_role import AnalyzedRole
+from folio_upm.model.eureka.role import Role
+from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.support.expanded_permission_set import ExpandedPermissionSet
+from folio_upm.model.types.permission_type import MUTABLE
 from folio_upm.utils import log_factory
-from folio_upm.utils.common_utils import IterableUtils
+from folio_upm.utils.iterable_utils import IterableUtils
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.service_utils import ServiceUtils
 from folio_upm.utils.sub_ps_helper import SubPermissionsHelper
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
+from folio_upm.utils.utils import Utils
 
 
 class RolesProvider:
@@ -34,25 +37,24 @@ class RolesProvider:
             result[ar.role.name] = ar
         return result
 
-    def __create_role(self, analyzed_ps: AnalyzedPermissionSet) -> AnalyzedRole | None:
+    def __create_role(self, analyzed_ps: AnalyzedPermissionSet) -> AnalyzedRole:
         name = analyzed_ps.get_first_value(lambda x: x.displayName)
         description = self.__get_role_description(analyzed_ps)
 
-        role = Role(name=name and name.strip(), description=description)
+        role = Role(name=name.strip() if name else "", description=description)
         source_ps_name = analyzed_ps.permissionName
 
         expanded_sub_permissions = SubPermissionsHelper(self._ps_analysis_result).expand_sub_ps(source_ps_name)
-        is_system_generated = SystemRolesProvider().has_system_generated_ps(source_ps_name)
-        if is_system_generated:
-            role_name = SystemRolesProvider().get_eureka_role_name(source_ps_name)
-            role = Role(name=role_name, description="System generated role")
+        system_generated_role_name = SystemRolesProvider().find_system_generated_role_name(source_ps_name)
+        if system_generated_role_name is not None:
+            role = Role(name=system_generated_role_name.strip(), description="System generated role")
 
         return AnalyzedRole(
             role=role,
             source=source_ps_name,
             users=self._users_by_ps_names.get(source_ps_name, OrderedSet()),
             permissionSets=expanded_sub_permissions,
-            systemGenerated=is_system_generated,
+            systemGenerated=system_generated_role_name is not None,
             originalPermissionsCount=len(analyzed_ps.get_sub_permissions()),
             expandedPermissionsCount=self.__get_uq_sub_permission_count(expanded_sub_permissions),
             # will be populated later
@@ -82,15 +84,18 @@ class RolesProvider:
     def __expand_sub_permissions(self, ap: AnalyzedPermissionSet, exp_list: List[str]) -> List[ExpandedPermissionSet]:
         result = []
         for permission_name in ap.get_sub_permissions():
+            if permission_name is None:
+                continue
             if permission_name in exp_list:
                 continue
-            if ServiceUtils.is_system_permission(permission_name):
+            if Utils.is_system_permission(permission_name):
                 continue
             ps_type = self._ps_analysis_result.identify_permission_type(permission_name)
             expanded_from = IterableUtils.last(exp_list)
-            result.append(ExpandedPermissionSet(permissionName=permission_name, expandedFrom=expanded_from))
+            expanded_from_list = [expanded_from] if expanded_from else []
+            result.append(ExpandedPermissionSet(permissionName=permission_name, expandedFrom=expanded_from_list))
             if ps_type == MUTABLE:
-                found_child_ap = self._ps_analysis_result[ps_type].get(permission_name)
+                found_child_ap = self._ps_analysis_result.get(ps_type).get(permission_name)
                 if found_child_ap is not None:
                     exp_list.append(permission_name)
                     result += self.__expand_sub_permissions(found_child_ap, exp_list=exp_list)

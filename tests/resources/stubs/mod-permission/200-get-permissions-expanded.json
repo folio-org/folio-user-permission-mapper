@@ -1,0 +1,74 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/perms/permissions",
+    "queryParameters": {
+      "query": {
+        "equalTo": "cql.allRecords=1"
+      },
+      "expanded": {
+        "equalTo": "true"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "permissions": [
+        {
+          "id": "2543cb3b-d0bd-4433-8899-38b9f57d81e8",
+          "permissionName": "test-module.item.get",
+          "displayName": "Test Read Permission",
+          "description": "Permission to read test data",
+          "subPermissions": [ ],
+          "childOf": [ ],
+          "grantedTo": [ ],
+          "mutable": false,
+          "visible": true
+        },
+        {
+          "id": "4f00c6d2-c65d-4f43-bacb-d1e5bd8762ef",
+          "permissionName": "test-module.item.post",
+          "displayName": "Test Write Permission",
+          "description": "Permission to write test data",
+          "subPermissions": [ "test-module.item.get" ],
+          "childOf": [ ],
+          "grantedTo": [ ],
+          "mutable": false,
+          "visible": true
+        },
+        {
+          "id": "b59bef76-4674-4e90-9a10-5b1deb771d51",
+          "permissionName": "perms.users.item.put",
+          "displayName": "perms.users.item.put",
+          "description": "perms.users.item.put",
+          "subPermissions": [ ],
+          "childOf": [ ],
+          "grantedTo": [ "141ec4f8-57a9-4a05-a1c6-60ff1fab4762" ],
+          "mutable": false,
+          "visible": true
+        },
+        {
+          "id": "50cceb55-a0eb-4d9a-b2f3-aa44573e142b",
+          "permissionName": "d842e69d-9602-4b1f-af32-eda32d1a350c",
+          "displayName": "Test Permission View (User-Defined)",
+          "description": "View test resources",
+          "subPermissions": [ "test-module.item.post", "test-module.item.get", "perms.users.item.put" ],
+          "childOf": [ ],
+          "grantedTo": [ "141ec4f8-57a9-4a05-a1c6-60ff1fab4762" ],
+          "mutable": true,
+          "visible": true
+        }
+      ],
+      "totalRecords": 3
+    }
+  }
+}

@@ -1,5 +1,5 @@
-from folio_upm.dto.cls_support import SingletonMeta
 from folio_upm.integration.clients.okapi_client import OkapiClient
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 
 
@@ -14,6 +14,9 @@ class OkapiService(metaclass=SingletonMeta):
         module_descriptors = self._client.read_module_descriptors()
         result = []
         for descriptor in module_descriptors:
+            if not isinstance(descriptor, dict):
+                self._log.error(f"Invalid descriptor type: {type(descriptor)}. Expected dict.")
+                continue
             permission_sets = descriptor.get("permissionSets", [])
             module_id = descriptor.get("id")
             if not permission_sets:

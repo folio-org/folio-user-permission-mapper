@@ -2,7 +2,7 @@ from io import BytesIO
 
 from openpyxl.workbook import Workbook
 
-from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.model.cls_support import SingletonMeta
 
 
 class XlsxUtils(metaclass=SingletonMeta):

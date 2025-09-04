@@ -1,14 +1,16 @@
 from logging import INFO, WARN
 from typing import List
 
-from folio_upm.dto.okapi import PermissionSet
-from folio_upm.dto.results import OkapiLoadResult, PermissionAnalysisResult
-from folio_upm.dto.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
-from folio_upm.dto.support import AnalyzedPermissionSet, SourcedPermissionSet
+from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
+from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.okapi.permission_set import PermissionSet
+from folio_upm.model.result.permission_analysis_result import PermissionAnalysisResult
+from folio_upm.model.support.sourced_permission_set import SourcedPermissionSet
+from folio_upm.model.types.source_type import FLAT_PS, OKAPI_PS, PS, SourceType
 from folio_upm.services.questionable_ps_validator import QuestionablePermissionValidator
 from folio_upm.utils import log_factory
 from folio_upm.utils.ordered_set import OrderedSet
-from folio_upm.utils.service_utils import ServiceUtils
+from folio_upm.utils.utils import Utils
 
 
 class PermissionAnalyzer:
@@ -18,6 +20,9 @@ class PermissionAnalyzer:
         self._load_result = load_result
         self._analyzed_ps_dict = dict[str, AnalyzedPermissionSet]()
         self._result = PermissionAnalysisResult()
+        self._analyzed_permissions = 0
+        self._system_perms_count = dict[SourceType, int]()
+        self._system_permission_names = OrderedSet[str]()
         self.__analyze_permissions()
 
     def get_analysis_result(self) -> PermissionAnalysisResult:
@@ -25,9 +30,6 @@ class PermissionAnalyzer:
 
     def __analyze_permissions(self):
         self._log.info("Starting permissions analysis...")
-        self._analyzed_permissions = 0
-        self._system_perms_count = dict[SourceType, int]()
-        self._system_permission_names = OrderedSet[str]()
         self.__process_permissions()
         self.__process_flat_permissions()
         self.__process_okapi_permissions()
@@ -49,7 +51,7 @@ class PermissionAnalyzer:
         self._system_perms_count[src_type] = 0
         for ps in permissions:
             self._analyzed_permissions += 1
-            if ServiceUtils.is_system_permission(ps.permissionName):
+            if Utils.is_system_permission(ps.permissionName):
                 self._system_perms_count[src_type] += 1
                 self._system_permission_names.add(ps.permissionName)
             else:
@@ -106,7 +108,7 @@ class PermissionAnalyzer:
             f"Invalid permissions found: {len(rs.invalid)}",
         )
         self._log.info(f"Unprocessed permissions found: {len(rs.unprocessed)}")
-        for t in [e for e in SourceType]:
+        for t in SourceType.__members__.values():
             self._log.info(f"System permissions filtered for type '{t.value}': {self._system_perms_count.get(t, 0)}")
 
 
@@ -129,7 +131,7 @@ class _Utils:
     def is_deprecated_ps(ap: AnalyzedPermissionSet) -> bool:
         deprecated_values_without_okapi = set([sp.val.deprecated for sp in ap.sourcePermSets if sp.src != OKAPI_PS])
         if len(deprecated_values_without_okapi) == 1 and next(iter(deprecated_values_without_okapi)) is True:
-            ap.note = "Deprecated (not in okapi)"
+            ap.set_note("Deprecated (not in okapi)")
             return True
         deprecated_values_set = set([sp.val.deprecated for sp in ap.sourcePermSets])
         return len(deprecated_values_set) == 1 and next(iter(deprecated_values_set)) is True

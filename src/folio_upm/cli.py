@@ -1,27 +1,51 @@
 #!/usr/bin/env python
 import json
+from datetime import datetime
 
 import click
 
-from folio_upm.dto.results import AnalysisResult, OkapiLoadResult
+from folio_upm.integration.services.eureka_cleanup_service import EurekaCleanupService
 from folio_upm.integration.services.eureka_migration_service import EurekaMigrationService
+from folio_upm.model.cleanup.hash_role_cleanup_record import HashRoleCleanupRecord
+from folio_upm.model.load.eureka_load_result import EurekaLoadResult
+from folio_upm.model.load.okapi_load_result import OkapiLoadResult
+from folio_upm.model.report.eureka_migration_report import EurekaMigrationReport
+from folio_upm.model.report.hash_roles_cleanup_report import HashRolesCleanupReport
+from folio_upm.model.result.eureka_migration_data import EurekaMigrationData
+from folio_upm.services.eureka_hash_role_analyzer import EurekaHashRoleAnalyzer
 from folio_upm.services.load_result_analyzer import LoadResultAnalyzer
 from folio_upm.services.loaders.capabilities_loader import CapabilitiesLoader
-from folio_upm.services.loaders.eureka_result_loader import EurekaResultLoader
-from folio_upm.services.loaders.permission_loader import PermissionLoader
+from folio_upm.services.loaders.eureka_data_loader import EurekaDataLoader
+from folio_upm.services.loaders.okapi_data_loader import OkapiDataLoader
+from folio_upm.services.ps_details_service import PermissionDetailsService
 from folio_upm.storage.tenant_storage_service import TenantStorageService
 from folio_upm.utils import log_factory
 from folio_upm.utils.system_roles_provider import SystemRolesProvider
 from folio_upm.utils.upm_env import Env
-from folio_upm.xlsx.migration_result_service import MigrationResultService
-from folio_upm.xlsx.xlsx_report_provider import XlsxReportProvider
+from folio_upm.xlsx.cleanup_process_report_service import CleanupProcessReportProvider
+from folio_upm.xlsx.eureka_report_provider import EurekaReportProvider
+from folio_upm.xlsx.migration_process_report_provider import MigrationProcessReportProvider
+from folio_upm.xlsx.okapi_analysis_report_provider import OkapiAnalysisReportProvider
 
 xlsx_ext = "xlsx"
 json_gz_ext = "json.gz"
+
+# load file names
 okapi_permissions_fn = "okapi-permissions"
 eureka_capabilities_fn = "eureka-capabilities"
-mixed_analysis_result_fn = "analysis-result"
-eureka_migration_result_fn = "migration-result"
+
+# analysis file names
+okapi_analysis_result_fn = "okapi-analysis-result"
+hash_roles_analysis_result_fn = "hash-roles-analysis-result"
+
+# result file names
+eureka_migrated_data_fn = "eureka-migrated-data"
+eureka_migration_data_fn = "eureka-migration-data"
+hash_roles_cleanup_data_fn = "hash-roles-cleanup-data"
+
+# reports
+migration_result_fn = "migration-report"
+hash_roles_cleanup_report_fn = "hash-roles-cleanup-report"
 
 
 _log = log_factory.get_logger("cli.py")
@@ -35,49 +59,135 @@ def cli():
 
 @cli.command("collect-permissions")
 def collect_permissions():
+    start_time = datetime.now()
+    _log.info("Collecting permissions...")
     storage_service = TenantStorageService()
-    perms_load_result = PermissionLoader().load_permission_data()
+    perms_load_result = OkapiDataLoader().load_okapi_data()
     storage_service.save_object(okapi_permissions_fn, json_gz_ext, perms_load_result)
+    _log.info("Permissions collected successfully (time: %s)", _get_time_taken(start_time))
 
 
 @cli.command("collect-capabilities")
 def collect_capabilities():
-    storage_service = TenantStorageService()
-    capability_load_result = CapabilitiesLoader().load_capabilities()
-    storage_service.save_object(eureka_capabilities_fn, json_gz_ext, capability_load_result)
+    __collect_capabilities(eureka_capabilities_fn)
 
 
 @cli.command("generate-report")
 def generate_report():
+    start_time = datetime.now()
     migration_strategy = Env().get_migration_strategy()
-    strategy_name = migration_strategy
+    strategy_name = migration_strategy.get_name()
     _log.info("Generating report for strategy: %s ...", strategy_name)
     SystemRolesProvider().print_system_roles()
 
     storage_service = TenantStorageService()
-    okapi_load_result = OkapiLoadResult(**storage_service.require_object(okapi_permissions_fn, json_gz_ext))
-    eureka_load_result = EurekaResultLoader().get_load_result()
-    analysis_result = LoadResultAnalyzer(okapi_load_result, eureka_load_result).get_results()
-    workbook = XlsxReportProvider(analysis_result).generate_report()
+    okapi_permissions_dict = storage_service.require_object(okapi_permissions_fn, json_gz_ext)
+    okapi_load_result = OkapiLoadResult(**okapi_permissions_dict)
+    eureka_load_result = EurekaDataLoader().find_load_result()
+    load_result_analyzer = LoadResultAnalyzer(okapi_load_result, eureka_load_result)
+    analysis_result = load_result_analyzer.get_results()
 
-    result_fn = f"{mixed_analysis_result_fn}-{strategy_name}"
-    storage_service.save_object(result_fn, xlsx_ext, workbook, include_ts=True)
-    storage_service.save_object(result_fn, json_gz_ext, analysis_result.model_dump())
-    _log.info("Report is successfully generated for strategy: %s", strategy_name)
+    okapi_analysis_fn = f"{okapi_analysis_result_fn}-{strategy_name}"
+    okapi_xlsx_analysis_result = OkapiAnalysisReportProvider(analysis_result).generate()
+    storage_service.save_object(okapi_analysis_fn, xlsx_ext, okapi_xlsx_analysis_result)
+
+    eureka_data_fn = f"{eureka_migration_data_fn}-{strategy_name}"
+    eureka_migration_data = load_result_analyzer.get_eureka_migration_data()
+    storage_service.save_object(eureka_data_fn, json_gz_ext, eureka_migration_data.model_dump(by_alias=True))
+    _log.info("Okapi Report is generated for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
 
 
 @cli.command("run-eureka-migration")
 def run_eureka_migration():
-    migration_strategy = Env().get_migration_strategy()
-    _log.info("Running eureka migration for strategy: %s ...", migration_strategy.get_name())
-    result_fn = f"{mixed_analysis_result_fn}-{migration_strategy.get_name()}"
+    start_time = datetime.now()
+    strategy_name = Env().get_migration_strategy().get_name()
+    _log.info("Running eureka migration for strategy: %s ...", strategy_name)
+
+    _eureka_migration_data_fn = f"{eureka_migration_data_fn}-{strategy_name}"
     storage_service = TenantStorageService()
-    analysis_result_dict = storage_service.require_object(result_fn, json_gz_ext)
-    analysis_result = AnalysisResult(**analysis_result_dict)
-    migration_result = EurekaMigrationService().migrate_to_eureka(analysis_result)
-    migration_result_report = MigrationResultService(migration_result).generate_report()
-    storage_service.save_object(eureka_migration_result_fn, json_gz_ext, migration_result.model_dump())
-    storage_service.save_object(eureka_migration_result_fn, xlsx_ext, migration_result_report, include_ts=True)
+    eureka_migration_data_dict = storage_service.require_object(_eureka_migration_data_fn, json_gz_ext)
+    migration_data = EurekaMigrationData(**eureka_migration_data_dict)
+    migration_report = EurekaMigrationService().migrate_to_eureka(migration_data)
+
+    _migration_result_fn = f"{migration_result_fn}-{strategy_name}"
+    storage_service.save_object(_migration_result_fn, json_gz_ext, migration_report.model_dump(by_alias=True))
+    _log.info("Eureka migration finished for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
+
+
+@cli.command("generate-migration-report")
+def generate_migration_report():
+    start_time = datetime.now()
+    _log.info("Generating migration report ...")
+    strategy_name = Env().get_migration_strategy().get_name()
+    storage_service = TenantStorageService()
+    _migration_result_fn = f"{migration_result_fn}-{strategy_name}"
+    raw_migration_report = storage_service.require_object(_migration_result_fn, json_gz_ext)
+    migration_report = EurekaMigrationReport(**raw_migration_report)
+    migration_xlsx_report = MigrationProcessReportProvider(migration_report).generate()
+    storage_service.save_object(_migration_result_fn, xlsx_ext, migration_xlsx_report)
+    _log.info("Migration Report is generated for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
+
+
+@cli.command("analyze-hash-roles")
+@click.option("--force-reload", is_flag=True, default=False, help="Force reloading of eureka capabilities.")
+def analyze_hash_roles(force_reload: bool):
+    start_time = datetime.now()
+    strategy_name = Env().get_migration_strategy().get_name()
+    storage_service = TenantStorageService()
+    _log.info("Analyzing hash-role capabilities for: %s", strategy_name)
+    _migrated_eureka_data_fn = f"{eureka_migrated_data_fn}-{strategy_name}"
+
+    if force_reload:
+        eureka_load_rs = __collect_capabilities(_migrated_eureka_data_fn)
+    else:
+        eureka_rs_loader = EurekaDataLoader(use_ref_file=False, src_file_name=_migrated_eureka_data_fn)
+        eureka_load_rs = eureka_rs_loader.find_load_result()
+        if eureka_load_rs is None:
+            eureka_load_rs = __collect_capabilities(_migrated_eureka_data_fn)
+
+    hash_role_analysis_result = EurekaHashRoleAnalyzer(eureka_load_rs).get_result()
+    hash_role_xlsx_analysis_result = EurekaReportProvider(hash_role_analysis_result).generate()
+    xlsx_analysis_result_fn = f"{hash_roles_analysis_result_fn}-{strategy_name}"
+    storage_service.save_object(xlsx_analysis_result_fn, xlsx_ext, hash_role_xlsx_analysis_result)
+
+    cleanup_records = HashRoleCleanupRecord.get_records_from_analysis_result(hash_role_analysis_result)
+    cleanup_records_dicts = [x.model_dump(by_alias=True) for x in cleanup_records]
+    _hash_roles_cleanup_data_fn = f"{hash_roles_cleanup_data_fn}-{strategy_name}"
+    storage_service.save_object(_hash_roles_cleanup_data_fn, json_gz_ext, cleanup_records_dicts)
+    _log.info("Hash-Roles analysis is finished for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
+
+
+@cli.command("cleanup-hash-roles")
+def clean_hash_roles():
+    start_time = datetime.now()
+    migration_strategy = Env().get_migration_strategy()
+    strategy_name = migration_strategy.get_name()
+    _log.info("Cleaning hash roles for strategy: %s ...", strategy_name)
+
+    storage_service = TenantStorageService()
+    _hash_roles_cleanup_data_fn = f"{hash_roles_cleanup_data_fn}-{strategy_name}"
+    hash_role_raw_cleanup_records = storage_service.require_object(_hash_roles_cleanup_data_fn, json_gz_ext)
+    hash_role_cleanup_records = [HashRoleCleanupRecord(**x) for x in hash_role_raw_cleanup_records]
+    cleanup_service = EurekaCleanupService(hash_role_cleanup_records)
+    hash_role_cleanup_report = cleanup_service.perform_cleanup()
+
+    result_fn = f"{hash_roles_cleanup_report_fn}-{strategy_name}"
+    storage_service.save_object(result_fn, json_gz_ext, hash_role_cleanup_report.model_dump(by_alias=True))
+    _log.info("Hash-Roles cleanup is finished for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
+
+
+@cli.command("generate-cleanup-report")
+def generate_cleanup_report():
+    start_time = datetime.now()
+    _log.info("Generating cleanup report...")
+    strategy_name = Env().get_migration_strategy().get_name()
+    storage_service = TenantStorageService()
+    cleanup_report_fn = f"{hash_roles_cleanup_report_fn}-{strategy_name}"
+    raw_cleanup_report = storage_service.require_object(cleanup_report_fn, json_gz_ext)
+    cleanup_report = HashRolesCleanupReport(**raw_cleanup_report)
+    migration_xlsx_report = CleanupProcessReportProvider(cleanup_report).generate()
+    storage_service.save_object(cleanup_report_fn, xlsx_ext, migration_xlsx_report)
+    _log.info("Cleanup report is generated for strategy: %s (%s)", strategy_name, _get_time_taken(start_time))
 
 
 @cli.command("download-json")
@@ -85,16 +195,58 @@ def run_eureka_migration():
 @click.argument("out_file", type=str)
 def download_json(source_file, out_file):
     storage_service = TenantStorageService()
-    analysis_result_dict = storage_service.get_ref_object_by_key(source_file)
+    analysis_result_dict = storage_service.find_object_by_key(source_file)
     if analysis_result_dict is None:
         raise FileNotFoundError(f"File not found: {source_file}")
     with open(out_file, "w") as f:
         json.dump(analysis_result_dict, f, indent=2)
 
 
+@cli.command("explain-permissions")
+@click.option("--name", "-n", type=str, default=None, help="Name of the permission to explain")
+@click.option("--file", "-f", type=str, default=None, help="File containing permission names to explain")
+def explain_permissions(name, file):
+    if not name and not file:
+        raise click.UsageError("Either --name or --file must be provided")
+    """Explain a permission by its name."""
+    _log.info("Explaining permission: %s", name)
+    storage_service = TenantStorageService()
+    okapi_load_result_dict = storage_service.require_object(okapi_permissions_fn, json_gz_ext)
+    okapi_load_result = OkapiLoadResult(**okapi_load_result_dict)
+    pd_service = PermissionDetailsService(okapi_load_result)
+    if name:
+        _log.info("Explaining permissions by file name: %s", file)
+        pd_service.print_explained_permission_set(name)
+        return
+
+    if file:
+        _log.info("Loading permission names from file: %s", file)
+        with open(file, "r") as f:
+            for line in f:
+                pd_service.print_explained_permission_set(line)
+        return
+
+
+def __collect_capabilities(result_fn: str) -> EurekaLoadResult:
+    storage_service = TenantStorageService()
+    capability_load_result = CapabilitiesLoader().load_capabilities()
+    storage_service.save_object(result_fn, json_gz_ext, capability_load_result)
+    return EurekaLoadResult(**capability_load_result)
+
+
+def _get_time_taken(start_time):
+    end_time = datetime.now()
+    delta = end_time - start_time
+    hours, remainder = divmod(delta.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours}h{minutes}m{seconds}s"
+
+
 if __name__ == "__main__":
     try:
         cli()
     except Exception as e:
-        _log.error(e, exc_info=True)
-        _log.error("Command execution finished with error: %s", e)
+        if Env().get_bool_cached("LOG_ERROR_STACKTRACE", False):
+            _log.error(e, exc_info=True)
+        else:
+            _log.error(e)

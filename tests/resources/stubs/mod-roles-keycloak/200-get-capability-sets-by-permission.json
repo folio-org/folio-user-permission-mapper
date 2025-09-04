@@ -1,0 +1,49 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/capability-sets",
+    "queryParameters": {
+      "query": {
+        "equalTo": "permission==(\"test-module.item.all\" or \"test-module.item.get\")"
+      },
+      "limit": {
+        "equalTo": "500"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "capabilitySets": [
+        {
+          "id": "674c45d2-786b-4ff7-aab1-61ba89b566f5",
+          "name": "test-module.item.all",
+          "description": "Test-Module Item Manage",
+          "resource": "Test-Module Item",
+          "action": "manage",
+          "applicationId": "app-platform-test-1.0.0",
+          "moduleId": "test-module-1.0.0",
+          "type": "data",
+          "permission": "test-module.item.all",
+          "capabilities": [
+            "004d6015-b98b-46ea-8645-87fdd1cbe0ad"
+          ],
+          "metadata": {
+            "createdDate": "2025-07-30T15:16:28.633+00:00",
+            "updatedDate": "2025-09-02T13:11:59.676+00:00"
+          }
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}

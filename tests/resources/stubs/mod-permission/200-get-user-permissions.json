@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/perms/users",
+    "queryParameters": {
+      "query": {
+        "equalTo": "id==(\"141ec4f8-57a9-4a05-a1c6-60ff1fab4762\")"
+      },
+      "limit": {
+        "equalTo": "500"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "permissionUsers": [
+        {
+          "id": "141ec4f8-57a9-4a05-a1c6-60ff1fab4762",
+          "userId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
+          "permissions": [ "user.entity.view", "perms.users.item.put" ]
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}

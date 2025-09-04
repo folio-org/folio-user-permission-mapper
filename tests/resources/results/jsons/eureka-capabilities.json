@@ -1,0 +1,241 @@
+{
+  "roles": [
+    {
+      "id": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+      "name": "99ebdbd711b0e1854a6c2e93f759efc2af291fd0",
+      "description": "System generated role",
+      "metadata": {
+        "createdDate": "2024-06-10T12:00:00Z",
+        "createdByUserId": "6c26853a-4b0f-4732-b725-83111b13d364",
+        "updatedDate": "2024-06-10T12:00:00Z",
+        "updatedByUserId": "6c26853a-4b0f-4732-b725-83111b13d364"
+      }
+    },
+    {
+      "id": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "name": "Test Permission View (User-Defined)",
+      "description": "View test resources",
+      "metadata": {
+        "createdDate": "2024-06-10T12:00:00Z",
+        "createdByUserId": "6c26853a-4b0f-4732-b725-83111b13d364",
+        "updatedDate": "2024-06-10T12:00:00Z",
+        "updatedByUserId": "6c26853a-4b0f-4732-b725-83111b13d364"
+      }
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "62381a70-5286-42a3-980c-ac3ac8478440",
+      "name": "users_collection.view",
+      "description": "Get a collection of user records",
+      "resource": "Users Collection",
+      "action": "view",
+      "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+      "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+      "permission": "users.collection.get",
+      "endpoints": [
+        {
+          "path": "/users",
+          "method": "GET"
+        }
+      ],
+      "dummyCapability": false,
+      "type": "data",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.844+00:00",
+        "updatedDate": "2025-07-25T11:46:02.844+00:00"
+      },
+      "visible": false
+    },
+    {
+      "id": "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
+      "name": "users_item.view",
+      "description": "Read an individual record in the User module",
+      "resource": "Users Item",
+      "action": "view",
+      "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+      "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+      "permission": "users.item.get",
+      "endpoints": [
+        {
+          "path": "/users/{id}",
+          "method": "GET"
+        }
+      ],
+      "dummyCapability": false,
+      "type": "data",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      },
+      "visible": false
+    },
+    {
+      "id": "26ea4a24-4f03-457e-9a37-b9456dcd808e",
+      "name": "users_item.create",
+      "description": "Create new records in the User module",
+      "resource": "Users Item",
+      "action": "create",
+      "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+      "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+      "permission": "users.item.post",
+      "endpoints": [
+        {
+          "path": "/users",
+          "method": "POST"
+        }
+      ],
+      "dummyCapability": false,
+      "type": "data",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      },
+      "visible": false
+    },
+    {
+      "id": "18eeded7-955b-4cec-871b-a3c39ac08328",
+      "name": "users_item.settings.view",
+      "description": "Viw user settings in the User module",
+      "resource": "Users Item Settings",
+      "action": "view",
+      "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+      "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+      "permission": "users.item.settings.get",
+      "endpoints": [
+        {
+          "path": "/users/{id}/settings",
+          "method": "POST"
+        }
+      ],
+      "dummyCapability": false,
+      "type": "settings",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      },
+      "visible": false
+    }
+  ],
+  "capabilitySets": [
+    {
+      "id": "4afb0a1d-72bc-49e0-bb76-aa11188f1585",
+      "name": "users.manage",
+      "description": "All permissions for the mod-users module",
+      "resource": "Users",
+      "action": "manage",
+      "applicationId": "app-platform-minimal-1.0.0",
+      "moduleId": "mod-users-1.0.0",
+      "type": "data",
+      "permission": "users.all",
+      "capabilities": [
+        "62381a70-5286-42a3-980c-ac3ac8478440",
+        "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
+        "26ea4a24-4f03-457e-9a37-b9456dcd808e"
+      ],
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.995+00:00",
+        "updatedDate": "2025-07-25T11:46:02.995+00:00"
+      },
+      "visible": false
+    }
+  ],
+  "roleUsers": [
+    {
+      "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+      "userId": "3ea9ea32-45e7-4143-b221-a611aea29b50",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.995+00:00",
+        "updatedDate": "2025-07-25T11:46:02.995+00:00"
+      }
+    },
+    {
+      "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "userId": "3ea9ea32-45e7-4143-b221-a611aea29b50",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.995+00:00",
+        "updatedDate": "2025-07-25T11:46:02.995+00:00"
+      }
+    }
+  ],
+  "roleCapabilities": [
+    {
+      "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+      "capabilityId": "62381a70-5286-42a3-980c-ac3ac8478440",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
+    },
+    {
+      "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+      "capabilityId": "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
+    },
+    {
+      "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+      "capabilityId": "26ea4a24-4f03-457e-9a37-b9456dcd808e",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
+    },
+    {
+      "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+      "capabilityId": "18eeded7-955b-4cec-871b-a3c39ac08328",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
+    },
+    {
+      "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "capabilityId": "62381a70-5286-42a3-980c-ac3ac8478440",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
+    },
+    {
+      "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "capabilityId": "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
+    }
+  ],
+  "userCapabilities": [
+    {
+      "userId": "36f2ca6b-7e15-4b1b-be07-07e403a3d385",
+      "capabilityId": "26ea4a24-4f03-457e-9a37-b9456dcd808e"
+    }
+  ],
+  "roleCapabilitySets": [
+    {
+      "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+      "capabilitySetId": "4afb0a1d-72bc-49e0-bb76-aa11188f1585",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
+    },
+    {
+      "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "capabilitySetId": "4afb0a1d-72bc-49e0-bb76-aa11188f1585",
+      "metadata": {
+        "createdDate": "2025-07-25T11:46:02.845+00:00",
+        "updatedDate": "2025-07-25T11:46:02.845+00:00"
+      }
+    }
+  ],
+  "userCapabilitySets": [
+    {
+      "userId": "36f2ca6b-7e15-4b1b-be07-07e403a3d385",
+      "capabilitySetId": "4afb0a1d-72bc-49e0-bb76-aa11188f1585"
+    }
+  ]
+}

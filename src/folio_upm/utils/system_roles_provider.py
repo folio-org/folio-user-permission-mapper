@@ -1,6 +1,6 @@
 from typing import Optional
 
-from folio_upm.dto.cls_support import SingletonMeta
+from folio_upm.model.cls_support import SingletonMeta
 from folio_upm.utils import log_factory
 from folio_upm.utils.upm_env import Env
 
@@ -12,17 +12,16 @@ class SystemRolesProvider(metaclass=SingletonMeta):
         self._log.debug("Initializing SystemGeneratedRolesProvider")
         self._system_roles_dict = self.__get_system_roles_mappings()
 
-    def has_system_generated_ps(self, permission_set: str) -> bool:
-        return permission_set in self._system_roles_dict
-
-    def get_eureka_role_name(self, role_name: str) -> Optional[str]:
-        return self._system_roles_dict.get(role_name)
+    def find_system_generated_role_name(self, permission_set: str) -> Optional[str]:
+        if permission_set in self._system_roles_dict:
+            return self._system_roles_dict[permission_set]
+        return None
 
     def print_system_roles(self):
         self._log.debug("Defined system-generated roles: %s", self._system_roles_dict)
 
     def __get_system_roles_mappings(self):
-        system_generated_roles = Env().get_env("SYSTEM_GENERATED_PERM_MAPPINGS")
+        system_generated_roles = Env().getenv_cached("SYSTEM_GENERATED_PERM_MAPPINGS")
         if not system_generated_roles:
             self._log.warning("No system-generated roles found in environment variables.")
             return dict[str, str]()

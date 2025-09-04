@@ -1,0 +1,30 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/capability-sets",
+    "queryParameters": {
+      "query": {
+        "equalTo": "name==(\"user-capabilities_collection.execute\")"
+      },
+      "limit": {
+        "equalTo": "500"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "capabilitySets": [],
+      "totalRecords": 0
+    }
+  }
+}

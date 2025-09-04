@@ -1,33 +1,31 @@
-from typing import List, Optional, override
+from typing import List, override
 
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
-from folio_upm.dto.permission_type import INVALID, MUTABLE, PermissionType
-from folio_upm.dto.results import AnalyzedUserPermissionSet
+from folio_upm.model.analysis.analyzed_user_permission_setresults import AnalyzedUserPermissionSet
+from folio_upm.model.types.permission_type import INVALID, MUTABLE, PermissionType
 from folio_upm.xlsx import ws_constants
 from folio_upm.xlsx.abstract_ws import AbstractWorksheet, Column
+from folio_upm.xlsx.ws_constants import desc_long_cw, role_name_cw, type_cw, uuid_cw
 
 
-class UserPermissionSetsWorksheet(AbstractWorksheet):
-    _title = "User-PS"
+class UserPermissionSetsWorksheet(AbstractWorksheet[AnalyzedUserPermissionSet]):
+
     _columns = [
-        Column[AnalyzedUserPermissionSet](w=40, n="User Id", f=lambda x: x.userId),
-        Column[AnalyzedUserPermissionSet](w=80, n="PS", f=lambda x: x.permissionName),
-        Column[AnalyzedUserPermissionSet](w=80, n="PS Name", f=lambda x: x.displayName),
-        Column[AnalyzedUserPermissionSet](w=25, n="PS Type", f=lambda x: x.get_permission_type_name()),
+        Column[AnalyzedUserPermissionSet](w=uuid_cw, n="User Id", f=lambda x: x.userId),
+        Column[AnalyzedUserPermissionSet](w=role_name_cw, n="PS", f=lambda x: x.permissionName),
+        Column[AnalyzedUserPermissionSet](w=desc_long_cw, n="PS Name", f=lambda x: x.displayName),
+        Column[AnalyzedUserPermissionSet](w=type_cw, n="PS Type", f=lambda x: x.get_permission_type_name()),
     ]
 
     def __init__(self, ws: Worksheet, data: List[AnalyzedUserPermissionSet]):
-        super().__init__(ws, self._title, data, self._columns)
+        _title = "User-PS"
+        super().__init__(ws, _title, data, self._columns)
         self._yellow_types = ["deprecated", "questionable", "unprocessed"]
 
     @override
-    def _get_iterable_data(self):
-        return self._data
-
-    @override
-    def _get_row_fill_color(self, value: AnalyzedUserPermissionSet) -> Optional[PatternFill]:
+    def _get_row_fill_color(self, value: AnalyzedUserPermissionSet) -> PatternFill:
         ps_type = PermissionType.from_string(value.permissionType)
         if ps_type == INVALID:
             return ws_constants.light_red_fill

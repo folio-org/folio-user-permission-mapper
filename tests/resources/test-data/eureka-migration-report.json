@@ -1,0 +1,47 @@
+{
+  "roles": [
+    {
+      "status": "success",
+      "srcEntityName": "role",
+      "srcEntityId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "srcEntityDisplayName": "Test Permission View (User-Defined)",
+      "reason": "Role created successfully"
+    }
+  ],
+  "roleUsers": [
+    {
+      "status": "success",
+      "srcEntityName": "user",
+      "srcEntityId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
+      "tarEntityName": "role",
+      "tarEntityId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "tarEntityDisplayName": "Test Permission View (User-Defined)"
+    }
+  ],
+  "roleCapabilities": [
+    {
+      "status": "success",
+      "srcEntityName": "role",
+      "srcEntityId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "srcEntityDisplayName": "Test Permission View (User-Defined)",
+      "tarEntityName": "capability",
+      "tarEntityId": "004d6015-b98b-46ea-8645-87fdd1cbe0ad"
+    },
+    {
+      "status": "success",
+      "srcEntityName": "role",
+      "srcEntityId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "srcEntityDisplayName": "Test Permission View (User-Defined)",
+      "tarEntityName": "capability",
+      "tarEntityId": "8137af1b-7ca3-44f1-a58a-63748f1b293b"
+    },
+    {
+      "status": "success",
+      "srcEntityName": "role",
+      "srcEntityId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+      "srcEntityDisplayName": "Test Permission View (User-Defined)",
+      "tarEntityName": "capability-set",
+      "tarEntityId": "674c45d2-786b-4ff7-aab1-61ba89b566f5"
+    }
+  ]
+}

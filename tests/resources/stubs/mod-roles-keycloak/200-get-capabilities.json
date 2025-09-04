@@ -1,0 +1,120 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/capabilities",
+    "queryParameters": {
+      "query": {
+        "equalTo": "cql.allRecords=1"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "capabilities": [
+        {
+          "id": "62381a70-5286-42a3-980c-ac3ac8478440",
+          "name": "users_collection.view",
+          "description": "Get a collection of user records",
+          "resource": "Users Collection",
+          "action": "view",
+          "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+          "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+          "permission": "users.collection.get",
+          "endpoints": [
+            {
+              "path": "/users",
+              "method": "GET"
+            }
+          ],
+          "dummyCapability": false,
+          "type": "data",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.844+00:00",
+            "updatedDate": "2025-07-25T11:46:02.844+00:00"
+          },
+          "visible": false
+        },
+        {
+          "id": "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
+          "name": "users_item.view",
+          "description": "Read an individual record in the User module",
+          "resource": "Users Item",
+          "action": "view",
+          "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+          "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+          "permission": "users.item.get",
+          "endpoints": [
+            {
+              "path": "/users/{id}",
+              "method": "GET"
+            }
+          ],
+          "dummyCapability": false,
+          "type": "data",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          },
+          "visible": false
+        },
+        {
+          "id": "26ea4a24-4f03-457e-9a37-b9456dcd808e",
+          "name": "users_item.create",
+          "description": "Create new records in the User module",
+          "resource": "Users Item",
+          "action": "create",
+          "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+          "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+          "permission": "users.item.post",
+          "endpoints": [
+            {
+              "path": "/users",
+              "method": "POST"
+            }
+          ],
+          "dummyCapability": false,
+          "type": "data",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          },
+          "visible": false
+        },
+        {
+          "id": "18eeded7-955b-4cec-871b-a3c39ac08328",
+          "name": "users_item.settings.view",
+          "description": "Viw user settings in the User module",
+          "resource": "Users Item Settings",
+          "action": "view",
+          "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+          "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+          "permission": "users.item.settings.get",
+          "endpoints": [
+            {
+              "path": "/users/{id}/settings",
+              "method": "POST"
+            }
+          ],
+          "dummyCapability": false,
+          "type": "settings",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          },
+          "visible": false
+        }
+      ],
+      "totalRecords": 3
+    }
+  }
+}

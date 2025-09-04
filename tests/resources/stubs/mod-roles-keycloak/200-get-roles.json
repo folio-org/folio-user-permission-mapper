@@ -1,0 +1,50 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/roles",
+    "queryParameters": {
+      "query": {
+        "equalTo": "cql.allRecords=1"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "roles": [
+        {
+          "id": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+          "name": "99ebdbd711b0e1854a6c2e93f759efc2af291fd0",
+          "description": "System generated role",
+          "metadata": {
+            "createdDate": "2024-06-10T12:00:00Z",
+            "createdByUserId": "6c26853a-4b0f-4732-b725-83111b13d364",
+            "updatedDate": "2024-06-10T12:00:00Z",
+            "updatedByUserId": "6c26853a-4b0f-4732-b725-83111b13d364"
+          }
+        },
+        {
+          "id": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+          "name": "Test Permission View (User-Defined)",
+          "description": "View test resources",
+          "metadata": {
+            "createdDate": "2024-06-10T12:00:00Z",
+            "createdByUserId": "6c26853a-4b0f-4732-b725-83111b13d364",
+            "updatedDate": "2024-06-10T12:00:00Z",
+            "updatedByUserId": "6c26853a-4b0f-4732-b725-83111b13d364"
+          }
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}

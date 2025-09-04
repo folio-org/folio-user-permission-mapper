@@ -1,0 +1,54 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/roles/capabilities",
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "equalToJson": {
+          "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+          "capabilityIds": [
+            "004d6015-b98b-46ea-8645-87fdd1cbe0ad",
+            "8137af1b-7ca3-44f1-a58a-63748f1b293b"
+          ]
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "roleCapabilities": [
+        {
+          "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+          "capabilityId": "004d6015-b98b-46ea-8645-87fdd1cbe0ad",
+          "metadata": {
+            "createdDate": "2024-06-10T12:00:00Z",
+            "createdByUserId": "6c26853a-4b0f-4732-b725-83111b13d364",
+            "updatedDate": "2024-06-10T12:00:00Z",
+            "updatedByUserId": "6c26853a-4b0f-4732-b725-83111b13d364"
+          }
+        },
+        {
+          "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+          "capabilityId": "8137af1b-7ca3-44f1-a58a-63748f1b293b",
+          "metadata": {
+            "createdDate": "2024-06-10T12:00:00Z",
+            "createdByUserId": "6c26853a-4b0f-4732-b725-83111b13d364",
+            "updatedDate": "2024-06-10T12:00:00Z",
+            "updatedByUserId": "6c26853a-4b0f-4732-b725-83111b13d364"
+          }
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}

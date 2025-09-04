@@ -1,0 +1,33 @@
+{
+  "scenarioName": "Role Migration",
+  "requiredScenarioState": "Started",
+  "newScenarioState": "Role Created",
+  "request": {
+    "method": "GET",
+    "urlPath": "/roles",
+    "queryParameters": {
+      "query": {
+        "equalTo": "name==(\"Test Permission View (User-Defined)\")"
+      },
+      "limit": {
+        "equalTo": "500"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "roles": [],
+      "totalRecords": 0
+    }
+  }
+}

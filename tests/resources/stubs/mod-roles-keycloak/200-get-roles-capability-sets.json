@@ -1,0 +1,44 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/roles/capability-sets",
+    "queryParameters": {
+      "query": {
+        "equalTo": "cql.allRecords=1"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "roleCapabilitySets": [
+        {
+          "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+          "capabilitySetId": "4afb0a1d-72bc-49e0-bb76-aa11188f1585",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          }
+        },
+        {
+          "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+          "capabilitySetId": "4afb0a1d-72bc-49e0-bb76-aa11188f1585",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          }
+        }
+      ],
+      "totalRecords": 2
+    }
+  }
+}

@@ -21,7 +21,7 @@ class HttpClient:
         response = requests.get(url, params=params, headers=headers, timeout=self._timeout)
 
         if response.status_code == 404 and handle_404:
-            self._log.warn(f"Status if 404 for request: GET {path}")
+            self._log.warning(f"Status if 404 for request: GET {path}")
             return None
 
         response.raise_for_status()
@@ -38,6 +38,25 @@ class HttpClient:
         )
         response.raise_for_status()
         return response.json()
+
+    def put_json(self, path, request_body: Any, params: dict | None = None) -> None:
+        body_json_str = JsonUtils.to_json(request_body)
+        response = requests.put(
+            self.__prepare_url(path),
+            params=params,
+            data=body_json_str,
+            headers=self.__get_headers(),
+            timeout=self._timeout,
+        )
+        response.raise_for_status()
+
+    def delete(self, path: str) -> None:
+        response = requests.delete(
+            self.__prepare_url(path),
+            headers=self.__get_headers(),
+            timeout=self._timeout,
+        )
+        response.raise_for_status()
 
     def __prepare_url(self, path: str) -> str:
         _path = path
