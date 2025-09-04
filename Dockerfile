@@ -15,4 +15,4 @@ COPY --from=builder /build/dist/*.whl /app/
 
 # Install the wheel without cache
 RUN pip install --no-cache-dir /app/*.whl && rm /app/*.whl
-CMD ["folio-permission-migration-cli"]
+ENTRYPOINT ["folio-permission-migration-cli"]
