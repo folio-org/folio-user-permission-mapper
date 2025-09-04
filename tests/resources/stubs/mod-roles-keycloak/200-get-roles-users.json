@@ -22,6 +22,14 @@
     "jsonBody": {
       "userRoles": [
         {
+          "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+          "userId": "3ea9ea32-45e7-4143-b221-a611aea29b50",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.995+00:00",
+            "updatedDate": "2025-07-25T11:46:02.995+00:00"
+          }
+        },
+        {
           "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
           "userId": "3ea9ea32-45e7-4143-b221-a611aea29b50",
           "metadata": {

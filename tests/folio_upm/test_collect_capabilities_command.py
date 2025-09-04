@@ -55,6 +55,7 @@ class TestCollectCapabilitiesCommand(BaseTest):
         self,
         capsys: CaptureFixture,
         test_tenant_env,
+        wiremock_container,
         s3_environment,
         eureka_wiremock_env,
         eureka_login_http_mock,

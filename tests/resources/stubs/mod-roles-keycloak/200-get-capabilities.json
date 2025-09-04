@@ -89,6 +89,29 @@
             "updatedDate": "2025-07-25T11:46:02.845+00:00"
           },
           "visible": false
+        },
+        {
+          "id": "18eeded7-955b-4cec-871b-a3c39ac08328",
+          "name": "users_item.settings.view",
+          "description": "Viw user settings in the User module",
+          "resource": "Users Item Settings",
+          "action": "view",
+          "applicationId": "app-platform-minimal-1.0.0-SNAPSHOT.5312",
+          "moduleId": "mod-users-19.6.0-SNAPSHOT.360",
+          "permission": "users.item.settings.get",
+          "endpoints": [
+            {
+              "path": "/users/{id}/settings",
+              "method": "POST"
+            }
+          ],
+          "dummyCapability": false,
+          "type": "settings",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          },
+          "visible": false
         }
       ],
       "totalRecords": 3

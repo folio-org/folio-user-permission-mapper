@@ -1,0 +1,13 @@
+[
+  {
+    "role": {
+      "id": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+      "name": "99ebdbd711b0e1854a6c2e93f759efc2af291fd0",
+      "description": "System generated role"
+    },
+    "capabilities": [
+      "18eeded7-955b-4cec-871b-a3c39ac08328"
+    ],
+    "capabilitySets": [ ]
+  }
+]

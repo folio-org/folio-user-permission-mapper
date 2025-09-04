@@ -1,0 +1,31 @@
+{
+  "request": {
+    "method": "PUT",
+    "urlPathTemplate": "/roles/{roleId}/capabilities",
+    "pathParameters": {
+      "roleId": {
+        "equalTo": "5ce27ef2-eda6-4303-b961-b88f23a1785f"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "equalToJson": {
+          "capabilityIds": [ "18eeded7-955b-4cec-871b-a3c39ac08328" ]
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 204,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "body": ""
+  }
+}

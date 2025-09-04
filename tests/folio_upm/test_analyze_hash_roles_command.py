@@ -1,5 +1,4 @@
 import os
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Generator
 
@@ -7,7 +6,6 @@ import pytest
 from _pytest.capture import CaptureFixture
 from assert_utils import Assert  # type: ignore[import-error]
 from click.testing import CliRunner
-from minio_test_helper import MinioTestHelper  # type: ignore[import-error]
 from wiremock.resources.mappings import Mapping
 from wiremock_test_helper import WireMockTestHelper  # type: ignore[import-error]
 
@@ -20,59 +18,69 @@ _tenant_id = "okapi_test"
 
 class BaseTest:
 
-    @pytest.fixture(scope="function", autouse=False)
-    def okapi_permissions_s3_object(self, minio_client, test_s3_bucket) -> Generator[str, None, None]:
-        file_path = Path("../resources/results/jsons/okapi-permissions.json")
-        okapi_capabilities = JsonUtils().read_string_safe(Path(os.path.dirname(__file__)) / file_path)
-        fk = f"{_tenant_id}/{_tenant_id}-okapi-permissions-{datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S%f")}.json.gz"
-        yield from MinioTestHelper.put_jsongz_object(minio_client, test_s3_bucket, fk, okapi_capabilities)
+    @pytest.fixture(scope="function")
+    def eureka_roles_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-get-roles.json")
 
-    @pytest.fixture(scope="function", autouse=False)
-    def eureka_capabilities_s3_object(self) -> Generator[Mapping, None, None]:
-        yield from WireMockTestHelper.set_mapping("mod-login/okapi-login-success.json")
+    @pytest.fixture(scope="function")
+    def eureka_capabilities_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-get-capabilities.json")
 
-    @pytest.fixture(autouse=True, scope="function")
-    def setup_environment(self, minio_container, minio_client, test_s3_bucket):
-        """Setup environment variables and clean up before each test."""
-        minio_config = minio_container.get_config()
+    @pytest.fixture(scope="function")
+    def eureka_capability_sets_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-get-capability-sets.json")
 
-        os.environ["TENANT_ID"] = _tenant_id
-        os.environ["STORAGE_TYPE"] = "s3"
-        os.environ["AWS_S3_ENDPOINT"] = f"http://{minio_config.get("endpoint")}"
-        os.environ["AWS_S3_BUCKET"] = test_s3_bucket
-        os.environ["AWS_S3_REGION"] = "us-east-1"
-        os.environ["AWS_S3_REGION"] = "us-east-1"
-        os.environ["AWS_ACCESS_KEY_ID"] = minio_config.get("access_key")
-        os.environ["AWS_SECRET_ACCESS_KEY"] = minio_config.get("secret_key")
+    @pytest.fixture(scope="function")
+    def eureka_roles_users_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-get-roles-users.json")
 
-        yield
-        env_vars_to_clean = [
-            "TENANT_ID",
-            "STORAGE_TYPE",
-            "AWS_S3_ENDPOINT",
-            "AWS_S3_BUCKET",
-            "AWS_S3_REGION",
-            "AWS_ACCESS_KEY_ID",
-            "AWS_SECRET_ACCESS_KEY",
-        ]
+    @pytest.fixture(scope="function")
+    def eureka_role_capabilities_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-get-roles-capabilities.json")
 
-        for var in env_vars_to_clean:
-            if var in os.environ:
-                del os.environ[var]
+    @pytest.fixture(scope="function")
+    def eureka_role_capability_sets_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-get-roles-capability-sets.json")
+
+    @pytest.fixture(scope="function")
+    def eureka_users_capabilities_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-get-users-capabilities.json")
+
+    @pytest.fixture(scope="function")
+    def eureka_users_capability_sets_http_mock(self) -> Generator[Mapping, None, None]:
+        yield from WireMockTestHelper.set_mapping("mod-roles-keycloak/200-get-users-capability-sets.json")
 
 
 class TestAnalyzeHashRolesCommand(BaseTest):
 
-    def test_analyze_hash_roles(self, capsys: CaptureFixture):
+    def test_analyze_hash_roles(
+        self,
+        capsys: CaptureFixture,
+        test_tenant_env,
+        s3_environment,
+        eureka_wiremock_env,
+        eureka_login_http_mock,
+        eureka_capabilities_http_mock,
+        eureka_capability_sets_http_mock,
+        eureka_roles_http_mock,
+        eureka_roles_users_http_mock,
+        eureka_role_capabilities_http_mock,
+        eureka_role_capability_sets_http_mock,
+        eureka_users_capabilities_http_mock,
+        eureka_users_capability_sets_http_mock,
+    ):
         runner = CliRunner()
         with capsys.disabled() as _:
             result = runner.invoke(cli, ["analyze-hash-roles"], color=True)
-            assert result.exit_code == 0
             if result.exception:
                 print(f"CLI failed as expected: {result.exception}")
+            assert result.exit_code == 0
 
-            result_object = S3TenantStorage().find_object("okapi-permissions", "json.gz")
-            file_path = Path("../resources/results/jsons/okapi-permissions.json")
+            result_object = S3TenantStorage().find_object("hash-roles-cleanup-data-distributed", "json.gz")
+            file_path = Path("../resources/results/jsons/hash-roles-cleanup-data.json")
             expected_fp = Path(os.path.dirname(__file__)) / file_path
             expected_object = JsonUtils().read_string_safe(expected_fp)
             Assert.compare_json_str(result_object, expected_object)
+
+            result_object = S3TenantStorage().find_object("hash-roles-analysis-result-distributed", "xlsx")
+            assert result_object is not None

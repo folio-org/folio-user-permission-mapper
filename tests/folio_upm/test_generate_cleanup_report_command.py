@@ -5,7 +5,6 @@ from typing import Generator
 
 import pytest
 from _pytest.capture import CaptureFixture
-from assert_utils import Assert  # type: ignore[import-error]
 from click.testing import CliRunner
 from minio_test_helper import MinioTestHelper  # type: ignore[import-error]
 
@@ -17,21 +16,22 @@ from folio_upm.utils.json_utils import JsonUtils
 class BaseTest:
 
     @pytest.fixture(scope="function")
-    def migration_report_s3_object(self, minio_client, test_tenant_id, test_s3_bucket) -> Generator[str, None, None]:
+    def cleanup_report_s3_object(self, minio_client, test_tenant_id, test_s3_bucket) -> Generator[str, None, None]:
         file_path = Path("../resources/test-data/eureka-cleanup-report.json")
         migration_data = JsonUtils().read_string_safe(Path(os.path.dirname(__file__)) / file_path)
         curr_datetime = datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S%f")
-        object_name = f"{test_tenant_id}/{test_tenant_id}-eureka-migration-report-distributed-{curr_datetime}.json.gz"
+        object_name = f"{test_tenant_id}/{test_tenant_id}-hash-roles-cleanup-report-distributed-{curr_datetime}.json.gz"
         yield from MinioTestHelper.put_jsongz_object(minio_client, test_s3_bucket, object_name, migration_data)
 
 
-class TestGenerateCleanupReportCommand:
+class TestGenerateCleanupReportCommand(BaseTest):
 
     def test_generate_cleanup_report(
         self,
         capsys: CaptureFixture,
         test_tenant_env,
         s3_environment,
+        cleanup_report_s3_object,
     ):
         runner = CliRunner()
         with capsys.disabled() as _:
@@ -40,8 +40,5 @@ class TestGenerateCleanupReportCommand:
             if result.exception:
                 print(f"CLI failed as expected: {result.exception}")
 
-            result_object = S3TenantStorage().find_object("generate-report", "json.gz")
-            file_path = Path("../resources/results/jsons/okapi-permissions.json")
-            expected_fp = Path(os.path.dirname(__file__)) / file_path
-            expected_object = JsonUtils().read_string_safe(expected_fp)
-            Assert.compare_json_str(result_object, expected_object)
+            result_object = S3TenantStorage().find_object("hash-roles-cleanup-report-distributed", "xlsx")
+            assert result_object is not None

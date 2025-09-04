@@ -51,14 +51,22 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
     def update_role_capabilities(self, cleanup_records: List[HashRoleCleanupRecord]) -> List[HttpRequestResult]:
         cleanup_result = list[HttpRequestResult]()
         total_records = len(cleanup_records)
-        records_counter = 1
-        self._log.info("Total cleanup records: %s", total_records)
+        self._log.info("Number of cleanup records: %s", total_records)
+
+        record_counter = 0
+        for hr in cleanup_records:
+            cleanup_result += self._rcs_service.update(hr.role, hr.capabilitySets)
+            record_counter += 1
+            self._log.info("Role-capability-sets processed: %s/%s", record_counter, total_records)
+        self._log.info("Role-capability-sets updated: %s", record_counter)
+
+        record_counter = 0
         for hr in cleanup_records:
             cleanup_result += self._rc_service.update(hr.role, hr.capabilities)
-            cleanup_result += self._rcs_service.update(hr.role, hr.capabilitySets)
-            self._log.info("Role cleanup processed: %s/%s", records_counter, total_records)
-            records_counter += 1
-        self._log.info("Role capabilities updated: %s", records_counter)
+            record_counter += 1
+            self._log.info("Role-capabilities processed: %s/%s", record_counter, total_records)
+        self._log.info("Role-capabilities updated: %s", record_counter)
+
         return cleanup_result
 
     def __find_role_entities(

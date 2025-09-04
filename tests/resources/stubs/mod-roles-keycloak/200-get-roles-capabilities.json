@@ -22,6 +22,38 @@
     "jsonBody": {
       "roleCapabilities": [
         {
+          "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+          "capabilityId": "62381a70-5286-42a3-980c-ac3ac8478440",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          }
+        },
+        {
+          "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+          "capabilityId": "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          }
+        },
+        {
+          "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+          "capabilityId": "26ea4a24-4f03-457e-9a37-b9456dcd808e",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          }
+        },
+        {
+          "roleId": "5ce27ef2-eda6-4303-b961-b88f23a1785f",
+          "capabilityId": "18eeded7-955b-4cec-871b-a3c39ac08328",
+          "metadata": {
+            "createdDate": "2025-07-25T11:46:02.845+00:00",
+            "updatedDate": "2025-07-25T11:46:02.845+00:00"
+          }
+        },
+        {
           "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
           "capabilityId": "62381a70-5286-42a3-980c-ac3ac8478440",
           "metadata": {
@@ -32,14 +64,6 @@
         {
           "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
           "capabilityId": "8e049d8d-8f9c-4ac8-8653-7d96d418a1a7",
-          "metadata": {
-            "createdDate": "2025-07-25T11:46:02.845+00:00",
-            "updatedDate": "2025-07-25T11:46:02.845+00:00"
-          }
-        },
-        {
-          "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
-          "capabilityId": "26ea4a24-4f03-457e-9a37-b9456dcd808e",
           "metadata": {
             "createdDate": "2025-07-25T11:46:02.845+00:00",
             "updatedDate": "2025-07-25T11:46:02.845+00:00"

@@ -206,6 +206,8 @@ class RoleEntityService(Generic[C_TYPE, RC_TYPE], metaclass=SingletonMeta):
         )
 
     def _create_success_update_results(self, role: Role, entity_ids: List[str]) -> List[HttpRequestResult]:
+        if not entity_ids:
+            return [self._create_success_update_result(role, "[]")]
         return [self._create_success_update_result(role, entity_id) for entity_id in entity_ids]
 
     def _create_success_update_result(self, role: Role, entity_id: str) -> HttpRequestResult:

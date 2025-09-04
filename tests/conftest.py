@@ -20,14 +20,14 @@ logging.getLogger("boto3").setLevel(logging.WARNING)
 
 
 # noinspection PyProtectedMember
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="class", autouse=True)
 def clear_singletons():
     SingletonMeta._instances.clear()
     yield
     SingletonMeta._instances.clear()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def wiremock_container():
     """Setup WireMock server for testing using testcontainers"""
     container = WireMockTestHelper.get_container()
@@ -36,12 +36,12 @@ def wiremock_container():
         yield wiremock
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def wiremock_url(wiremock_container):
     return wiremock_container.get_url("")
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session", autouse=True)
 def minio_container():
     """Set the base URL for WireMock"""
     with MinioTestHelper.get_container() as minio_container:
@@ -58,7 +58,7 @@ def minio_container():
         yield minio_container
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def minio_client(minio_container):
     yield minio_container.get_client()
 

@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "PUT",
+    "urlPath": "/roles/5ce27ef2-eda6-4303-b961-b88f23a1785f/capability-sets",
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "equalToJson": {
+          "capabilitySetIds": [ ]
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 204,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "body": ""
+  }
+}

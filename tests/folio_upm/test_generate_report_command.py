@@ -47,3 +47,6 @@ class TestGenerateReportCommand(BaseTest):
             expected_fp = Path(os.path.dirname(__file__)) / file_path
             expected_object = JsonUtils().read_string_safe(expected_fp)
             Assert.compare_json_str(result_object, expected_object)
+
+            result_object = S3TenantStorage().find_object("okapi-analysis-result-distributed", "xlsx")
+            assert result_object is not None
