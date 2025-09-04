@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from folio_upm.model.analysis.analyzed_role_capabilities import AnalyzedRoleCapabilities
 from folio_upm.model.analysis.analyzed_user_roles import AnalyzedUserRoles
+from folio_upm.model.eureka.role import Role
 from folio_upm.model.load.eureka_load_result import EurekaLoadResult
 from folio_upm.model.load.okapi_load_result import OkapiLoadResult
 from folio_upm.model.result.eureka_migration_data import EurekaMigrationData
@@ -73,6 +74,16 @@ class LoadResultAnalyzer:
             EurekaMigrationData: Migration-ready data containing roles as a list,
                 user role assignments, and role capability mappings.
         """
+        roles = [
+            Role(name=analyzed_role.role.name, description=analyzed_role.role.description)
+            for analyzed_role in self._result.roles.values()
+            if analyzed_role.role
+        ]
+
+        role_capabilities = [
+            r for r in self._result.roleCapabilities
+        ]
+
         return EurekaMigrationData(
             roles=list(self._result.roles.values()),
             userRoles=self._result.userRoles,

@@ -6,12 +6,18 @@
       "query": {
         "equalTo": "cql.allRecords=1"
       }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
     }
   },
   "response": {
     "status": 200,
     "headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
     },
     "jsonBody": {
       "roleCapabilitySets": [

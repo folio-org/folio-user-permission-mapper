@@ -25,7 +25,7 @@ class BaseTest:
         file_path = Path("../resources/results/jsons/okapi-permissions.json")
         okapi_capabilities = JsonUtils().read_string_safe(Path(os.path.dirname(__file__)) / file_path)
         fk = f"{_tenant_id}/{_tenant_id}-okapi-permissions-{datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S%f")}.json.gz"
-        yield from MinioTestHelper.with_jsongz_object(minio_client, test_s3_bucket, fk, okapi_capabilities)
+        yield from MinioTestHelper.put_jsongz_object(minio_client, test_s3_bucket, fk, okapi_capabilities)
 
     @pytest.fixture(scope="function", autouse=False)
     def eureka_capabilities_s3_object(self) -> Generator[Mapping, None, None]:
@@ -63,7 +63,7 @@ class BaseTest:
 
 class TestAnalyzeHashRolesCommand(BaseTest):
 
-    def test_load_okapi_permissions(self, capsys: CaptureFixture):
+    def test_analyze_hash_roles(self, capsys: CaptureFixture):
         runner = CliRunner()
         with capsys.disabled() as _:
             result = runner.invoke(cli, ["analyze-hash-roles"], color=True)
@@ -72,7 +72,7 @@ class TestAnalyzeHashRolesCommand(BaseTest):
                 print(f"CLI failed as expected: {result.exception}")
 
             result_object = S3TenantStorage().find_object("okapi-permissions", "json.gz")
-            file_path = Path("../resources/results/jsons/expected_okapi_load_result.json")
+            file_path = Path("../resources/results/jsons/okapi-permissions.json")
             expected_fp = Path(os.path.dirname(__file__)) / file_path
             expected_object = JsonUtils().read_string_safe(expected_fp)
             Assert.compare_json_str(result_object, expected_object)

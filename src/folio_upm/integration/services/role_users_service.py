@@ -19,7 +19,7 @@ class RoleUsersService(metaclass=SingletonMeta):
 
     def __init__(self):
         self._log = log_factory.get_logger(self.__class__.__name__)
-        self._log.info("RoleService initialized.")
+        self._log.debug("RoleUsersService initialized.")
         self._client = EurekaClient()
         self._roles_service = RoleService()
         self._role_user_service = UserRolesClient()
@@ -27,13 +27,13 @@ class RoleUsersService(metaclass=SingletonMeta):
     def assign_users(self, analyzed_user_role_records: List[AnalyzedUserRoles]) -> List[HttpRequestResult]:
         migration_result = list[HttpRequestResult]()
         total_user_roles = len(analyzed_user_role_records)
-        self._log.info("Total user roles to assign: %s", total_user_roles)
-        user_roles_counter = 1
+        self._log.info("Total user-roles to assign: %s", total_user_roles)
+        user_roles_counter = 0
         for ur in analyzed_user_role_records:
             migration_result += self.__assign(ur)
-            self._log.info("User roles processed: %s/%s", user_roles_counter, total_user_roles)
             user_roles_counter += 1
-        self._log.info("User roles to assigned: %s", user_roles_counter)
+            self._log.info("User roles processed: %s/%s", user_roles_counter, total_user_roles)
+        self._log.info("User-roles assigned: %s", user_roles_counter)
         return migration_result
 
     def __assign(self, analyzed_user_roles: AnalyzedUserRoles) -> List[HttpRequestResult]:
@@ -57,7 +57,7 @@ class RoleUsersService(metaclass=SingletonMeta):
         role_ids = [r.id for r in found_roles if r if r.id]
         roles_by_ids = self.__collect_roles_by_id(found_roles)
         if unmatched_roles:
-            self._log.warning("Roles not found by name, skipping user assignment %s -> %s", user_id, unmatched_roles)
+            self._log.warning("Roles not found by name, skipping user assignment: %s -> %s", user_id, unmatched_roles)
             return [HttpRequestResult.user_role_not_found_result(user_id, r) for r in unmatched_roles]
         try:
             return self.__assign_role_users(user_id, role_ids, roles_by_ids)

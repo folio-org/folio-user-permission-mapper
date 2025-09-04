@@ -38,7 +38,9 @@ class TenantStorage:
         if object_ext == "json.gz":
             return self._get_json_gz(object_key)
         elif object_ext == "json":
-            return self._find_json(object_key)
+            return self._get_json(object_key)
+        elif object_ext == "xlsx":
+            return self._get_xlsx(object_key)
         else:
             self._log.error("Unsupported object type: %s, file=%s", object_ext, object_name)
             return None
@@ -47,7 +49,7 @@ class TenantStorage:
         if ref_key.endswith("json.gz"):
             return self._get_json_gz(ref_key)
         elif ref_key.endswith("json"):
-            return self._find_json(ref_key)
+            return self._get_json(ref_key)
         else:
             self._log.error("Unsupported object type: %s, file=%s", ref_key, ref_key)
         return None
@@ -55,7 +57,7 @@ class TenantStorage:
     def _find_latest_object_by_name(self, prefix: str, object_ext: str) -> Optional[str]:
         return None
 
-    def _find_json(self, file_key: str):
+    def _get_json(self, file_key: str):
         pass
 
     def _save_json(self, file_key: str, object_data: Any):

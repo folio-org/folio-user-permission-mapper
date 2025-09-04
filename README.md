@@ -269,11 +269,12 @@ The command will do the following actions:
 
 **Environment Variables:**
 
-| Env Variable              | Default Value | Required | Description                                                              |
-|:--------------------------|:--------------|:---------|:-------------------------------------------------------------------------|
-| TENANT_ID                 |               | true     | The tenant ID for the FOLIO environment                                  |
-| EUREKA_ROLE_LOAD_STRATEGY | distributed   | true     | Approach how roles were generated (one of: distributed, consolidated)    |
-
+| Env Variable                   | Default Value | Required | Description                                                                                                                                                    |
+|:-------------------------------|:--------------|:---------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| TENANT_ID                      |               | true     | The tenant ID for the FOLIO environment                                                                                                                        |
+| EUREKA_ROLE_LOAD_STRATEGY      | distributed   | true     | Approach how roles were generated (one of: distributed, consolidated)                                                                                          |
+| SKIP_USERS_WITH_TOO_MANY_ROLES | true          | false    | Defines if a users with too many roles should be skipped                                                                                                       |
+| MAX_JWT_LENGTH                 | 4000          | false    | To validate maximum amount of roles, script tries to generate a keycloak-like JWT token to validate it's length and compare it with current env variable value |
 
 ---
 

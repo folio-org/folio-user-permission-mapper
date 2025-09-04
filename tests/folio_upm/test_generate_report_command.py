@@ -14,46 +14,16 @@ from folio_upm.utils.json_utils import JsonUtils
 from minio_test_helper import MinioTestHelper
 from wiremock_test_helper import WireMockTestHelper  # type: ignore[import-error]
 
-_tenant_id = "okapi_test"
-
 
 class BaseTest:
 
     @pytest.fixture(scope="function", autouse=False)
-    def okapi_permissions_s3_object(self, minio_client, test_s3_bucket) -> Generator[str, None, None]:
+    def okapi_permissions_s3_object(self, minio_client, test_tenant_id, test_s3_bucket) -> Generator[str, None, None]:
         file_path = Path("../resources/test-data/okapi-permissions.json")
         okapi_capabilities = JsonUtils().read_string_safe(Path(os.path.dirname(__file__)) / file_path)
-        fk = f"{_tenant_id}/{_tenant_id}-okapi-permissions-{datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S%f")}.json.gz"
-        yield from MinioTestHelper.with_jsongz_object(minio_client, test_s3_bucket, fk, okapi_capabilities)
-
-    @pytest.fixture(autouse=True, scope="function")
-    def setup_environment(self, minio_container, minio_client, test_s3_bucket):
-        """Setup environment variables and clean up before each test."""
-        minio_config = minio_container.get_config()
-
-        os.environ["TENANT_ID"] = "okapi_test"
-        os.environ["STORAGE_TYPE"] = "s3"
-        os.environ["AWS_S3_ENDPOINT"] = f"http://{minio_config.get("endpoint")}"
-        os.environ["AWS_S3_BUCKET"] = test_s3_bucket
-        os.environ["AWS_S3_REGION"] = "us-east-1"
-        os.environ["AWS_S3_REGION"] = "us-east-1"
-        os.environ["AWS_ACCESS_KEY_ID"] = minio_config.get("access_key")
-        os.environ["AWS_SECRET_ACCESS_KEY"] = minio_config.get("secret_key")
-
-        yield
-        env_vars_to_clean = [
-            "TENANT_ID",
-            "STORAGE_TYPE",
-            "AWS_S3_ENDPOINT",
-            "AWS_S3_BUCKET",
-            "AWS_S3_REGION",
-            "AWS_ACCESS_KEY_ID",
-            "AWS_SECRET_ACCESS_KEY",
-        ]
-
-        for var in env_vars_to_clean:
-            if var in os.environ:
-                del os.environ[var]
+        curr_datetime = datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S%f")
+        fk = f"{test_tenant_id}/{test_tenant_id}-okapi-permissions-{curr_datetime}.json.gz"
+        yield from MinioTestHelper.put_jsongz_object(minio_client, test_s3_bucket, fk, okapi_capabilities)
 
 
 class TestGenerateReportCommand(BaseTest):
@@ -61,6 +31,9 @@ class TestGenerateReportCommand(BaseTest):
     def test_generate_report(
         self,
         capsys: CaptureFixture,
+        s3_environment,
+        test_tenant_env,
+        eureka_role_load_strategy_env,
         okapi_permissions_s3_object,
     ):
         runner = CliRunner()
@@ -71,7 +44,7 @@ class TestGenerateReportCommand(BaseTest):
             assert result.exit_code == 0
 
             result_object = S3TenantStorage().find_object("eureka-migration-data-distributed", "json.gz")
-            file_path = Path("../resources/results/jsons/expected_eureka_migration_data.json")
+            file_path = Path("../resources/results/jsons/eureka-migration-data.json")
             expected_fp = Path(os.path.dirname(__file__)) / file_path
             expected_object = JsonUtils().read_string_safe(expected_fp)
             Assert.compare_json_str(result_object, expected_object)

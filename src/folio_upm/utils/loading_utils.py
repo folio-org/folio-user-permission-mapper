@@ -60,7 +60,6 @@ class PagedDataLoader:
         self._log.info("Loading paged data for '%s' and query: '%s'...", self._resource, self._query)
         result = []
         last_offset = 0
-
         while True:
             self._log.debug(
                 "Loading '%s' page: query='%s', limit=%s, offset=%s",
@@ -77,7 +76,6 @@ class PagedDataLoader:
             if last_load_size < self._batch_limit:
                 self._log.info("Paged data loading finished for '%s': total=%s", self._resource, len(result))
                 break
-
         return result
 
     def load_page(self, last_offset: int = 0) -> List[Any]:

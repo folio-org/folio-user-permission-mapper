@@ -1,0 +1,61 @@
+{
+  "roles": [
+    {
+      "role": {
+        "name": "Test Permission View (User-Defined)",
+        "description": "View test resources"
+      },
+      "permissionSets": [
+        {
+          "permissionName": "test-module.item.post",
+          "expandedFrom": [ ]
+        },
+        {
+          "permissionName": "perms.users.item.put",
+          "expandedFrom": [ ]
+        }
+      ],
+      "source": "d842e69d-9602-4b1f-af32-eda32d1a350c",
+      "users": [ "99eaae21-d7db-4b2c-a7b5-091f14a8b38a" ],
+      "usersCount": 1,
+      "systemGenerated": false,
+      "capabilitiesCount": 56,
+      "originalPermissionsCount": 2,
+      "expandedPermissionsCount": 2
+    }
+  ],
+  "userRoles": [
+    {
+      "userId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
+      "skipRoleAssignment": false,
+      "roleNames": [ "Test Permission View (User-Defined)" ]
+    }
+  ],
+  "roleCapabilities": [
+    {
+      "roleName": "Test Permission View (User-Defined)",
+      "capabilities": [
+        {
+          "resolvedType": "unknown",
+          "permissionName": "test-module.item.all",
+          "permissionType": "okapi",
+          "displayName": "Test Write Permission",
+          "expandedFrom": [ ]
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionName": "test-module.item.get",
+          "permissionType": "okapi",
+          "displayName": "Test Write Permission",
+          "expandedFrom": [ ]
+        },
+        {
+          "resolvedType": "unknown",
+          "permissionType": "extra",
+          "expandedFrom": [ ],
+          "name": "user-capabilities_collection.execute"
+        }
+      ]
+    }
+  ]
+}

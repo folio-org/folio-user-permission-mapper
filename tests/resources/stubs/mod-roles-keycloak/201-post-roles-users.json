@@ -1,0 +1,41 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/roles/users",
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "equalToJson": {
+          "userId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
+          "roleIds": [ "6dcc3288-abce-471f-9bd1-a9160a6c9524" ]
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "userRoles": [
+        {
+          "userId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
+          "roleId": "6dcc3288-abce-471f-9bd1-a9160a6c9524",
+          "metadata": {
+            "createdDate": "2024-06-10T12:00:00Z",
+            "createdByUserId": "6c26853a-4b0f-4732-b725-83111b13d364",
+            "updatedDate": "2024-06-10T12:00:00Z",
+            "updatedByUserId": "6c26853a-4b0f-4732-b725-83111b13d364"
+          }
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}

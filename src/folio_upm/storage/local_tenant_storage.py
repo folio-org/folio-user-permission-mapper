@@ -39,9 +39,8 @@ class LocalTenantStorage(TenantStorage, metaclass=SingletonMeta):
         self.__save_file_with_latest_included(object_name, data_bytes)
 
     @override
-    def _get_xlsx(self, object_name: str):
-        self._log.error("LocalTenantStorage._get_xlsx is not available.")
-        return None
+    def _get_xlsx(self, object_name: str) -> Optional[BytesIO]:
+        return self.__read_binary_data(object_name)
 
     def __save_file_with_latest_included(self, file_key, object_data):
         self.__write_binary_data(file_key, object_data)

@@ -9,8 +9,8 @@ class CapabilitySet(BaseModel):
     description: Optional[str] = None
     resource: str
     action: str
-    applicationId: str
-    moduleId: str
+    applicationId: Optional[str] = None
+    moduleId: Optional[str] = None
     capabilityType: Optional[str] = Field(alias="type", default=None)
     permission: str
     capabilities: List[str] = []

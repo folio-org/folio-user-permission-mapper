@@ -19,6 +19,6 @@ class EurekaMigrationService(metaclass=SingletonMeta):
         self._log.info("Eureka migration started...")
         return EurekaMigrationReport(
             roles=self._role_service.create_roles(eureka_data.roles),
-            roleCapabilities=self._role_capability_facade.assign_role_capabilities(eureka_data.roleCapabilities),
+            roleCapabilities=self._role_capability_facade.assign_role_entities(eureka_data.roleCapabilities),
             roleUsers=self._role_users_service.assign_users(eureka_data.userRoles),
         )

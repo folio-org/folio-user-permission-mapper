@@ -1,0 +1,53 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/capabilities",
+    "queryParameters": {
+      "query": {
+        "equalTo": "name==(\"user-capabilities_collection.execute\")"
+      },
+      "limit": {
+        "equalTo": "500"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "capabilities": [
+        {
+          "id": "8137af1b-7ca3-44f1-a58a-63748f1b293b",
+          "name": "user-capabilities_collection.execute",
+          "description": "Create a record associating one or more capabilities with user",
+          "resource": "User-Capabilities Collection",
+          "action": "execute",
+          "applicationId": "app-platform-minimal-2.0.24",
+          "moduleId": "mod-roles-keycloak-3.0.6",
+          "permission": "user-capabilities.collection.post",
+          "endpoints": [
+            {
+              "path": "/users/capabilities",
+              "method": "POST"
+            }
+          ],
+          "dummyCapability": false,
+          "type": "procedural",
+          "metadata": {
+            "createdDate": "2025-07-30T15:16:12.030+00:00",
+            "updatedDate": "2025-09-02T13:10:49.169+00:00"
+          }
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}

@@ -17,4 +17,4 @@ class RoleCapabilityService(RoleEntityService[Capability, RoleCapability], metac
             role_entity_client=RoleCapabilitiesClient(),
         )
         self._log = log_factory.get_logger(self.__class__.__name__)
-        self._log.info("RoleService initialized.")
+        self._log.debug("RoleCapabilityService initialized.")

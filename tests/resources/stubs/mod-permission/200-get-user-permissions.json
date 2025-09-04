@@ -9,6 +9,11 @@
       "limit": {
         "equalTo": "500"
       }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
     }
   },
   "response": {

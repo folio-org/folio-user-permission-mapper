@@ -1,6 +1,4 @@
-from typing import List, Tuple
-
-from black.lines import Callable
+from typing import List, Tuple, Callable
 
 from folio_upm.integration.services.role_capability_service import RoleCapabilityService
 from folio_upm.integration.services.role_capability_set_service import RoleCapabilitySetService
@@ -26,7 +24,7 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         self._rc_service = RoleCapabilityService()
         self._rcs_service = RoleCapabilitySetService()
 
-    def assign_role_capabilities(self, arc_list: List[AnalyzedRoleCapabilities]) -> List[HttpRequestResult]:
+    def assign_role_entities(self, arc_list: List[AnalyzedRoleCapabilities]) -> List[HttpRequestResult]:
         migration_results = list[HttpRequestResult]()
         role_capabilities_counter = 1
         total_role_capabilities = len(arc_list)
@@ -74,21 +72,23 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
 
         # gather capabilities by permission name
         ps_names = [x.permissionName for x in arc.capabilities if x.permissionName]
-        sets_by_ps, capabilities_by_ps, unmatched_ps = self.__find_by(ps_names, CQL.any_match_by_permission)
-        found_capabilities += capabilities_by_ps
-        found_capability_sets += sets_by_ps
-        unmatched_values += unmatched_ps
+        entities_by_ps_name = self.__find_by(ps_names, CQL.any_match_by_permission, lambda x: x.permission)
+        found_capabilities += entities_by_ps_name[1]
+        found_capability_sets += entities_by_ps_name[0]
+        unmatched_values += entities_by_ps_name[2]
 
         # gather extra capabilities by name (if eureka load result was not provided)
         capability_names = [x.name for x in arc.capabilities if not x.permissionName and x.name]
-        sets_by_name, capabilities_by_name, unmatched_names = self.__find_by(capability_names, CQL.any_match_by_name)
-        found_capabilities += capabilities_by_name
-        found_capability_sets += sets_by_name
-        unmatched_values += unmatched_names
-        unmatched_values = IterableUtils.unique_values(unmatched_names)
+        entities_by_name = self.__find_by(
+            capability_names, CQL.any_match_by_name, lambda x: x.name
+        )
+        found_capabilities += entities_by_name[1]
+        found_capability_sets += entities_by_name[0]
+        unmatched_values += entities_by_name[2]
+        unmatched_values = IterableUtils.unique_values(entities_by_name[2])
 
-        if unmatched_names:
-            self._log.warning("Unmatched entities found for role '%s': %s", arc.roleName, unmatched_names)
+        if unmatched_values:
+            self._log.warning("Unmatched entities found for role '%s': %s", arc.roleName, unmatched_values)
 
         return (
             IterableUtils.unique_values_by_key(found_capability_sets, lambda x: x.id),
@@ -97,17 +97,20 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         )
 
     def __find_by(
-        self, identifiers: List[str], query_builder_func: Callable[[List[str]], str]
+        self,
+        identifiers: List[str],
+        query_builder_func: Callable[[List[str]], str],
+        value_accessor: Callable[[Capability | CapabilitySet], str],
     ) -> Tuple[List[CapabilitySet], List[Capability], List[str]]:
 
         found_capability_sets = list[CapabilitySet]()
         unmatched_values = OrderedSet[str](identifiers)
         found_capability_sets += self._rcs_service.find_by(unmatched_values.to_list(), query_builder_func)
-        unmatched_values.remove_all([cs.permission for cs in found_capability_sets])
+        unmatched_values.remove_all([value_accessor(cs) for cs in found_capability_sets])
 
         found_capabilities = list[Capability]()
-        found_capabilities += self._rc_service.find_by(unmatched_values.to_list(), CQL.any_match_by_permission)
-        unmatched_values.remove_all([c.permission for c in found_capabilities])
+        found_capabilities += self._rc_service.find_by(unmatched_values.to_list(), query_builder_func)
+        unmatched_values.remove_all([value_accessor(c) for c in found_capabilities])
 
         return found_capability_sets, found_capabilities, unmatched_values.to_list()
 

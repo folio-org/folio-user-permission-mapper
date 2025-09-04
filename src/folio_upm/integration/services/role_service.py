@@ -46,7 +46,7 @@ class RoleService(metaclass=SingletonMeta):
             load_rs.append(self.__verify_and_create_role(ar, existing_role_names))
             self._log.info("Roles created: %s/%s", role_counter, total_roles)
             role_counter += 1
-        self._log.info("Roles created", role_counter)
+        self._log.info("Roles created: %s", role_counter)
         return load_rs
 
     def delete_roles(self, cleanup_records: List[HashRoleCleanupRecord]) -> List[HttpRequestResult]:

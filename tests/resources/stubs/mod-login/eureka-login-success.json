@@ -4,7 +4,7 @@
     "urlPath": "/authn/login-with-expiry",
     "headers": {
       "x-okapi-tenant": {
-        "equalTo": "okapi_test"
+        "equalTo": "test_tenant"
       }
     },
     "bodyPatterns": [

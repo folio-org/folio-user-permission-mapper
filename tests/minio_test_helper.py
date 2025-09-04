@@ -38,7 +38,7 @@ class MinioTestHelper:
         return minio_container.get_client()
 
     @staticmethod
-    def with_jsongz_object(minio_client: Minio, bucket_name: str, object_key: str, value: Any) -> Generator[str, None, None]:
+    def put_jsongz_object(minio_client: Minio, bucket_name: str, object_key: str, value: Any) -> Generator[str, None, None]:
         json_data = JsonUtils().to_json_gz(value)
         json_data.seek(0)
         minio_client.put_object(

@@ -13,7 +13,9 @@
           "permissionName": "test-module.item.post",
           "displayName": "Test Write Permission",
           "description": "Permission to write test data",
-          "subPermissions": [ "test-module.item.get" ]
+          "subPermissions": [
+            "test-module.item.get"
+          ]
         }
       ]
     }
@@ -35,7 +37,9 @@
       "permissionName": "test-module.item.post",
       "displayName": "Test Write Permission",
       "description": "Permission to write test data",
-      "subPermissions": [ "test-module.item.get" ],
+      "subPermissions": [
+        "test-module.item.get"
+      ],
       "childOf": [ ],
       "grantedTo": [ ],
       "mutable": false,
@@ -48,7 +52,9 @@
       "description": "perms.users.item.put",
       "subPermissions": [ ],
       "childOf": [ ],
-      "grantedTo": [ "141ec4f8-57a9-4a05-a1c6-60ff1fab4762" ],
+      "grantedTo": [
+        "141ec4f8-57a9-4a05-a1c6-60ff1fab4762"
+      ],
       "mutable": false,
       "visible": true
     },
@@ -57,9 +63,14 @@
       "permissionName": "d842e69d-9602-4b1f-af32-eda32d1a350c",
       "displayName": "Test Permission View (User-Defined)",
       "description": "View test resources",
-      "subPermissions": [ "test-module.item.post", "perms.users.item.put" ],
+      "subPermissions": [
+        "test-module.item.post",
+        "perms.users.item.put"
+      ],
       "childOf": [ ],
-      "grantedTo": [ "141ec4f8-57a9-4a05-a1c6-60ff1fab4762" ],
+      "grantedTo": [
+        "141ec4f8-57a9-4a05-a1c6-60ff1fab4762"
+      ],
       "mutable": true,
       "visible": true
     }
@@ -81,7 +92,9 @@
       "permissionName": "test-module.item.post",
       "displayName": "Test Write Permission",
       "description": "Permission to write test data",
-      "subPermissions": [ "test-module.item.get" ],
+      "subPermissions": [
+        "test-module.item.get"
+      ],
       "childOf": [ ],
       "grantedTo": [ ],
       "mutable": false,
@@ -94,7 +107,9 @@
       "description": "perms.users.item.put",
       "subPermissions": [ ],
       "childOf": [ ],
-      "grantedTo": [ "141ec4f8-57a9-4a05-a1c6-60ff1fab4762" ],
+      "grantedTo": [
+        "141ec4f8-57a9-4a05-a1c6-60ff1fab4762"
+      ],
       "mutable": false,
       "visible": true
     },
@@ -103,9 +118,15 @@
       "permissionName": "d842e69d-9602-4b1f-af32-eda32d1a350c",
       "displayName": "Test Permission View (User-Defined)",
       "description": "View test resources",
-      "subPermissions": [ "test-module.item.post", "test-module.item.get", "perms.users.item.put" ],
+      "subPermissions": [
+        "test-module.item.post",
+        "test-module.item.get",
+        "perms.users.item.put"
+      ],
       "childOf": [ ],
-      "grantedTo": [ "141ec4f8-57a9-4a05-a1c6-60ff1fab4762" ],
+      "grantedTo": [
+        "141ec4f8-57a9-4a05-a1c6-60ff1fab4762"
+      ],
       "mutable": true,
       "visible": true
     }
@@ -114,14 +135,20 @@
     {
       "id": "141ec4f8-57a9-4a05-a1c6-60ff1fab4762",
       "userId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
-      "permissions": [ "user.entity.view", "perms.users.item.put" ]
+      "permissions": [
+        "d842e69d-9602-4b1f-af32-eda32d1a350c",
+        "perms.users.item.put"
+      ]
     }
   ],
   "allPermissionUsersExpanded": [
     {
       "id": "141ec4f8-57a9-4a05-a1c6-60ff1fab4762",
       "userId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
-      "permissions": [ "user.entity.view", "perms.users.item.put" ]
+      "permissions": [
+        "d842e69d-9602-4b1f-af32-eda32d1a350c",
+        "perms.users.item.put"
+      ]
     }
   ]
 }

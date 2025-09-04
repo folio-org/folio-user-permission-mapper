@@ -16,15 +16,21 @@
         }
       ],
       "source": "d842e69d-9602-4b1f-af32-eda32d1a350c",
-      "users": [ ],
-      "usersCount": 0,
+      "users": [ "99eaae21-d7db-4b2c-a7b5-091f14a8b38a" ],
+      "usersCount": 1,
       "systemGenerated": false,
       "capabilitiesCount": 56,
       "originalPermissionsCount": 2,
       "expandedPermissionsCount": 2
     }
   ],
-  "userRoles": [ ],
+  "userRoles": [
+    {
+      "userId": "99eaae21-d7db-4b2c-a7b5-091f14a8b38a",
+      "skipRoleAssignment": false,
+      "roleNames": [ "Test Permission View (User-Defined)" ]
+    }
+  ],
   "roleCapabilities": [
     {
       "roleName": "Test Permission View (User-Defined)",

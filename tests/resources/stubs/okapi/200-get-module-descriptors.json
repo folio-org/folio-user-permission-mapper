@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/_/proxy/tenants/okapi_test/modules",
+    "urlPath": "/_/proxy/tenants/test_tenant/modules",
     "queryParameters": {
       "full": {
         "equalTo": "true"

@@ -1,0 +1,52 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/capabilities",
+    "queryParameters": {
+      "query": {
+        "equalTo": "permission==(\"test-module.item.get\")"
+      },
+      "limit": {
+        "equalTo": "500"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Okapi-Tenant": "test_tenant"
+    },
+    "jsonBody": {
+      "capabilities": [
+        {
+          "id": "004d6015-b98b-46ea-8645-87fdd1cbe0ad",
+          "name": "test-module.item.get",
+          "description": "Test-Module Item View",
+          "resource": "Test-Module Item",
+          "action": "view",
+          "applicationId": "app-platform-test-1.0.0",
+          "moduleId": "test-module-1.0.0",
+          "type": "data",
+          "permission": "test-module.item.get",
+          "endpoints": [
+            {
+                "path": "/items/{id}",
+                "method": "GET"
+            }
+          ],
+          "metadata": {
+            "createdDate": "2025-07-30T15:16:28.633+00:00",
+            "updatedDate": "2025-09-02T13:11:59.676+00:00"
+          }
+        }
+      ],
+      "totalRecords": 1
+    }
+  }
+}

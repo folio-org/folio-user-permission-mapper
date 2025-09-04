@@ -7,7 +7,12 @@
         "equalTo": "cql.allRecords=1"
       },
       "expanded": {
-        "equalTo": "true"
+        "equalTo": "false"
+      }
+    },
+    "headers": {
+      "x-okapi-tenant": {
+        "equalTo": "test_tenant"
       }
     }
   },
@@ -56,7 +61,7 @@
           "permissionName": "d842e69d-9602-4b1f-af32-eda32d1a350c",
           "displayName": "Test Permission View (User-Defined)",
           "description": "View test resources",
-          "subPermissions": [ "test-module.item.post", "test-module.item.get", "perms.users.item.put" ],
+          "subPermissions": [ "test-module.item.post", "perms.users.item.put" ],
           "childOf": [ ],
           "grantedTo": [ "141ec4f8-57a9-4a05-a1c6-60ff1fab4762" ],
           "mutable": true,

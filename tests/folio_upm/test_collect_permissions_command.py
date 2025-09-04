@@ -16,70 +16,32 @@ from wiremock_test_helper import WireMockTestHelper  # type: ignore[import-error
 
 class BaseTest:
 
-    @pytest.fixture(autouse=True, scope="function")
-    def setup_environment(self, wiremock_container, minio_container, minio_client, test_s3_bucket):
-        """Setup environment variables and clean up before each test."""
-        base_url = wiremock_container.get_url("")
-
-        minio_config = minio_container.get_config()
-
-        os.environ["OKAPI_URL"] = base_url
-        os.environ["TENANT_ID"] = "okapi_test"
-        os.environ["STORAGE_TYPE"] = "s3"
-        os.environ["AWS_S3_ENDPOINT"] = f"http://{minio_config.get("endpoint")}"
-        os.environ["AWS_S3_BUCKET"] = test_s3_bucket
-        os.environ["AWS_S3_REGION"] = "us-east-1"
-        os.environ["OKAPI_ADMIN_USERNAME"] = "test_okapi_admin"
-        os.environ["OKAPI_ADMIN_PASSWORD"] = "test_okapi_password"
-        os.environ["AWS_S3_REGION"] = "us-east-1"
-        os.environ["AWS_ACCESS_KEY_ID"] = minio_config.get("access_key")
-        os.environ["AWS_SECRET_ACCESS_KEY"] = minio_config.get("secret_key")
-
-        yield
-        env_vars_to_clean = [
-            "TENANT_ID",
-            "OKAPI_URL",
-            "OKAPI_ADMIN_USERNAME",
-            "OKAPI_ADMIN_PASSWORD",
-            "STORAGE_TYPE",
-            "AWS_S3_ENDPOINT",
-            "AWS_S3_BUCKET",
-            "AWS_S3_REGION",
-            "AWS_ACCESS_KEY_ID",
-            "AWS_SECRET_ACCESS_KEY",
-        ]
-
-        for var in env_vars_to_clean:
-            if var in os.environ:
-                del os.environ[var]
-
-    @pytest.fixture(scope="function", autouse=False)
-    def login_http_mock(self) -> Generator[Mapping, None, None]:
-        yield from WireMockTestHelper.set_mapping("mod-login/okapi-login-success.json")
-
     @pytest.fixture(scope="function", autouse=False)
     def okapi_desc_http_mock(self) -> Generator[Mapping, None, None]:
-        yield from WireMockTestHelper.set_mapping("okapi/200-module-descriptors.json")
+        yield from WireMockTestHelper.set_mapping("okapi/200-get-module-descriptors.json")
 
     @pytest.fixture(scope="function", autouse=False)
     def ps_http_mock(self) -> Generator[Mapping, None, None]:
-        yield from WireMockTestHelper.set_mapping("mod-permission/200-permissions.json")
+        yield from WireMockTestHelper.set_mapping("mod-permission/200-get-permissions.json")
 
     @pytest.fixture(scope="function", autouse=False)
     def ps_expanded_http_mock(self) -> Generator[Mapping, None, None]:
-        yield from WireMockTestHelper.set_mapping("mod-permission/200-permissions-expanded.json")
+        yield from WireMockTestHelper.set_mapping("mod-permission/200-get-permissions-expanded.json")
 
     @pytest.fixture(scope="function", autouse=False)
     def user_ps_http_mock(self) -> Generator[Mapping, None, None]:
-        yield from WireMockTestHelper.set_mapping("mod-permission/200-user-permissions.json")
+        yield from WireMockTestHelper.set_mapping("mod-permission/200-get-user-permissions.json")
 
 
 class TestCollectPermissionsCommand(BaseTest):
 
-    def test_load_okapi_permissions(
+    def test_collect_permissions(
         self,
         capsys: CaptureFixture,
-        login_http_mock,
+        test_tenant_env,
+        okapi_wiremock_env,
+        s3_environment,
+        okapi_login_http_mock,
         okapi_desc_http_mock,
         ps_http_mock,
         ps_expanded_http_mock,
@@ -88,12 +50,13 @@ class TestCollectPermissionsCommand(BaseTest):
         runner = CliRunner()
         with capsys.disabled() as _:
             result = runner.invoke(cli, ["collect-permissions"], color=True)
-            assert result.exit_code == 0
+
             if result.exception:
                 print(f"CLI failed as expected: {result.exception}")
+            assert result.exit_code == 0
 
             result_object = S3TenantStorage().find_object("okapi-permissions", "json.gz")
-            file_path = Path("../resources/results/jsons/expected_okapi_load_result.json")
+            file_path = Path("../resources/results/jsons/okapi-permissions.json")
             expected_fp = Path(os.path.dirname(__file__)) / file_path
             expected_object = JsonUtils().read_string_safe(expected_fp)
             Assert.compare_json_str(result_object, expected_object)

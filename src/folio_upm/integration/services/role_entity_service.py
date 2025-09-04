@@ -1,8 +1,7 @@
 import re
-from typing import Generic, List, TypeVar
+from typing import Generic, List, TypeVar, Callable
 
 import requests
-from black.lines import Callable
 
 from folio_upm.integration.clients.eureka.absract_role_entity_client import AbstractRoleEntityClient
 from folio_upm.integration.clients.eureka.abstract_entity_client import AbstractEntityClient
@@ -34,7 +33,6 @@ class RoleEntityService(Generic[C_TYPE, RC_TYPE], metaclass=SingletonMeta):
         role_entity_client: AbstractRoleEntityClient[RC_TYPE],
     ):
         self._log = log_factory.get_logger(self.__class__.__name__)
-        self._log.debug("RoleEntityService initialized.")
         self._name = resource_name
         self._entity_name = entity_name
         self._entity_client = entity_client
