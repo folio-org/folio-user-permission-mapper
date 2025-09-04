@@ -1,5 +1,5 @@
 from functools import reduce
-from typing import List, Set, Optional
+from typing import List, Optional, Set
 
 from folio_upm.model.analysis.analyzed_permission_set import AnalyzedPermissionSet
 from folio_upm.model.load.eureka_load_result import EurekaLoadResult

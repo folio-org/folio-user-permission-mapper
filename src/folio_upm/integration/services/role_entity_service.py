@@ -1,5 +1,5 @@
 import re
-from typing import Generic, List, TypeVar, Callable
+from typing import Callable, Generic, List, TypeVar
 
 import requests
 

@@ -1,4 +1,4 @@
-from typing import Any, Generic, List, Optional, TypeVar, Callable
+from typing import Any, Callable, Generic, List, Optional, TypeVar
 
 from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet

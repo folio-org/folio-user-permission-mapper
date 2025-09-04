@@ -4,10 +4,9 @@ import time
 from typing import Dict, Generator
 
 import pytest
-from wiremock.resources.mappings import Mapping
-
 from minio_test_helper import MinioTestHelper  # type: ignore[import-error]
 from wiremock.constants import Config
+from wiremock.resources.mappings import Mapping
 from wiremock_test_helper import WireMockTestHelper  # type: ignore[import-error]
 
 from folio_upm.model.cls_support import SingletonMeta

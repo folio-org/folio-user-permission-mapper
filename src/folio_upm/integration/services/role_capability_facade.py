@@ -1,4 +1,4 @@
-from typing import List, Tuple, Callable
+from typing import Callable, List, Tuple
 
 from folio_upm.integration.services.role_capability_service import RoleCapabilityService
 from folio_upm.integration.services.role_capability_set_service import RoleCapabilitySetService
@@ -79,9 +79,7 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
 
         # gather extra capabilities by name (if eureka load result was not provided)
         capability_names = [x.name for x in arc.capabilities if not x.permissionName and x.name]
-        entities_by_name = self.__find_by(
-            capability_names, CQL.any_match_by_name, lambda x: x.name
-        )
+        entities_by_name = self.__find_by(capability_names, CQL.any_match_by_name, lambda x: x.name)
         found_capabilities += entities_by_name[1]
         found_capability_sets += entities_by_name[0]
         unmatched_values += entities_by_name[2]
