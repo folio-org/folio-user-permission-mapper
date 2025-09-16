@@ -1,7 +1,7 @@
 FROM python:3.12 AS builder
 
 RUN python -m pip install --upgrade pip setuptools wheel \
-    && python -m pip install "poetry==1.8.5" \
+    && python -m pip install "poetry==2.1.3" \
     && python -m pip install "packaging>=24.2" "pkginfo>=1.12"
 
 WORKDIR /build
