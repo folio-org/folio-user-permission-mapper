@@ -51,7 +51,14 @@ class RoleUsersService(metaclass=SingletonMeta):
                 _result.append(self._create_skipped_result(user_id, role_placeholder, "Too many roles"))
             return _result
 
-        found_roles = self._roles_service.find_roles_by_names(role_names)
+        try:
+            found_roles = self._roles_service.find_roles_by_names(role_names)
+        except Exception as e:
+            self._log.error("Unexpected error while finding roles by names: %s", role_names, e)
+            err_message = f"Failed to find roles by name: {role_names}, {str(e)}"
+            error = DetailedHttpError(message=err_message, status=-1, responseBody="")
+            return [self.__create_error_result(user_id, None, error)]
+
         found_role_names = self.__get_role_names(found_roles)
         unmatched_roles = OrderedSet[str](role_names).remove_all(found_role_names).to_list()
         role_ids = [r.id for r in found_roles if r if r.id]
@@ -63,6 +70,11 @@ class RoleUsersService(metaclass=SingletonMeta):
             return self.__assign_role_users(user_id, role_ids, roles_by_ids)
         except requests.HTTPError as err:
             return self.__handle_error_response(user_id, role_ids, roles_by_ids, err)
+        except Exception as e:
+            self._log.error("Unexpected error while assigning roles: %s", str(e))
+            error_msg = f"Unexpected error while assigning roles to user: {str(e)}"
+            error = DetailedHttpError(message=error_msg, status=-1, responseBody="")
+            return [self.__create_error_result(user_id, None, error)]
 
     def __assign_role_users(self, user_id: str, role_ids: List[str], roles_dict: dict[str, Role]) -> List:
         self._log.debug("Assigning user to roles '%s': %s", user_id, role_ids)

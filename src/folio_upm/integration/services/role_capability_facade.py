@@ -31,11 +31,29 @@ class RoleCapabilityFacade(metaclass=SingletonMeta):
         self._log.info("Total role capabilities to assign: %s", total_role_capabilities)
         for analyzed_role_capabilities in arc_list:
             role_name = analyzed_role_capabilities.roleName
-            role_by_name = self._role_service.find_role_by_name(role_name)
+
+            try:
+                role_by_name = self._role_service.find_role_by_name(role_name)
+            except Exception as e:
+                self._log.error("Unexpected error while finding role by name: %s", role_name, e)
+                err_message = f"Failed to find role by name: {role_name}, {str(e)}"
+                http_request_result = HttpRequestResult(
+                    status="error",
+                    srcEntityName="role",
+                    srcEntityId=role_name,
+                    tarEntityName="role-capability | role-capability-set",
+                    tarEntityId=None,
+                    reason=err_message,
+                )
+
+                migration_results.append(http_request_result)
+                continue
+
             if role_by_name is None:
                 self._log.warning("Role '%s' not found by name, skipping capability assignment...", role_name)
                 migration_results.append(HttpRequestResult.role_capability_not_found_result(role_name))
                 continue
+
             capability_sets, capabilities, issues = self.__find_role_entities(analyzed_role_capabilities)
             migration_results += [self.__create_unmatched_result(role_by_name, i) for i in issues]
             role_capability_assign_rs = self._rc_service.assign_to_role(role_by_name, capabilities)

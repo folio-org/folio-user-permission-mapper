@@ -5,6 +5,9 @@
     "queryParameters": {
       "query": {
         "equalTo": "cql.allRecords=1"
+      },
+      "limit": {
+        "equalTo": "500"
       }
     },
     "headers": {

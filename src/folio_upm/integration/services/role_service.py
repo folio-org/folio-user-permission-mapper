@@ -100,6 +100,10 @@ class RoleService(metaclass=SingletonMeta):
                 self._log.info("Role '%s' already exists in 'mod-roles-keycloak'.", role_name)
             self._log.warning("Failed to create role '%s': %s, responseBody: %s", role_name, e, e.response.text)
             return HttpRequestResult.for_role(role, status, "Failed to perform request", error)
+        except Exception as e:
+            self._log.error("Unexpected error during role creation '%s': %s", role_name, e)
+            error = DetailedHttpError(message=str(e), status=-1)
+            return HttpRequestResult.for_role(role, "error", "Failed to perform request", error)
 
     def __delete_role_safe(self, role_id: str) -> HttpRequestResult:
         try:
@@ -113,6 +117,11 @@ class RoleService(metaclass=SingletonMeta):
             status = "not_found" if resp.status_code == 404 else "error"
             self._log.warning("Failed to remove role '%s': %s, responseBody: %s", role_id, e, e.response.text)
             return HttpRequestResult.for_removed_role(role_id, status, "Failed to perform request", error)
+        except Exception as e:
+            self._log.error("Unexpected error during role removal '%s': %s", role_id, e)
+            error_message = f"Unexpected error during role removal: {str(e)}"
+            error = DetailedHttpError(message=error_message, status=-1)
+            return HttpRequestResult.for_removed_role(role_id, "error", "Failed to perform request", error)
 
     @staticmethod
     def __should_delete(role: HashRoleCleanupRecord) -> bool:

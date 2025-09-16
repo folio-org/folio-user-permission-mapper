@@ -87,6 +87,11 @@ class RoleEntityService(Generic[C_TYPE, RC_TYPE], metaclass=SingletonMeta):
             self._log.error("Request error while updating role-%s for role '%s': %s", self._name, role.name, req_error)
             error_rs = DetailedHttpError(message=str(req_error), status=0)
             return [self._create_error_assignment_result(role, entity_id, error_rs) for entity_id in entity_ids]
+        except Exception as e:
+            self._log.error("Error while assigning role-%s for role '%s': %s", self._name, role.name, entity_ids, e)
+            error_msg = f"Error while assigning role-{self._name} for role '{role.name}': {entity_ids}: {str(e)}"
+            error = DetailedHttpError(message=error_msg, status=-1, responseBody="")
+            return [self._create_error_assignment_result(role, entity_id, error) for entity_id in entity_ids]
 
     def update(self, role: Role, entity_ids: List[str]) -> List[HttpRequestResult]:
         """
@@ -115,6 +120,11 @@ class RoleEntityService(Generic[C_TYPE, RC_TYPE], metaclass=SingletonMeta):
             self._log.error("Request error while updating role-%s for role '%s': %s", self._name, role.name, req_error)
             error_rs = DetailedHttpError(message=str(req_error), status=0)
             return self._create_error_update_results(role, entity_ids, error_rs)
+        except Exception as e:
+            self._log.error("Error while updating role-%s for role '%s': %s", self._name, role.name, entity_ids, e)
+            error_msg = f"Error while updating role-{self._name} for role '{role.name}': {entity_ids}: {str(e)}"
+            error = DetailedHttpError(message=error_msg, status=-1, responseBody="")
+            return [self._create_error_assignment_result(role, entity_id, error) for entity_id in entity_ids]
 
     def __assign_entity_ids_to_role(self, role: Role, entity_ids: List[str]) -> List[HttpRequestResult]:
         role_id = role.id
