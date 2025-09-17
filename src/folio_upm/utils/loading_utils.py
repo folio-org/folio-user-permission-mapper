@@ -34,7 +34,14 @@ class PartitionedDataLoader:
 
             query = self._query_builder(partition)
             self._log.debug("Loading partitioned data ('%s') for query: '%s'", self._resource, query)
-            loaded_data = self._data_loader(query)
+            try:
+                loaded_data = self._data_loader(query)
+            except Exception as e:
+                self._log.error(
+                    "Failed to load partitioned data for '%s' and query: '%s': %s", self._resource, query, e
+                )
+                loaded_data = []
+
             self._log.debug("Partitioned data loaded '%s': records=%s", self._resource, len(loaded_data))
             result += loaded_data
         self._log.info("Partitioned data loading finished for '%s': total=%d", self._resource, len(result))
@@ -82,5 +89,5 @@ class PagedDataLoader:
         try:
             return self._loader_func(self._query, self._batch_limit, last_offset)
         except Exception as e:
-            self._log.warning("Failed to load page for '%s': %s", self._resource, e)
+            self._log.error("Failed to load page for '%s': %s", self._resource, e)
             return []

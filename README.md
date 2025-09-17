@@ -437,6 +437,9 @@ You can use a `.env` file to manage these variables.
 | ENABLED_STORAGES       | s3            | false    | Enabled storage for data loading and report output (one of: local, s3) |
 | ENABLE_REPORT_COLORING | false         | false    | Boolean value, defines if row colors will be applied for xlsx reports  |
 | ACCESS_TOKEN_TTL       | 60            | false    | TTL for access token refresh                                           |
+| HTTP_CLIENT_TIMEOUT    | 300           | false    | Request timeout in second (default is 5 min)                           |
+| LOG_ERROR_STACKTRACE   | false         | false    | Defines if error stacktrace must be included in log messages           |
+| QUERY_CHUNK_SIZE       | 50            | false    | Number of identifier (id, name) per CQL query                          |
 
 
 ### Environment Variables (S3 Storage)
@@ -457,9 +460,9 @@ This environment variables are used to configure the connection to AWS S3 or a c
 
 This environment variables are used to configure the local storage for the CLI tool.
 
-| Env Variable         | Default Value | Required | Description                                    |
-|:---------------------|:--------------|:---------|:-----------------------------------------------|
-| STORAGE_LOCAL_FOLDER | `./.temp`     | false    | Path to directory where results will be stored |
+| Env Variable         | Default Value | Required | Description                                                      |
+|:---------------------|:--------------|:---------|:-----------------------------------------------------------------|
+| STORAGE_LOCAL_FOLDER | `./.temp`     | false    | Path to directory where results will be stored (not implemented) |
 
 ---
 
