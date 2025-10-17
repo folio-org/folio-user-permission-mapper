@@ -32,7 +32,7 @@ class RoleLengthVerifier(metaclass=SingletonMeta):
     @cache  # noqa: B019
     def read_private_key(self):
         key_name = "test_private_key.pem"
-        key_path = Path(f"../../resources/role-length-test-data/{key_name}")
+        key_path = Path(f"../../folio_upm_resource/role-length-test-data/{key_name}")
         full_file_path = self._curr_dir / key_path
         self._log.debug("Reading test private key: %s", full_file_path)
         with open(full_file_path, "rb") as f:
@@ -41,5 +41,5 @@ class RoleLengthVerifier(metaclass=SingletonMeta):
     @cache  # noqa: B019
     def read_sample_payload(self):
         file_name = "sample-payload.json"
-        file_path = self._curr_dir / Path(f"../../resources/role-length-test-data/{file_name}")
+        file_path = self._curr_dir / Path(f"../../folio_upm_resource/role-length-test-data/{file_name}")
         return JsonUtils().read_string_safe(file_path)
