@@ -14,7 +14,7 @@ class PermissionService(metaclass=SingletonMeta):
         self._client = PermissionsClient()
 
     def load_all_permissions_by_query(self, query: str, expanded=False):
-        data_loader = PagedDataLoader("permissions", self.__load_ps_page(expanded), query)
+        data_loader = PagedDataLoader("permissions", self.__load_ps_page(expanded), query, batch_limit=100000)
         return data_loader.load()
 
     def load_permission_users(self, permissions):
