@@ -16,17 +16,17 @@ folio-permission-migration-cli = "folio_upm.cli:cli"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-boto3 = "^1.40.54"
+boto3 = "^1.42.12"
 dotenv = "^0.9.9"
 requests = "^2.32.5"
 poetry-core = "^2.2.0"
-click = "^8.2.1"
+click = "^8.3.1"
 openpyxl = "^3.1.5"
-pydantic = "^2.12.2"
-cachetools = "^6.2.0"
+pydantic = "^2.12.5"
+cachetools = "^6.2.4"
 cryptography = "^46.0.3"
 pyjwt = "^2.10.1"
-mypy-boto3-s3 = "^1.40.26"
+mypy-boto3-s3 = "^1.42.10"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.2.0"
