@@ -179,3 +179,8 @@ cython_debug/
 .temp
 **/.temp/
 **/tmp/
+
+# AI
+.claude/
+.codemie/
+.agents/
