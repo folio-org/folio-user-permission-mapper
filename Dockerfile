@@ -1,4 +1,4 @@
-FROM python:3.12 AS builder
+FROM python:3.14 AS builder
 
 RUN pip install poetry
 WORKDIR /build
@@ -8,7 +8,7 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction --no-ansi
 RUN poetry build -f wheel
 
-FROM python:3.12-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 WORKDIR /app
 COPY --from=builder /build/dist/*.whl /app/

@@ -61,7 +61,7 @@ for further analysis.
 
 ## Prerequisites
 
-- Python 3.12 or higher
+- Python 3.14 or higher
 - Poetry for dependency management (if installed from source)
   https://python-poetry.org/docs/
 
@@ -80,7 +80,7 @@ command.
 
 ## Prerequisites
 
-- Python 3.12 or higher
+- Python 3.14 or higher
 - Poetry for dependency management
 
 ## Steps
