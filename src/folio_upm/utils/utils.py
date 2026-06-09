@@ -1,6 +1,6 @@
 import random
 import string
-from typing import Optional, TypeVar
+from typing import Any, Callable, Optional, TypeVar
 
 from folio_upm.model.okapi.permission_set import PermissionSet
 
@@ -16,14 +16,14 @@ class Utils:
         return chr(0x2705) if value else chr(0x2BBD)
 
     @staticmethod
-    def safe_cast[T](val, to_type: type[T], default: T | None = None) -> T | None:
+    def safe_cast[T](val: Any, to_type: Callable[[Any], T], default: T | None = None) -> T | None:
         try:
             return to_type(val)
         except (ValueError, TypeError):
             return default
 
     @staticmethod
-    def random_string(length):
+    def random_string(length: int):
         characters = string.ascii_letters + string.digits
         random_string = "".join(random.choices(characters, k=length))
         return random_string

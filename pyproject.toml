@@ -15,31 +15,31 @@ packages = [
 folio-permission-migration-cli = "folio_upm.cli:cli"
 
 [tool.poetry.dependencies]
-python = "^3.12"
-boto3 = "^1.42.12"
+python = "^3.14"
+boto3 = "^1.43.25"
 dotenv = "^0.9.9"
-requests = "^2.32.5"
-poetry-core = "^2.2.0"
-click = "^8.3.1"
+requests = "^2.34.2"
+poetry-core = "^2.4.1"
+click = "^8.4.1"
 openpyxl = "^3.1.5"
-pydantic = "^2.12.5"
-cachetools = "^6.2.4"
-cryptography = "^46.0.5"
-pyjwt = "^2.10.1"
-mypy-boto3-s3 = "^1.42.10"
+pydantic = "^2.13.4"
+cachetools = "^7.1.4"
+cryptography = "^48.0.0"
+pyjwt = "^2.13.0"
+mypy-boto3-s3 = "^1.43.14"
 
 [tool.poetry.group.dev.dependencies]
-flake8 = "^7.2.0"
-flake8-bugbear = "^24.12.12"
-black = "^25.1.0"
-isort = "^7.0.0"
-pytest = "^8.4.1"
-types-cachetools = "^6.0.0.20250525"
+flake8 = "^7.3.0"
+flake8-bugbear = "^25.11.29"
+black = "^26.5.1"
+isort = "^8.0.1"
+pytest = "^9.0.3"
+types-cachetools = "^7.0.0.20260518"
 types-click = "^7.1.8"
-boto3-stubs = "^1.40.7"
-pyrefly = "^0.37.0"
-types-openpyxl = "^3.1.5.20250602"
-testcontainers = { extras = ["minio"], version = "^4.13.2" }
+boto3-stubs = "^1.43.14"
+pyrefly = "^1.0.0"
+types-openpyxl = "^3.1.5.20260518"
+testcontainers = { extras = ["minio"], version = "^4.14.2" }
 wiremock = "^2.7.0"
 
 [tool.black]
@@ -57,7 +57,7 @@ log_date_format = "%Y-%m-%d %H:%M:%S"
 
 [tool.pyrefly]
 project-includes = ["**/*"]
-project-excludes = ['**/*venv/**\*', '**/tmp/**\*']
+project-excludes = ['**/*venv/**', '**/tmp/**']
 
 [build-system]
 requires = ["poetry-core"]
