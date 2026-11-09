@@ -41,10 +41,6 @@ class TestDataProvider:
 
 class TestLoadResultAnalyzer:
 
-    @pytest.fixture(autouse=True, scope="class")
-    def setup_clss(self, clear_singletons) -> None:
-        pass
-
     @pytest.fixture(autouse=True)
     def set_environment_variables(self):
         os.environ["TENANT_ID"] = "test_tenant"
