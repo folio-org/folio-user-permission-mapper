@@ -66,13 +66,13 @@ def minio_client(minio_container):
 @pytest.fixture(scope="function")
 def test_s3_bucket(minio_client):
     bucket_name = "test-bucket"
-    minio_client.make_bucket(bucket_name)
+    minio_client.create_bucket(Bucket=bucket_name)
     yield bucket_name
 
-    objects = minio_client.list_objects(bucket_name, recursive=True)
-    for obj in objects:
-        minio_client.remove_object(bucket_name, obj.object_name)
-    minio_client.remove_bucket(bucket_name)
+    for page in minio_client.get_paginator("list_objects_v2").paginate(Bucket=bucket_name):
+        for obj in page.get("Contents", []):
+            minio_client.delete_object(Bucket=bucket_name, Key=obj["Key"])
+    minio_client.delete_bucket(Bucket=bucket_name)
 
 
 @pytest.fixture(scope="function")

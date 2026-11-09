@@ -21,10 +21,6 @@ class TestExtraPermissionsProvider:
 
     _extra_ps_service: ExtraPermissionsService
 
-    @pytest.fixture(autouse=True, scope="class")
-    def setup_clss(self, clear_singletons) -> None:
-        pass
-
     @pytest.fixture(autouse=True)
     def setup(self, clear_singletons) -> Generator:
         service_name = "folio_upm.services.extra_permissions_service.ExtraPermissionSetDataProvider"

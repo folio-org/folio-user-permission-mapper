@@ -19,7 +19,7 @@ class Utils:
     def safe_cast[T](val: Any, to_type: Callable[[Any], T], default: T | None = None) -> T | None:
         try:
             return to_type(val)
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             return default
 
     @staticmethod
